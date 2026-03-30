@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOPHIE: Vocab Master</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>🎧 SOPHIE: Vocab Master</h1>
+            <p>Hands-free learning universe</p>
+        </header>
+
+        <main class="grid-layout">
+            <section class="card input-col">
+                <div class="card-header">
+                    <span class="icon">📥</span>
+                    <h2>Input</h2>
+                </div>
+                <textarea id="textInput" placeholder="Paste your text here (French & German)..."></textarea>
+                <button id="processBtn" class="primary-btn">Process Lesson</button>
+            </section>
+
+            <section class="card lab-col">
+                <div class="card-header">
+                    <span class="icon">🧪</span>
+                    <h2>Lab</h2>
+                </div>
+                <div id="labList" class="list-container">
+                    </div>
+                <button id="playSession" class="play-btn">▶ Play Hands-Free</button>
+            </section>
+
+            <section class="card gallery-col">
+                <div class="card-header">
+                    <span class="icon">🖼️</span>
+                    <h2>Gallery</h2>
+                </div>
+                <div id="notebookGallery" class="notebook-grid">
+                    </div>
+                <button id="exportBtn" class="secondary-btn">Export (.json)</button>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
