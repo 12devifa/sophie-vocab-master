@@ -16,12 +16,20 @@
         </header>
 
         <main class="grid-layout">
-            <section class="card input-col">
+<section class="card input-col">
                 <div class="card-header">
                     <span class="icon">📥</span>
                     <h2>Input</h2>
                 </div>
-                <textarea id="textInput" placeholder="Paste your text here (French & German)..."></textarea>
+                <textarea id="textInput" placeholder="Escribe o pega aquí..."></textarea>
+                
+                <div class="file-actions" style="margin: 10px 0; display: flex; gap: 10px;">
+                    <label for="fileUpload" class="secondary-btn" style="flex: 1; text-align: center; cursor: pointer; padding: 8px; font-size: 14px; border: 1px solid #dadce0; border-radius: 20px;">
+                        📄 Subir PDF/TXT
+                    </label>
+                    <input type="file" id="fileUpload" accept=".pdf,.txt" style="display: none;">
+                </div>
+
                 <button id="processBtn" class="primary-btn">Process Lesson</button>
             </section>
 
@@ -47,5 +55,6 @@
         </main>
     </div>
     <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 </body>
 </html>
