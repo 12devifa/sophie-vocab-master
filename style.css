@@ -90,3 +90,31 @@ button {
 .secondary-btn { background: #f8f9fa; border: 1px solid var(--border-color); }
 
 button:hover { opacity: 0.9; transform: translateY(-1px); }
+/* --- Ajustes para Móvil (iPhone/Android) --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        align-items: flex-start; /* Evita que se centre verticalmente y "salte" */
+    }
+
+    .grid-layout {
+        display: flex;
+        flex-direction: column; /* De 3 columnas a una lista vertical */
+        gap: 15px;
+        height: auto; /* Permite que la pantalla crezca hacia abajo */
+    }
+
+    .card {
+        min-height: 300px; /* Tamaño cómodo para tocar con el dedo */
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Evitar el zoom azul al tocar botones en iOS */
+    button, textarea {
+        -webkit-tap-highlight-color: transparent;
+        font-size: 16px !important; /* iOS no hace zoom si la letra es de 16px o más */
+    }
+}
