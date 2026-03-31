@@ -10,12 +10,19 @@ window.addEventListener('DOMContentLoaded', () => {
     savedLessons.forEach(lesson => createCardUI(lesson.content, lesson.date));
 });
 
-// --- 2. LECTOR DE ARCHIVOS (PDF/TXT) ---
+// --- 2. LECTOR DE ARCHIVOS (PDF/TXT/IMÁGENES) ---
 fileUpload.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.type === "application/pdf") {
+    processBtn.innerText = "⌛ Leyendo...";
+    
+    if (file.type.startsWith("image/")) {
+        // Magia OCR para fotos
+        const result = await Tesseract.recognize(file, 'fra+deu'); 
+        textInput.value = result.data.text;
+    } else if (file.type === "application/pdf") {
+        // Lector PDF
         const reader = new FileReader();
         reader.onload = async function() {
             const typedarray = new Uint8Array(this.result);
@@ -33,6 +40,7 @@ fileUpload.addEventListener('change', async (e) => {
         const text = await file.text();
         textInput.value = text;
     }
+    processBtn.innerText = "Process Lesson";
 });
 
 // --- 3. MULTILENGUAJE INTELIGENTE ---
