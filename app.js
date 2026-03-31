@@ -41,15 +41,25 @@ processBtn.addEventListener('click', () => {
     saveToGallery(rawText);
 });
 
-// 3. Función para Guardar en Galería (Estilo NotebookLM)
+// 3. Función para Guardar en Galería (Sin duplicados)
 function saveToGallery(content) {
+    const title = content.split('\n')[0].substring(0, 20).trim() + "...";
+    
+    // --- Comprobamos si ya existe una tarjeta con este título ---
+    const existingCards = Array.from(notebookGallery.querySelectorAll('.notebook-card'));
+    const isDuplicate = existingCards.some(card => {
+        const cardTitle = card.querySelector('div:nth-child(2)');
+        return cardTitle && cardTitle.innerText === title;
+    });
+    
+    if (isDuplicate) return; 
+
     const date = new Date().toLocaleDateString();
     const emoji = getEmoji(content);
-    const title = content.split('\n')[0].substring(0, 20) + "...";
 
     const card = document.createElement('div');
     card.className = 'notebook-card';
-    card.style.background = "#e3f2fd"; // Azul pastel
+    card.style.background = "#e3f2fd"; 
     card.style.padding = "15px";
     card.style.borderRadius = "12px";
     card.style.marginBottom = "10px";
@@ -62,10 +72,21 @@ function saveToGallery(content) {
         <div style="font-size: 0.7rem; color: #555;">${date}</div>
     `;
 
-    // Al hacer clic en la tarjeta, se recarga esa lección
     card.onclick = () => {
         textInput.value = content;
-        processBtn.click();
+        const lines = content.split('\n');
+        labList.innerHTML = '';
+        lines.forEach(line => {
+            let parts = line.includes('→') ? line.split('→') : line.includes('\t') ? line.split('\t') : line.split('-');
+            if (parts.length >= 2) {
+                const row = document.createElement('div');
+                row.className = 'lab-row';
+                row.style.padding = "10px";
+                row.style.borderBottom = "1px solid #eee";
+                row.innerHTML = `<span class="fr">🇫🇷 ${parts[0].trim()}</span> <span style="color:#aaa"> → </span> <span class="de">🇩🇪 ${parts[1].trim()}</span>`;
+                labList.appendChild(row);
+            }
+        });
     };
 
     notebookGallery.prepend(card);
