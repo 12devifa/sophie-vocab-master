@@ -152,3 +152,66 @@ button:hover { opacity: 0.9; transform: translateY(-1px); }
 .notebook-card:hover .del {
     opacity: 1;
 }
+/* Pantalla completa del Quiz */
+.quiz-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #ffffff;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Empezamos desde arriba para que el teclado no tape */
+    z-index: 3000;
+    padding-top: 60px; /* Espacio para que no choque con la hora del iPhone */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* La tarjeta con la pregunta */
+.quiz-card {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding: 30px 20px;
+    background: #f3e5f5; /* Un lila muy suave */
+    border-radius: 20px;
+    width: 85%;
+    box-shadow: 0 4px 15px rgba(103, 58, 183, 0.1);
+    color: #311b92;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* El campo de escritura */
+#quizInput {
+    padding: 15px;
+    width: 80%;
+    font-size: 1.2rem;
+    border-radius: 15px;
+    border: 2px solid #673ab7;
+    margin-bottom: 20px;
+    outline: none;
+    background: #fff;
+    -webkit-appearance: none; /* Quita sombras raras en iOS */
+}
+
+/* Botón de Comprobar */
+#checkBtn {
+    background: #673ab7 !important;
+    color: white !important;
+    width: 85% !important;
+    padding: 15px !important;
+    border-radius: 15px !important;
+    font-size: 1.1rem !important;
+    border: none !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Botón de cerrar */
+#closeQuiz {
+    margin-top: 30px;
+    color: #999;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
