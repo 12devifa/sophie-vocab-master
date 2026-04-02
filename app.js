@@ -144,3 +144,55 @@ document.getElementById('playSession').onclick = async () => {
         row.style.background = "transparent";
     }
 };
+const quizBtn = document.getElementById('quizBtn');
+
+// Crear la pantalla de Quiz en el documento
+const quizOverlay = document.createElement('div');
+quizOverlay.className = 'quiz-overlay';
+quizOverlay.innerHTML = `
+    <div style="position:absolute; top:40px; font-weight:bold; color:#673ab7;">SOPHIE QUIZ 🧠</div>
+    <div id="quizQuestion" class="quiz-card">Cargando...</div>
+    <input type="text" id="quizInput" placeholder="Escribe la traducción..." autocomplete="off">
+    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Comprobar</button>
+    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Cerrar Examen</button>
+`;
+document.body.appendChild(quizOverlay);
+
+let currentCorrectAnswer = "";
+
+quizBtn.onclick = () => {
+    const rows = document.querySelectorAll('.lab-row');
+    if (rows.length === 0) return alert("¡Sube una lección primero para poder examinarte!");
+    
+    quizOverlay.style.display = 'flex';
+    nextQuestion();
+};
+
+function nextQuestion() {
+    const rows = document.querySelectorAll('.lab-row');
+    const randomRow = rows[Math.floor(Math.random() * rows.length)];
+    
+    // Mostramos Francés, preguntamos Alemán
+    document.getElementById('quizQuestion').innerText = `¿Cómo se dice "${randomRow.dataset.fr}"?`;
+    currentCorrectAnswer = randomRow.dataset.de.toLowerCase().trim();
+    
+    const input = document.getElementById('quizInput');
+    input.value = "";
+    input.focus();
+}
+
+document.getElementById('checkBtn').onclick = () => {
+    const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
+    
+    if (userAns === currentCorrectAnswer) {
+        alert("¡Excelente! 🎉 Vas por buen camino.");
+        nextQuestion();
+    } else {
+        alert(`Casi... La respuesta correcta era: ${currentCorrectAnswer.toUpperCase()}`);
+        nextQuestion();
+    }
+};
+
+document.getElementById('closeQuiz').onclick = () => {
+    quizOverlay.style.display = 'none';
+};
