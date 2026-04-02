@@ -16,7 +16,8 @@ fileUpload.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    processBtn.innerText = "⌛ Leyendo...";
+   processBtn.classList.add('reading-mode');
+    processBtn.innerText = "⌛ SOPHIE está leyendo...";
     
     try {
         if (file.type.startsWith("image/")) {
@@ -42,6 +43,7 @@ fileUpload.addEventListener('change', async (e) => {
     } catch (err) {
         alert("Error al leer archivo");
     }
+    processBtn.classList.remove('reading-mode');
     processBtn.innerText = "Process Lesson";
 });
 
