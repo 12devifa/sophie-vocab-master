@@ -118,3 +118,37 @@ button:hover { opacity: 0.9; transform: translateY(-1px); }
         font-size: 16px !important; /* iOS no hace zoom si la letra es de 16px o más */
     }
 }
+/* Animación de carga para cuando Sophie lee fotos */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.reading-mode {
+    animation: pulse 1.5s infinite;
+    color: #1a73e8 !important;
+    font-weight: bold;
+}
+
+/* Tarjetas de Galería estilo Premium */
+.notebook-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0 !important;
+}
+
+.notebook-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Botón de borrar más elegante */
+.del {
+    transition: color 0.2s;
+    opacity: 0.3;
+}
+
+.notebook-card:hover .del {
+    opacity: 1;
+}
