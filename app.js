@@ -196,3 +196,18 @@ document.getElementById('checkBtn').onclick = () => {
 document.getElementById('closeQuiz').onclick = () => {
     quizOverlay.style.display = 'none';
 };
+function playMusic(type) {
+    const player = document.getElementById('bgMusic');
+    const sources = {
+        'classic': 'https://streaming.radio.co/s68673a628/listen', // Radio de piano/clásica
+        'focus': 'http://usa9.fastcast4u.com:8014/stream', // Deep Focus / Electrónica suave
+        'stop': ''
+    };
+    
+    if (type === 'stop') {
+        player.pause();
+    } else {
+        player.src = sources[type];
+        player.play();
+    }
+}
