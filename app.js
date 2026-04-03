@@ -200,12 +200,11 @@ function playMusic(type) {
     const player = document.getElementById('bgMusic');
     
     // Antenas de alta disponibilidad (Estilo Radio Suiza/Europea)
-    const sources = {
-        'classic': 'https://stream.radiojar.com/8s9u8p3p400uv', // Radio Clásica HD
-        'focus': 'https://icecast.walmradio.com:8000/ambient',   // Ambient Focus
+  const sources = {
+        'classic': 'https://actions.google.com/sounds/v1/ambiences/morning_birds.ogg', 
+        'focus': 'https://icecast.walmradio.com:8000/ambient',
         'stop': ''
     };
-
     if (type === 'stop') {
         player.pause();
         player.src = "";
