@@ -199,29 +199,27 @@ document.getElementById('closeQuiz').onclick = () => {
 function playMusic(type) {
     const player = document.getElementById('bgMusic');
     
-    // Antenas nuevas y estables para Europa
+    // Antenas de alta disponibilidad (Estilo Radio Suiza/Europea)
     const sources = {
-        'classic': 'https://streaming.radio.co/s68673a628/listen', 
-        'focus': 'https://icecast.walmradio.com:8000/ambient',
+        'classic': 'https://stream.radiojar.com/8s9u8p3p400uv', // Radio Clásica HD
+        'focus': 'https://icecast.walmradio.com:8000/ambient',   // Ambient Focus
         'stop': ''
     };
-    
+
     if (type === 'stop') {
         player.pause();
-        player.src = ""; 
+        player.src = "";
     } else {
         player.src = sources[type];
-        player.load(); // Esto prepara la antena
+        player.load(); // Esto conecta con la antena
         
-        // Intentamos reproducir
-        const playPromise = player.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log("Reproduciendo música... 🎶");
-            }).catch(error => {
-                console.log("Bloqueado por el navegador. Toca la pantalla primero.");
-            });
-        }
+        // Intentar sonar
+        player.play().then(() => {
+            console.log("¡Música sonando perfectamente! 🎶");
+        }).catch(err => {
+            console.log("Bloqueado. Toca la pantalla primero.");
+            // Pequeño truco: reintentar
+            player.play();
+        });
     }
 }
