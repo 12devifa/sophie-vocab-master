@@ -198,16 +198,30 @@ document.getElementById('closeQuiz').onclick = () => {
 };
 function playMusic(type) {
     const player = document.getElementById('bgMusic');
+    
+    // Antenas nuevas y estables para Europa
     const sources = {
-        'classic': 'https://streaming.radio.co/s68673a628/listen', // Radio de piano/clásica
-        'focus': 'http://usa9.fastcast4u.com:8014/stream', // Deep Focus / Electrónica suave
+        'classic': 'https://streaming.radio.co/s68673a628/listen', 
+        'focus': 'https://icecast.walmradio.com:8000/ambient',
         'stop': ''
     };
     
     if (type === 'stop') {
         player.pause();
+        player.src = ""; 
     } else {
         player.src = sources[type];
-        player.play();
+        player.load(); // Esto prepara la antena
+        
+        // Intentamos reproducir
+        const playPromise = player.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log("Reproduciendo música... 🎶");
+            }).catch(error => {
+                console.log("Bloqueado por el navegador. Toca la pantalla primero.");
+            });
+        }
     }
 }
