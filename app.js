@@ -205,13 +205,27 @@ function playMusic(type) {
         'focus': 'https://icecast.walmradio.com:8000/ambient',
         'stop': ''
     };
-    if (type === 'stop') {
+   if (type === 'stop') {
         player.pause();
         player.src = "";
     } else {
-        player.src = sources[type];
-        player.load(); // Esto conecta con la antena
+        // 1. Forzamos al navegador a reconocer la nueva antena
+        player.setAttribute('src', sources[type]);
+        player.load();
         
+        // 2. Intentamos reproducir inmediatamente (esto desbloquea el audio en iOS)
+        const playPromise = player.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log("Reproducción iniciada con éxito 🎶");
+            }).catch(error => {
+                console.log("El navegador bloqueó el audio. Toca la pantalla y reintenta.");
+                // Reintento automático
+                player.play();
+            });
+        }
+    }
         // Intentar sonar
         player.play().then(() => {
             console.log("¡Música sonando perfectamente! 🎶");
