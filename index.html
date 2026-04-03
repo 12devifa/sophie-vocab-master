@@ -7,12 +7,20 @@
     <link rel="stylesheet" href="style.css">
     <link rel="apple-touch-icon" href="https://fav.farm/🎧">
     <link rel="icon" href="https://fav.farm/🎧">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="app-container">
         <header>
             <h1>🎧 SOPHIE: Vocab Master</h1>
             <p>Hands-free learning universe</p>
+            <div class="music-player" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+    <button onclick="playMusic('classic')" style="background: rgba(255,255,255,0.2); border: 1px solid #ddd; border-radius: 20px; padding: 5px 15px; cursor: pointer; font-size: 0.8rem;">🎹 Clásica</button>
+    <button onclick="playMusic('focus')" style="background: rgba(255,255,255,0.2); border: 1px solid #ddd; border-radius: 20px; padding: 5px 15px; cursor: pointer; font-size: 0.8rem;">⚡ Deep Focus</button>
+    <button onclick="playMusic('stop')" style="background: none; border: none; cursor: pointer; font-size: 0.8rem;">🔇</button>
+</div>
+
+<audio id="bgMusic" loop></audio>
         </header>
 
         <main class="grid-layout">
