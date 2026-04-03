@@ -1,0 +1,15 @@
+{
+  "short_name": "SOPHIE",
+  "name": "SOPHIE: Vocab Master",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3406/3406830.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#673ab7",
+  "background_color": "#ffffff"
+}
