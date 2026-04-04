@@ -1,4 +1,17 @@
 // SOPHIE: Cerebro Final con OCR y Memoria
+// --- MEMORIA DE ELEFANTE AL CARGAR ---
+window.addEventListener('load', () => {
+    const savedText = localStorage.getItem('sophie_last_input');
+    if (savedText) {
+        document.getElementById('textInput').value = savedText;
+        console.log("SOPHIE recordó tu última lección 🐘");
+    }
+});
+
+// --- GUARDADO MIENTRAS ESCRIBES ---
+document.getElementById('textInput').addEventListener('input', (e) => {
+    localStorage.setItem('sophie_last_input', e.target.value);
+});
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
 const labList = document.getElementById('labList');
@@ -23,6 +36,7 @@ fileUpload.addEventListener('change', async (e) => {
         if (file.type.startsWith("image/")) {
             const result = await Tesseract.recognize(file, 'fra+deu');
             textInput.value = result.data.text;
+            localStorage.setItem('sophie_last_input', textInput.value);
         } else if (file.type === "application/pdf") {
             const reader = new FileReader();
             reader.onload = async function() {
@@ -34,7 +48,8 @@ fileUpload.addEventListener('change', async (e) => {
                     const text = await page.getTextContent();
                     fullText += text.items.map(s => s.str).join(' ') + "\n";
                 }
-                textInput.value = fullText;
+                textInput.value = fullText; 
+localStorage.setItem('sophie_last_input', fullText);
             };
             reader.readAsArrayBuffer(file);
         } else {
