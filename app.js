@@ -214,13 +214,14 @@ document.getElementById('closeQuiz').onclick = () => {
 function playMusic(type) {
     const player = document.getElementById('bgMusic');
     
-    // Antenas de alta disponibilidad (Estilo Radio Suiza/Europea)
-  const sources = {
+    // Antenas de alta disponibilidad
+    const sources = {
         'classic': 'https://actions.google.com/sounds/v1/ambiences/morning_birds.ogg', 
         'focus': 'https://icecast.walmradio.com:8000/ambient',
         'stop': ''
     };
-   if (type === 'stop') {
+
+    if (type === 'stop') {
         player.pause();
         player.src = "";
     } else {
@@ -228,26 +229,16 @@ function playMusic(type) {
         player.setAttribute('src', sources[type]);
         player.load();
         
-        // 2. Intentamos reproducir inmediatamente (esto desbloquea el audio en iOS)
+        // 2. Intentamos reproducir inmediatamente (Desbloqueo iOS)
         const playPromise = player.play();
         
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 console.log("Reproducción iniciada con éxito 🎶");
             }).catch(error => {
-                console.log("El navegador bloqueó el audio. Toca la pantalla y reintenta.");
-                // Reintento automático
+                console.log("Audio bloqueado. Toca la pantalla y reintenta.");
                 player.play();
             });
         }
-    }
-        // Intentar sonar
-        player.play().then(() => {
-            console.log("¡Música sonando perfectamente! 🎶");
-        }).catch(err => {
-            console.log("Bloqueado. Toca la pantalla primero.");
-            // Pequeño truco: reintentar
-            player.play();
-        });
     }
 }
