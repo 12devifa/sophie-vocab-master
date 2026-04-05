@@ -272,6 +272,7 @@ const themeToggle = document.getElementById('themeToggle');
 
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
+        alert("¡Botón pulsado correctamente! 🌙✨");
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
