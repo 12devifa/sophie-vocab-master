@@ -18,6 +18,26 @@
     --border-color: #333d4d;
 }
 
+/* --- FUERZA BRUTA PARA MODO OSCURO --- */
+[data-theme="dark"] body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .app-container, 
+[data-theme="dark"] .input-section, 
+[data-theme="dark"] .lab-section, 
+[data-theme="dark"] .notebook-card,
+[data-theme="dark"] .quiz-overlay {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] p {
+    color: var(--text-main) !important;
+}
+
 body {
     transition: background-color 0.3s ease, color 0.3s ease;
     font-family: 'Google Sans', Roboto, Arial, sans-serif;
