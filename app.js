@@ -1,3 +1,37 @@
+        // --- CEREBRO DEL MODO OSCURO (VERSIÓN RESISTENTE) ---
+const themeToggle = document.getElementById('themeToggle');
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        alert("¡Botón pulsado correctamente! 🌙✨");
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        
+        // Intentamos guardar, pero si está bloqueado, que no explote la app
+        try {
+            localStorage.setItem('sophie_theme', newTheme);
+        } catch (e) {
+            console.log("Storage bloqueado por el navegador");
+        }
+    });
+}
+
+// Al cargar, intentamos recordar con cuidado
+window.addEventListener('DOMContentLoaded', () => {
+    let savedTheme = 'light';
+    try {
+        savedTheme = localStorage.getItem('sophie_theme') || 'light';
+    } catch (e) {
+        console.log("No se pudo leer el tema guardado");
+    }
+    
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if(themeToggle) themeToggle.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+});
+
 // SOPHIE: Cerebro Final con OCR y Memoria
 // --- MEMORIA DE ELEFANTE AL CARGAR ---
 window.addEventListener('load', () => {
@@ -267,36 +301,3 @@ function playMusic(type) {
                 console.log("Audio bloqueado. Toca la pantalla y reintenta.");
                 player.play();
             });
-        // --- CEREBRO DEL MODO OSCURO (VERSIÓN RESISTENTE) ---
-const themeToggle = document.getElementById('themeToggle');
-
-if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        alert("¡Botón pulsado correctamente! 🌙✨");
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
-        
-        // Intentamos guardar, pero si está bloqueado, que no explote la app
-        try {
-            localStorage.setItem('sophie_theme', newTheme);
-        } catch (e) {
-            console.log("Storage bloqueado por el navegador");
-        }
-    });
-}
-
-// Al cargar, intentamos recordar con cuidado
-window.addEventListener('DOMContentLoaded', () => {
-    let savedTheme = 'light';
-    try {
-        savedTheme = localStorage.getItem('sophie_theme') || 'light';
-    } catch (e) {
-        console.log("No se pudo leer el tema guardado");
-    }
-    
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    if(themeToggle) themeToggle.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
-});
