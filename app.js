@@ -212,11 +212,10 @@ document.getElementById('playSession').onclick = async () => {
     btn.style.background = "#4caf50";
 };
 
-// --- 9. SISTEMA DE QUIZ ---
+// --- SISTEMA DE QUIZ ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
-   quizOverlay.innerHTML = `
     <div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
         SOPHIE QUIZ 🧠
     </div>
@@ -228,7 +227,6 @@ quizOverlay.innerHTML = `
 document.body.appendChild(quizOverlay);
 
 let currentCorrectAnswer = "";
-
 quizBtn.onclick = () => {
     const rows = document.querySelectorAll('.lab-row');
     if (rows.length === 0) return alert("¡Bitte lade zuerst eine Lektion hoch, um das Quiz zu starten!");
