@@ -220,7 +220,7 @@ quizOverlay.innerHTML = `
     <div id="quizQuestion" class="quiz-card">Lädt......</div>
     <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
     <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
-    <button id="Quiz beenden" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
+   <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
 `;
 document.body.appendChild(quizOverlay);
 
