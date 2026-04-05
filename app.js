@@ -1,16 +1,18 @@
-        // --- CEREBRO DEL MODO OSCURO (VERSIÓN RESISTENTE) ---
+// ==============================================================
+// SOPHIE: VOCAB MASTER - CEREBRO CENTRAL
+// ==============================================================
+
+// --- 1. MODO OSCURO (EL INTERRUPTOR MÁGICO) ---
 const themeToggle = document.getElementById('themeToggle');
 
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
-        alert("¡Botón pulsado correctamente! 🌙✨");
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
         document.documentElement.setAttribute('data-theme', newTheme);
         themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
         
-        // Intentamos guardar, pero si está bloqueado, que no explote la app
         try {
             localStorage.setItem('sophie_theme', newTheme);
         } catch (e) {
@@ -19,51 +21,47 @@ if (themeToggle) {
     });
 }
 
-// Al cargar, intentamos recordar con cuidado
+// --- 2. CARGA INICIAL (MEMORIA DE ELEFANTE) ---
 window.addEventListener('DOMContentLoaded', () => {
+    // Restaurar Tema
     let savedTheme = 'light';
     try {
         savedTheme = localStorage.getItem('sophie_theme') || 'light';
-    } catch (e) {
-        console.log("No se pudo leer el tema guardado");
-    }
-    
+    } catch (e) {}
     document.documentElement.setAttribute('data-theme', savedTheme);
     if(themeToggle) themeToggle.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
-});
 
-// SOPHIE: Cerebro Final con OCR y Memoria
-// --- MEMORIA DE ELEFANTE AL CARGAR ---
-window.addEventListener('load', () => {
+    // Restaurar Texto
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText) {
         document.getElementById('textInput').value = savedText;
         console.log("SOPHIE recordó tu última lección 🐘");
     }
+
+    // Restaurar Galería
+    const saved = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
+    saved.forEach(l => createCardUI(l.content, l.date));
 });
 
-// --- GUARDADO MIENTRAS ESCRIBES ---
-document.getElementById('textInput').addEventListener('input', (e) => {
-    localStorage.setItem('sophie_last_input', e.target.value);
-});
+// --- 3. REFERENCIAS DEL DOM ---
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
 const labList = document.getElementById('labList');
 const notebookGallery = document.getElementById('notebookGallery');
 const fileUpload = document.getElementById('fileUpload');
+const quizBtn = document.getElementById('quizBtn');
 
-// 1. Cargar Memoria al iniciar
-window.addEventListener('DOMContentLoaded', () => {
-    const saved = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
-    saved.forEach(l => createCardUI(l.content, l.date));
+// --- 4. GUARDADO MIENTRAS ESCRIBES ---
+textInput.addEventListener('input', (e) => {
+    localStorage.setItem('sophie_last_input', e.target.value);
 });
 
-// 2. Lector de Archivos y Fotos
+// --- 5. LECTOR DE ARCHIVOS Y FOTOS ---
 fileUpload.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-   processBtn.classList.add('reading-mode');
+    processBtn.classList.add('reading-mode');
     processBtn.innerText = "⌛ SOPHIE está leyendo...";
     
     try {
@@ -83,7 +81,7 @@ fileUpload.addEventListener('change', async (e) => {
                     fullText += text.items.map(s => s.str).join(' ') + "\n";
                 }
                 textInput.value = fullText; 
-localStorage.setItem('sophie_last_input', fullText);
+                localStorage.setItem('sophie_last_input', fullText);
             };
             reader.readAsArrayBuffer(file);
         } else {
@@ -96,7 +94,7 @@ localStorage.setItem('sophie_last_input', fullText);
     processBtn.innerText = "Process Lesson";
 });
 
-// 3. Procesar Texto (El corazón del Lab)
+// --- 6. PROCESAR TEXTO (LAB) ---
 processBtn.addEventListener('click', () => {
     const rawText = textInput.value;
     if (!rawText.trim()) return;
@@ -107,10 +105,7 @@ processBtn.addEventListener('click', () => {
     lines.forEach(line => {
         if (!line.trim()) return;
 
-        // Limpiamos fonética tipo [abc] para que no moleste
         let cleanLine = line.replace(/\[.*?\]/g, ''); 
-        
-        // Separamos por flecha o por espacios grandes (2 o más)
         let parts = cleanLine.includes('→') ? cleanLine.split('→') : cleanLine.trim().split(/\s{2,}/);
         
         if (parts.length >= 2) {
@@ -119,7 +114,7 @@ processBtn.addEventListener('click', () => {
             row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
             
             const fr = parts[0].trim();
-            const de = parts.slice(-1)[0].trim(); // Agarramos el último pedazo como alemán
+            const de = parts.slice(-1)[0].trim();
 
             row.dataset.fr = fr;
             row.dataset.de = de;
@@ -130,7 +125,7 @@ processBtn.addEventListener('click', () => {
     saveLesson(rawText);
 });
 
-// 4. Guardado y Galería
+// --- 7. GUARDADO Y GALERÍA ---
 function saveLesson(content) {
     let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     const title = content.trim().split('\n')[0].substring(0, 25);
@@ -168,12 +163,11 @@ function createCardUI(content, date) {
     notebookGallery.prepend(card);
 }
 
-// 5. Voces y Reproducción
+// --- 8. VOCES Y REPRODUCCIÓN (PLAY/PAUSE) ---
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
         const ut = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
         ut.lang = lang;
         ut.rate = 0.9;
         ut.onend = resolve;
@@ -181,9 +175,7 @@ async function speak(text, lang) {
     });
 }
 
-// --- SISTEMA DE PLAY / PAUSE INTELIGENTE ---
 let isPlaying = false; 
-
 document.getElementById('playSession').onclick = async () => {
     const btn = document.getElementById('playSession');
     const rows = document.querySelectorAll('.lab-row');
@@ -204,15 +196,13 @@ document.getElementById('playSession').onclick = async () => {
 
     for (let row of rows) {
         if (!isPlaying) break; 
-
         row.style.background = "#fff9c4";
-        
         await speak(row.dataset.fr, 'fr-FR');
+        
         if (!isPlaying) break; 
-        
         await new Promise(r => setTimeout(r, 1000));
-        if (!isPlaying) break;
         
+        if (!isPlaying) break;
         await speak(row.dataset.de, 'de-DE');
         row.style.background = "transparent";
     }
@@ -221,9 +211,8 @@ document.getElementById('playSession').onclick = async () => {
     btn.innerHTML = "▶️ Play Session";
     btn.style.background = "#4caf50";
 };
-const quizBtn = document.getElementById('quizBtn');
 
-// Crear la pantalla de Quiz en el documento
+// --- 9. SISTEMA DE QUIZ ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
@@ -249,7 +238,6 @@ function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     
-    // Mostramos Francés, preguntamos Alemán
     document.getElementById('quizQuestion').innerText = `¿Cómo se dice "${randomRow.dataset.fr}"?`;
     currentCorrectAnswer = randomRow.dataset.de.toLowerCase().trim();
     
@@ -273,10 +261,10 @@ document.getElementById('checkBtn').onclick = () => {
 document.getElementById('closeQuiz').onclick = () => {
     quizOverlay.style.display = 'none';
 };
+
+// --- 10. REPRODUCTOR DE MÚSICA ---
 function playMusic(type) {
     const player = document.getElementById('bgMusic');
-    
-    // Antenas de alta disponibilidad
     const sources = {
         'classic': 'https://actions.google.com/sounds/v1/ambiences/morning_birds.ogg', 
         'focus': 'https://icecast.walmradio.com:8000/ambient',
@@ -287,11 +275,8 @@ function playMusic(type) {
         player.pause();
         player.src = "";
     } else {
-        // 1. Forzamos al navegador a reconocer la nueva antena
         player.setAttribute('src', sources[type]);
         player.load();
-        
-        // 2. Intentamos reproducir inmediatamente (Desbloqueo iOS)
         const playPromise = player.play();
         
         if (playPromise !== undefined) {
@@ -301,3 +286,6 @@ function playMusic(type) {
                 console.log("Audio bloqueado. Toca la pantalla y reintenta.");
                 player.play();
             });
+        }
+    }
+} 
