@@ -147,17 +147,45 @@ async function speak(text, lang) {
     });
 }
 
+// --- SISTEMA DE PLAY / PAUSE INTELIGENTE ---
+let isPlaying = false; 
+
 document.getElementById('playSession').onclick = async () => {
+    const btn = document.getElementById('playSession');
     const rows = document.querySelectorAll('.lab-row');
-    if (rows.length === 0) return alert("¡Carga una lección primero!");
     
+    if (rows.length === 0) return alert("¡Carga una lección primero!");
+
+    if (isPlaying) {
+        isPlaying = false;
+        window.speechSynthesis.cancel(); 
+        btn.innerHTML = "▶️ Reanudar Sesión";
+        btn.style.background = "#4caf50"; 
+        return;
+    }
+
+    isPlaying = true;
+    btn.innerHTML = "⏸️ Pausar Sesión";
+    btn.style.background = "#ff9800"; 
+
     for (let row of rows) {
+        if (!isPlaying) break; 
+
         row.style.background = "#fff9c4";
+        
         await speak(row.dataset.fr, 'fr-FR');
+        if (!isPlaying) break; 
+        
         await new Promise(r => setTimeout(r, 1000));
+        if (!isPlaying) break;
+        
         await speak(row.dataset.de, 'de-DE');
         row.style.background = "transparent";
     }
+
+    isPlaying = false;
+    btn.innerHTML = "▶️ Play Session";
+    btn.style.background = "#4caf50";
 };
 const quizBtn = document.getElementById('quizBtn');
 
