@@ -241,7 +241,7 @@ function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     
-    document.getElementById('quizQuestion').innerText = `¿Was bedeutet "${randomRow.dataset.fr}" auf Deutsch?`;
+    document.getElementById('quizQuestion').innerText = `Was bedeutet "${randomRow.dataset.fr}" auf Deutsch?`;
     currentCorrectAnswer = randomRow.dataset.de.toLowerCase().trim();
     
     const input = document.getElementById('quizInput');
