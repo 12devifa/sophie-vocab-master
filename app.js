@@ -267,26 +267,35 @@ function playMusic(type) {
                 console.log("Audio bloqueado. Toca la pantalla y reintenta.");
                 player.play();
             });
-            // --- CEREBRO DEL MODO OSCURO ---
+        // --- CEREBRO DEL MODO OSCURO (VERSIÓN RESISTENTE) ---
 const themeToggle = document.getElementById('themeToggle');
 
-themeToggle.addEventListener('click', () => {
-    // Miramos qué tema tiene puesto el sistema
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    // Cambiamos el tema en el HTML y el emoji del botón
-    document.documentElement.setAttribute('data-theme', newTheme);
-    themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
-    
-    // Guardamos la elección para la próxima vez
-    localStorage.setItem('sophie_theme', newTheme);
-});
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        
+        // Intentamos guardar, pero si está bloqueado, que no explote la app
+        try {
+            localStorage.setItem('sophie_theme', newTheme);
+        } catch (e) {
+            console.log("Storage bloqueado por el navegador");
+        }
+    });
+}
 
-// Al cargar la página, recordamos si la socia prefiere luz o sombra
+// Al cargar, intentamos recordar con cuidado
 window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('sophie_theme') || 'light';
+    let savedTheme = 'light';
+    try {
+        savedTheme = localStorage.getItem('sophie_theme') || 'light';
+    } catch (e) {
+        console.log("No se pudo leer el tema guardado");
+    }
+    
     document.documentElement.setAttribute('data-theme', savedTheme);
-    themeToggle.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+    if(themeToggle) themeToggle.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
 });
- 
