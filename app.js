@@ -216,11 +216,14 @@ document.getElementById('playSession').onclick = async () => {
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
-    <div style="position:absolute; top:40px; font-weight:bold; color:#673ab7;">SOPHIE QUIZ 🧠</div>
-    <div id="quizQuestion" class="quiz-card">Lädt......</div>
+   quizOverlay.innerHTML = `
+    <div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+        SOPHIE QUIZ 🧠
+    </div>
+    <div id="quizQuestion" class="quiz-card">Lädt...</div>
     <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
     <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
-   <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
+    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
 `;
 document.body.appendChild(quizOverlay);
 
