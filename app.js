@@ -267,6 +267,26 @@ function playMusic(type) {
                 console.log("Audio bloqueado. Toca la pantalla y reintenta.");
                 player.play();
             });
-        }
-    }
-}
+            // --- CEREBRO DEL MODO OSCURO ---
+const themeToggle = document.getElementById('themeToggle');
+
+themeToggle.addEventListener('click', () => {
+    // Miramos qué tema tiene puesto el sistema
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Cambiamos el tema en el HTML y el emoji del botón
+    document.documentElement.setAttribute('data-theme', newTheme);
+    themeToggle.innerText = newTheme === 'dark' ? '☀️' : '🌙';
+    
+    // Guardamos la elección para la próxima vez
+    localStorage.setItem('sophie_theme', newTheme);
+});
+
+// Al cargar la página, recordamos si la socia prefiere luz o sombra
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('sophie_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggle.innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+});
+ 
