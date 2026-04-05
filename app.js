@@ -35,7 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText) {
         document.getElementById('textInput').value = savedText;
-        console.log("SOPHIE recordó tu última lección 🐘");
+        console.log("SSOPHIE hat deine letzte Lektion geladen 🐘");
     }
 
     // Restaurar Galería
@@ -62,7 +62,7 @@ fileUpload.addEventListener('change', async (e) => {
     if (!file) return;
 
     processBtn.classList.add('reading-mode');
-    processBtn.innerText = "⌛ SOPHIE está leyendo...";
+    processBtn.innerText = "⌛ SOPHIE liest...";
     
     try {
         if (file.type.startsWith("image/")) {
@@ -88,10 +88,10 @@ fileUpload.addEventListener('change', async (e) => {
             textInput.value = await file.text();
         }
     } catch (err) {
-        alert("Error al leer archivo");
+        alert("Fehler beim Lesen der Datei");
     }
     processBtn.classList.remove('reading-mode');
-    processBtn.innerText = "Process Lesson";
+    processBtn.innerText = "Lektion verarbeiten";
 });
 
 // --- 6. PROCESAR TEXTO (LAB) ---
@@ -180,18 +180,18 @@ document.getElementById('playSession').onclick = async () => {
     const btn = document.getElementById('playSession');
     const rows = document.querySelectorAll('.lab-row');
     
-    if (rows.length === 0) return alert("¡Carga una lección primero!");
+    if (rows.length === 0) return alert("¡Bitte zuerst eine Lektion laden!");
 
     if (isPlaying) {
         isPlaying = false;
         window.speechSynthesis.cancel(); 
-        btn.innerHTML = "▶️ Reanudar Sesión";
+        btn.innerHTML = "▶️ Sitzung fortsetzen";
         btn.style.background = "#4caf50"; 
         return;
     }
 
     isPlaying = true;
-    btn.innerHTML = "⏸️ Pausar Sesión";
+    btn.innerHTML = "⏸️ Sitzung pausieren";
     btn.style.background = "#ff9800"; 
 
     for (let row of rows) {
@@ -208,7 +208,7 @@ document.getElementById('playSession').onclick = async () => {
     }
 
     isPlaying = false;
-    btn.innerHTML = "▶️ Play Session";
+    btn.innerHTML = "▶️ Sitzung starten";
     btn.style.background = "#4caf50";
 };
 
@@ -217,10 +217,10 @@ const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
     <div style="position:absolute; top:40px; font-weight:bold; color:#673ab7;">SOPHIE QUIZ 🧠</div>
-    <div id="quizQuestion" class="quiz-card">Cargando...</div>
-    <input type="text" id="quizInput" placeholder="Escribe la traducción..." autocomplete="off">
-    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Comprobar</button>
-    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Cerrar Examen</button>
+    <div id="quizQuestion" class="quiz-card">Lädt......</div>
+    <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
+    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
+    <button id="Quiz beenden" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Cerrar Examen</button>
 `;
 document.body.appendChild(quizOverlay);
 
@@ -228,7 +228,7 @@ let currentCorrectAnswer = "";
 
 quizBtn.onclick = () => {
     const rows = document.querySelectorAll('.lab-row');
-    if (rows.length === 0) return alert("¡Sube una lección primero para poder examinarte!");
+    if (rows.length === 0) return alert("¡Bitte lade zuerst eine Lektion hoch, um das Quiz zu starten!");
     
     quizOverlay.style.display = 'flex';
     nextQuestion();
@@ -238,7 +238,7 @@ function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     
-    document.getElementById('quizQuestion').innerText = `¿Cómo se dice "${randomRow.dataset.fr}"?`;
+    document.getElementById('quizQuestion').innerText = `¿Was bedeutet "${randomRow.dataset.fr}" auf Deutsch?`;
     currentCorrectAnswer = randomRow.dataset.de.toLowerCase().trim();
     
     const input = document.getElementById('quizInput');
@@ -250,10 +250,10 @@ document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
     
     if (userAns === currentCorrectAnswer) {
-        alert("¡Excelente! 🎉 Vas por buen camino.");
+        alert("¡Excelente! 🎉 Ausgezeichnet! 🎉 Gut gemacht.");
         nextQuestion();
     } else {
-        alert(`Casi... La respuesta correcta era: ${currentCorrectAnswer.toUpperCase()}`);
+        alert(`Fast... Die richtige Antwort war: ${currentCorrectAnswer.toUpperCase()}`);
         nextQuestion();
     }
 };
@@ -262,30 +262,5 @@ document.getElementById('closeQuiz').onclick = () => {
     quizOverlay.style.display = 'none';
 };
 
-// --- 10. REPRODUCTOR DE MÚSICA ---
-function playMusic(type) {
-    const player = document.getElementById('bgMusic');
-    const sources = {
-        'classic': 'https://actions.google.com/sounds/v1/ambiences/morning_birds.ogg', 
-        'focus': 'https://icecast.walmradio.com:8000/ambient',
-        'stop': ''
-    };
 
-    if (type === 'stop') {
-        player.pause();
-        player.src = "";
-    } else {
-        player.setAttribute('src', sources[type]);
-        player.load();
-        const playPromise = player.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log("Reproducción iniciada con éxito 🎶");
-            }).catch(error => {
-                console.log("Audio bloqueado. Toca la pantalla y reintenta.");
-                player.play();
-            });
-        }
-    }
-} 
+    
