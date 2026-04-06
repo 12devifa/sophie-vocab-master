@@ -1,258 +1,119 @@
+/* =========================================
+   SOPHIE - NOTEBOOK LM PREMIUM THEME
+   ========================================= */
+
+/* --- 1. PALETA DE COLORES (Dark Mode Google) --- */
 :root {
-    /* Colores Originales */
-    --bg-color: #f0f2f5;
-    --card-bg: #ffffff;
-    --text-main: #202124;
-    --accent-blue: #1a73e8;
-    --pastel-green: #e6f4ea;
-    --border-color: #dadce0;
+    --bg-main: #131314;       /* Fondo súper oscuro */
+    --bg-sidebar: #1e1f22;    /* Fondo del menú izquierdo */
+    --bg-card: #1e1f22;       /* Fondo de las áreas de trabajo */
+    --text-main: #e3e3e3;     /* Texto blanco/grisáceo */
+    --text-muted: #8e918f;    /* Texto secundario (fechas, subtítulos) */
+    --accent: #a8c7fa;        /* Azul NotebookLM */
+    --border-color: #444746;  /* Líneas divisorias elegantes */
+    --btn-primary: #a8c7fa;   
+    --btn-primary-text: #062e6f;
 }
 
-/* El bloque cuántico: Cuando el "data-theme" sea dark, los colores cambian */
-[data-theme="dark"] {
-    --bg-color: #0b0e14; 
-    --card-bg: #1a1f29; 
-    --text-main: #e0e0e0; 
-    --accent-blue: #bb86fc; /* Púrpura neón */
-    --pastel-green: #1e3a2a; 
-    --border-color: #333d4d;
-}
-
-/* --- FUERZA BRUTA PARA MODO OSCURO --- */
-[data-theme="dark"] body {
-    background-color: var(--bg-color) !important;
-    color: var(--text-main) !important;
-}
-
-[data-theme="dark"] .app-container, 
-[data-theme="dark"] .input-section, 
-[data-theme="dark"] .lab-section, 
-[data-theme="dark"] .notebook-card,
-[data-theme="dark"] .quiz-overlay {
-    background-color: var(--card-bg) !important;
-    color: var(--text-main) !important;
-    border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] p {
-    color: var(--text-main) !important;
-}
-
+/* --- 2. CONFIGURACIÓN GENERAL --- */
 body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-family: 'Google Sans', Roboto, Arial, sans-serif;
-    background-color: var(--bg-color);
+    background-color: var(--bg-main);
     color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
+    padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden; /* Evita scroll doble */
 }
-    font-family: 'Google Sans', Roboto, Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    margin: 0;
+
+/* --- 3. ESTRUCTURA (Izquierda / Derecha) --- */
+/* (Asumiendo que la Galería está a un lado y el resto al otro) */
+.sidebar {
+    width: 320px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    padding: 20px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
-.app-container {
-    width: 95%;
-    max-width: 1200px;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-header h1 { font-weight: 500; color: #1f1f1f; }
-
-.grid-layout {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+.main-content {
+    flex: 1;
+    padding: 30px 50px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
-    height: 70vh;
 }
 
-.card {
-    background: var(--card-bg);
+/* --- 4. CAJAS Y TARJETAS (Cards) --- */
+.card, .input-section, .lab-col {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
+/* Tarjetas de la Galería */
+.gallery-item {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.card-header h2 { font-size: 1.2rem; margin: 0; }
+.gallery-item:hover {
+    background-color: #2a2b2f;
+    border-color: var(--text-muted);
+}
 
-textarea {
-    flex-grow: 1;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
+/* --- 5. CAJA DE TEXTO (Workspace) --- */
+textarea#textInput {
+    width: 100%;
+    height: 300px;
+    background-color: transparent;
+    color: var(--text-main);
+    border: none;
     font-size: 1rem;
+    line-height: 1.6;
+    resize: none;
     outline: none;
 }
 
-textarea:focus { border: 2px solid var(--accent-blue); }
-
-.list-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    margin: 10px 0;
-    padding: 10px;
+textarea#textInput::placeholder {
+    color: var(--text-muted);
 }
 
-button {
-    cursor: pointer;
+/* --- 6. BOTONES PREMIUM --- */
+.primary-btn {
+    background-color: var(--btn-primary);
+    color: var(--btn-primary-text) !important;
     border: none;
+    padding: 12px 20px;
     border-radius: 24px;
-    padding: 12px 24px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.primary-btn { background: var(--accent-blue); color: white; }
-.play-btn { background: #34a853; color: white; margin-top: 10px; }
-.secondary-btn { background: #f8f9fa; border: 1px solid var(--border-color); }
-
-button:hover { opacity: 0.9; transform: translateY(-1px); }
-/* --- Ajustes para Móvil (iPhone/Android) --- */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-        align-items: flex-start; /* Evita que se centre verticalmente y "salte" */
-    }
-
-    .grid-layout {
-        display: flex;
-        flex-direction: column; /* De 3 columnas a una lista vertical */
-        gap: 15px;
-        height: auto; /* Permite que la pantalla crezca hacia abajo */
-    }
-
-    .card {
-        min-height: 300px; /* Tamaño cómodo para tocar con el dedo */
-    }
-
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-    /* Evitar el zoom azul al tocar botones en iOS */
-    button, textarea {
-        -webkit-tap-highlight-color: transparent;
-        font-size: 16px !important; /* iOS no hace zoom si la letra es de 16px o más */
-    }
-}
-/* Animación de carga para cuando Sophie lee fotos */
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-.reading-mode {
-    animation: pulse 1.5s infinite;
-    color: #1a73e8 !important;
-    font-weight: bold;
-}
-
-/* Tarjetas de Galería estilo Premium */
-.notebook-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    border: 1px solid #e0e0e0 !important;
-}
-
-.notebook-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-/* Botón de borrar más elegante */
-.del {
-    transition: color 0.2s;
-    opacity: 0.3;
-}
-
-.notebook-card:hover .del {
-    opacity: 1;
-}
-/* Pantalla completa del Quiz */
-.quiz-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: #ffffff;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Empezamos desde arriba para que el teclado no tape */
-    z-index: 3000;
-    padding-top: 60px; /* Espacio para que no choque con la hora del iPhone */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* La tarjeta con la pregunta */
-.quiz-card {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    padding: 30px 20px;
-    background: #f3e5f5; /* Un lila muy suave */
-    border-radius: 20px;
-    width: 85%;
-    box-shadow: 0 4px 15px rgba(103, 58, 183, 0.1);
-    color: #311b92;
-    font-weight: bold;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
     text-align: center;
 }
 
-/* El campo de escritura */
-#quizInput {
-    padding: 15px;
-    width: 80%;
-    font-size: 1.2rem;
-    border-radius: 15px;
-    border: 2px solid #673ab7;
-    margin-bottom: 20px;
-    outline: none;
-    background: #fff;
-    -webkit-appearance: none; /* Quita sombras raras en iOS */
+.primary-btn:hover {
+    background-color: #d3e3fd;
 }
 
-/* Botón de Comprobar */
-#checkBtn {
-    background: #673ab7 !important;
-    color: white !important;
-    width: 85% !important;
-    padding: 15px !important;
-    border-radius: 15px !important;
-    font-size: 1.1rem !important;
-    border: none !important;
-    font-weight: bold;
-    cursor: pointer;
+/* Botón Nueva Notiz (Estilo fantasma/secundario) */
+#newNoteBtn {
+    background-color: transparent !important;
+    color: var(--accent) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-/* Botón de cerrar */
-#closeQuiz {
-    margin-top: 30px;
-    color: #999;
-    background: none;
-    border: none;
-    text-decoration: underline;
-    font-size: 0.9rem;
+#newNoteBtn:hover {
+    background-color: rgba(168, 199, 250, 0.08) !important;
 }
