@@ -1,119 +1,129 @@
 /* =========================================
-   SOPHIE - NOTEBOOK LM PREMIUM THEME
+   SOPHIE - NOTEBOOK LM THEME (MOBILE READY)
    ========================================= */
 
-/* --- 1. PALETA DE COLORES (Dark Mode Google) --- */
 :root {
-    --bg-main: #131314;       /* Fondo súper oscuro */
-    --bg-sidebar: #1e1f22;    /* Fondo del menú izquierdo */
-    --bg-card: #1e1f22;       /* Fondo de las áreas de trabajo */
-    --text-main: #e3e3e3;     /* Texto blanco/grisáceo */
-    --text-muted: #8e918f;    /* Texto secundario (fechas, subtítulos) */
-    --accent: #a8c7fa;        /* Azul NotebookLM */
-    --border-color: #444746;  /* Líneas divisorias elegantes */
-    --btn-primary: #a8c7fa;   
-    --btn-primary-text: #062e6f;
+    --bg-main: #131314;       
+    --bg-card: #1e1f22;       
+    --text-main: #e3e3e3;     
+    --text-muted: #8e918f;    
+    --accent: #a8c7fa;        
+    --border-color: #444746;  
 }
 
-/* --- 2. CONFIGURACIÓN GENERAL --- */
+* { box-sizing: border-box; }
+
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
     margin: 0;
-    padding: 0;
-    display: flex;
-    height: 100vh;
-    overflow: hidden; /* Evita scroll doble */
+    padding: 15px; /* Margen para móvil */
 }
 
-/* --- 3. ESTRUCTURA (Izquierda / Derecha) --- */
-/* (Asumiendo que la Galería está a un lado y el resto al otro) */
-.sidebar {
-    width: 320px;
-    background-color: var(--bg-sidebar);
-    border-right: 1px solid var(--border-color);
-    padding: 20px;
+/* --- ESTRUCTURA PRINCIPAL --- */
+.container {
     display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-}
-
-.main-content {
-    flex: 1;
-    padding: 30px 50px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Apila todo en móvil */
     gap: 20px;
 }
 
-/* --- 4. CAJAS Y TARJETAS (Cards) --- */
-.card, .input-section, .lab-col {
+/* En ordenadores se pone lado a lado */
+@media (min-width: 768px) {
+    .container { flex-direction: row; }
+    .gallery-col { width: 300px; order: -1; } /* Galería a la izquierda */
+    .input-section { flex: 1; }
+    .lab-col { flex: 1; }
+}
+
+/* --- TARJETAS (Cajas redondeadas) --- */
+.card {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: 24px; /* Estilo NotebookLM */
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* Tarjetas de la Galería */
-.gallery-item {
-    background-color: var(--bg-main);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-main);
 }
 
-.gallery-item:hover {
-    background-color: #2a2b2f;
-    border-color: var(--text-muted);
-}
-
-/* --- 5. CAJA DE TEXTO (Workspace) --- */
+/* --- TEXTAREA Y BOTONES --- */
 textarea#textInput {
     width: 100%;
-    height: 300px;
+    min-height: 200px;
     background-color: transparent;
     color: var(--text-main);
     border: none;
     font-size: 1rem;
-    line-height: 1.6;
-    resize: none;
+    line-height: 1.5;
+    resize: vertical;
     outline: none;
+    margin-bottom: 10px;
 }
 
-textarea#textInput::placeholder {
-    color: var(--text-muted);
-}
+textarea#textInput::placeholder { color: var(--text-muted); }
 
-/* --- 6. BOTONES PREMIUM --- */
 .primary-btn {
-    background-color: var(--btn-primary);
-    color: var(--btn-primary-text) !important;
+    background-color: var(--accent);
+    color: #062e6f !important;
     border: none;
-    padding: 12px 20px;
-    border-radius: 24px;
-    font-weight: 600;
+    padding: 14px;
+    border-radius: 30px;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
     text-align: center;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 1rem;
 }
 
-.primary-btn:hover {
-    background-color: #d3e3fd;
+/* --- GALERÍA --- */
+.gallery-card {
+    background-color: #2a2b2f;
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
 }
 
-/* Botón Nueva Notiz (Estilo fantasma/secundario) */
-#newNoteBtn {
-    background-color: transparent !important;
-    color: var(--accent) !important;
-    border: 1px solid var(--border-color) !important;
+.gallery-card:hover { border-color: var(--accent); }
+
+/* --- QUIZ OVERLAY (¡Restaurado!) --- */
+.quiz-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(19, 19, 20, 0.95); /* Fondo oscuro semitransparente */
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-#newNoteBtn:hover {
-    background-color: rgba(168, 199, 250, 0.08) !important;
+.quiz-card {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+    color: white;
+}
+
+#quizInput {
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: white;
+    font-size: 1.2rem;
+    width: 90%;
+    text-align: center;
+    margin-bottom: 20px;
+    outline: none;
 }
