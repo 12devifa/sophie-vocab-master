@@ -51,6 +51,16 @@ const notebookGallery = document.getElementById('notebookGallery');
 const fileUpload = document.getElementById('fileUpload');
 const quizBtn = document.getElementById('quizBtn');
 
+// Nuevo Botón de "Nueva Notiz"
+const newNoteBtn = document.getElementById('newNoteBtn');
+
+// Lógica del botón Nueva Notiz
+newNoteBtn.addEventListener('click', () => {
+    textInput.value = "";
+    localStorage.setItem('sophie_last_input', "");
+    console.log("SOPHIE bereit für eine neue Notiz 🐘");
+});
+
 // --- 4. GUARDADO MIENTRAS ESCRIBES ---
 textInput.addEventListener('input', (e) => {
     localStorage.setItem('sophie_last_input', e.target.value);
