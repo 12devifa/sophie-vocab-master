@@ -77,7 +77,7 @@ fileUpload.addEventListener('change', async (e) => {
     try {
         if (file.type.startsWith("image/")) {
             const result = await Tesseract.recognize(file, 'fra+deu');
-            textInput.value = result.data.text;
+            textInput.value += "\n" + result.data.text;
             localStorage.setItem('sophie_last_input', textInput.value);
         } else if (file.type === "application/pdf") {
             const reader = new FileReader();
@@ -90,12 +90,12 @@ fileUpload.addEventListener('change', async (e) => {
                     const text = await page.getTextContent();
                     fullText += text.items.map(s => s.str).join(' ') + "\n";
                 }
-                textInput.value = fullText; 
+                textInput.value += "\n" + fullText;
                 localStorage.setItem('sophie_last_input', fullText);
             };
             reader.readAsArrayBuffer(file);
         } else {
-            textInput.value = await file.text();
+            textInput.value += "\n" + await file.text();
         }
     } catch (err) {
         alert("Fehler beim Lesen der Datei");
@@ -138,13 +138,28 @@ processBtn.addEventListener('click', () => {
 // --- 7. GUARDADO Y GALERÍA ---
 function saveLesson(content) {
     let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
-    const title = content.trim().split('\n')[0].substring(0, 25);
-    if (lessons.some(l => l.title === title)) return;
+    
+    // El título será la primera línea del texto
+    const title = content.trim().split('\n')[0].substring(0, 30);
+    
+    // Buscamos si ya existe una libreta con este título
+    const existingIndex = lessons.findIndex(l => l.title === title);
 
-    const lesson = { title, content, date: new Date().toLocaleDateString() };
-    lessons.push(lesson);
+    if (existingIndex !== -1) {
+        // SI YA EXISTE: Actualizamos su contenido con todo lo nuevo
+        lessons[existingIndex].content = content;
+        lessons[existingIndex].date = new Date().toLocaleDateString();
+    } else {
+        // SI NO EXISTE: Creamos una tarjeta nueva en la galería
+        const lesson = { title, content, date: new Date().toLocaleDateString() };
+        lessons.push(lesson);
+    }
+
     localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
-    createCardUI(content, lesson.date);
+    
+    // Recargamos la galería visualmente
+    notebookGallery.innerHTML = '';
+    lessons.forEach(l => createCardUI(l.content, l.date));
 }
 
 function createCardUI(content, date) {
