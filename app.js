@@ -163,29 +163,43 @@ function saveLesson(content) {
 }
 
 function createCardUI(content, date) {
-    const title = content.trim().split('\n')[0].substring(0, 20) + "...";
+    // Sacamos el título
+    const title = content.trim().split('\n')[0].substring(0, 30);
+    
+    // Creamos la tarjeta
     const card = document.createElement('div');
-    card.className = 'notebook-card';
-    card.style = "background:#e3f2fd; padding:12px; border-radius:12px; margin-bottom:10px; position:relative; border:1px solid #bbdefb; cursor:pointer;";
+    card.className = 'gallery-card';
+    
+    // Diseño exacto de tu render con el icono de un librito y la papelera escondida
     card.innerHTML = `
-        <button class="del" style="position:absolute; top:5px; right:8px; border:none; background:none; color:red; font-weight:bold;">X</button>
-        <div style="font-size:1.2rem;">📚</div>
-        <div style="font-weight:bold; font-size:0.85rem;">${title}</div>
-        <div style="font-size:0.7rem; color:#666;">${date}</div>
+        <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+            <div style="font-size: 1.5rem; color: #8e918f;">📓</div>
+            <div style="flex: 1; text-align: left;">
+                <div style="font-weight: bold; font-size: 0.95rem; color: #e3e3e3; margin-bottom: 3px;">${title}</div>
+                <div style="font-size: 0.75rem; color: #8e918f;">Erstellt am ${date}</div>
+            </div>
+            <button class="delete-btn" title="Löschen">🗑️</button>
+        </div>
     `;
+    
+    // Para que al hacer clic en la tarjeta se cargue el texto en la caja
+    card.addEventListener('click', (e) => {
+        if(e.target.closest('.delete-btn')) return; // Evitar que cargue si clicamos en borrar
+        document.getElementById('textInput').value = content;
+        localStorage.setItem('sophie_last_input', content);
+    });
 
-    card.querySelector('.del').onclick = (e) => {
-        e.stopPropagation();
-        card.remove();
+    // La magia de borrar
+    const delBtn = card.querySelector('.delete-btn');
+    delBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que se abra la nota de fondo
         let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
-        localStorage.setItem('sophie_lessons', JSON.stringify(lessons.filter(l => l.content !== content)));
-    };
+        lessons = lessons.filter(l => l.title !== title); // La borra de la memoria
+        localStorage.setItem('sophie_lessons', JSON.stringify(lessons)); // Guarda la memoria limpia
+        card.remove(); // La desaparece de la pantalla
+    });
 
-    card.onclick = () => {
-        textInput.value = content;
-        processBtn.click();
-    };
-    notebookGallery.prepend(card);
+    document.getElementById('notebookGallery').appendChild(card);
 }
 
 // --- 8. VOCES Y REPRODUCCIÓN (PLAY/PAUSE) ---
