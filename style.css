@@ -192,6 +192,21 @@ textarea#textInput::placeholder { color: var(--text-muted); }
     opacity: 1; 
 }
 
+/* --- TEMA CLARO (LIGHT MODE) --- */
+body.light-theme {
+    --bg-main: #f0f4f9;       /* Fondo principal gris clarito */
+    --bg-sidebar: #ffffff;    /* Fondo de galería blanco puro */
+    --bg-card: #ffffff;       /* Fondo de cajas blanco puro */
+    --text-main: #1f1f1f;     /* Texto oscuro para que se lea bien */
+    --text-muted: #444746;    /* Texto secundario gris */
+    --border-color: #c4c7c5;  /* Bordes suaves */
+}
+
+/* Ajuste sutil para que la galería se vea bien en blanco al pasar el ratón */
+body.light-theme .gallery-card:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important; 
+}
+
 .delete-btn:hover {
     transform: scale(1.2);
 }
