@@ -10,8 +10,8 @@
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-   <button id="themeToggle" style="background:none; border:none; cursor:pointer; font-size:1.8rem; position:fixed; top:15px; right:15px; z-index: 9999; padding: 5px;">
-  ☀️
+  <button id="themeToggle" style="background:none; border:none; cursor:pointer; font-size:1.8rem; position:fixed; top:15px; right:15px; z-index: 9999; padding: 5px;" onclick="document.body.classList.toggle('light-theme'); this.innerText = document.body.classList.contains('light-theme') ? '🌙' : '☀️';">
+☀️
 </button>
     <div class="app-container">
         <header>
