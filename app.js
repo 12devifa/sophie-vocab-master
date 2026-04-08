@@ -1,3 +1,21 @@
+// --- 8. MODO CLARO / OSCURO ---
+const themeToggle = document.getElementById('themeToggle');
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-theme');
+        
+        // Cambiar el icono visualmente
+        if (document.body.classList.contains('light-theme')) {
+            themeToggle.innerText = '🌙'; 
+        } else {
+            themeToggle.innerText = '☀️'; 
+        }
+    });
+}
+
+
+
 // ==============================================================
 // SOPHIE: VOCAB MASTER - CEREBRO CENTRAL
 // ==============================================================
@@ -303,21 +321,6 @@ document.getElementById('closeQuiz').onclick = () => {
 };
 
 
-// --- 8. MODO CLARO / OSCURO ---
-const themeToggle = document.getElementById('themeToggle');
-
-if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        
-        // Cambiar el icono visualmente
-        if (document.body.classList.contains('light-theme')) {
-            themeToggle.innerText = '🌙'; 
-        } else {
-            themeToggle.innerText = '☀️'; 
-        }
-    });
-}
 
 
     
