@@ -321,6 +321,38 @@ document.getElementById('closeQuiz').onclick = () => {
 };
 
 
+// --- 10. EXPORTAR COPIA DE SEGURIDAD (.json) ---
+const exportBtn = document.getElementById('exportBtn');
+
+if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+        // Sacamos las lecciones de la memoria
+        const lessons = localStorage.getItem('sophie_lessons');
+        
+        // Si no hay nada guardado, avisamos
+        if (!lessons || lessons === '[]') {
+            alert('Es gibt noch keine Notizen zum Exportieren. (Aún no hay notas para exportar).');
+            return;
+        }
+
+        // Creamos un "paquete" con los datos
+        const blob = new Blob([lessons], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        // Creamos un enlace invisible, lo pulsamos mágicamente y lo borramos
+        const a = document.createElement('a');
+        a.href = url;
+        // Le ponemos la fecha al archivo para saber de cuándo es la copia
+        const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
+        a.download = 'SOPHIE_Backup_' + fecha + '.json';
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+}
 
 
     
