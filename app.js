@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - EDICIÓN PRO (CONTEXTO Y EJEMPLOS)
+// SOPHIE: VOCAB MASTER - V6.1 (AUDIO SEGURO + ALTAVOZ INDIVIDUAL)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -100,7 +100,6 @@ if (fileUpload) {
                     localStorage.setItem('sophie_last_input', textInput.value);
                 };
                 reader.readAsText(file);
-                
             } else if (file.type === "application/pdf") {
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -112,26 +111,23 @@ if (fileUpload) {
                 }
                 textInput.value = fullText;
                 localStorage.setItem('sophie_last_input', fullText);
-                
             } else if (file.type.startsWith("image/")) {
                 textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
                 const result = await Tesseract.recognize(file, 'deu+fra+eng+spa+por');
                 textInput.value = result.data.text;
                 localStorage.setItem('sophie_last_input', textInput.value);
-                
             } else {
-                textInput.value = "❌ Format wird nicht unterstützt. Bitte TXT, PDF oder Bild wählen.";
+                textInput.value = "❌ Format wird nicht unterstützt.";
             }
         } catch (error) {
             textInput.value = "❌ Fehler beim Lesen der Datei.";
-            console.error(error);
         }
         fileUpload.value = '';
         if(processBtn) processBtn.innerText = "Lektion verarbeiten";
     });
 }
 
-// --- 6. PROCESAR TEXTO (AHORA CON EJEMPLOS OCULTOS) ---
+// --- 6. PROCESAR TEXTO ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
@@ -145,24 +141,20 @@ if (processBtn) {
         lines.forEach(line => {
             if (!line.trim()) return;
             
-            // 1. Limpiamos corchetes
             let cleanLine = line.replace(/\[.*?\]/g, ''); 
-            
-            // 2. Buscamos si hay un ejemplo (marcado con | )
             let exampleText = "";
+            
             if (cleanLine.includes('|')) {
                 const partsWithExample = cleanLine.split('|');
-                cleanLine = partsWithExample[0]; // Nos quedamos con el vocabulario
-                exampleText = partsWithExample[1].trim(); // Guardamos el ejemplo
+                cleanLine = partsWithExample[0]; 
+                exampleText = partsWithExample[1].trim(); 
             }
 
-            // 3. Separamos el vocabulario
             let parts = cleanLine.includes('→') ? cleanLine.split('→') : cleanLine.trim().split(/\s{2,}/);
 
             if (parts.length >= 2) {
                 const row = document.createElement('div');
                 row.className = 'lab-row';
-                // Cambiamos el diseño a columna para que quepa el botón debajo
                 row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; gap:8px;";
                 
                 let text1 = parts[0].trim();
@@ -178,14 +170,13 @@ if (processBtn) {
                 row.dataset.text2 = text2;
                 row.dataset.voice1 = config.voice1;
                 row.dataset.voice2 = config.voice2;
+                row.dataset.example = exampleText; 
 
-                // Contenedor principal de las banderas
                 const vocabContainer = document.createElement('div');
-                vocabContainer.style = "display:flex; justify-content:space-between; width:100%;";
+                vocabContainer.style = "display:flex; justify-content:space-between; width:100%; align-items: center;";
                 vocabContainer.innerHTML = `<span>${config.flag1} ${text1}</span> <span>${config.flag2} ${text2}</span>`;
                 row.appendChild(vocabContainer);
 
-                // Si detectamos un ejemplo, creamos el cajón secreto
                 if (exampleText !== "") {
                     const btnCtx = document.createElement('button');
                     btnCtx.innerHTML = "📖 Mostrar contexto";
@@ -193,9 +184,22 @@ if (processBtn) {
                     
                     const divCtx = document.createElement('div');
                     divCtx.style = "display: none; background: #e0f2fe; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #0369a1; margin-top: 5px; font-style: italic;";
-                    divCtx.innerHTML = `💡 ${exampleText}`;
+                    
+                    // AÑADIDO: Botón de altavoz al lado del texto
+                    divCtx.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>💡 ${exampleText}</span>
+                            <button class="play-example" title="Anhören" style="background:white; border:1px solid #bae6fd; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; flex-shrink:0; margin-left:10px;">🔊</button>
+                        </div>
+                    `;
 
-                    // Lógica para abrir/cerrar
+                    // Lógica para que hable al tocar el altavoz
+                    const speakerBtn = divCtx.querySelector('.play-example');
+                    speakerBtn.onclick = (e) => {
+                        e.stopPropagation(); // Evitar que se pulse otra cosa sin querer
+                        speak(exampleText, config.voice1);
+                    };
+
                     btnCtx.onclick = () => {
                         if (divCtx.style.display === 'none') {
                             divCtx.style.display = 'block';
@@ -211,7 +215,6 @@ if (processBtn) {
                     row.appendChild(btnCtx);
                     row.appendChild(divCtx);
                 }
-
                 labList.appendChild(row);
             }
         });
@@ -224,7 +227,6 @@ function saveLesson(content) {
     let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     const title = content.trim().split('\n')[0].substring(0, 30);
     const existingIndex = lessons.findIndex(l => l.title === title);
-
     if (existingIndex !== -1) {
         lessons[existingIndex].content = content;
         lessons[existingIndex].date = new Date().toLocaleDateString();
@@ -232,7 +234,6 @@ function saveLesson(content) {
         const lesson = { title, content, date: new Date().toLocaleDateString() };
         lessons.push(lesson);
     }
-
     localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
     notebookGallery.innerHTML = '';
     lessons.forEach(l => createCardUI(l.content, l.date));
@@ -252,13 +253,11 @@ function createCardUI(content, date) {
             <button class="delete-btn" title="Löschen">🗑️</button>
         </div>
     `;
-
     card.addEventListener('click', (e) => {
         if(e.target.closest('.delete-btn')) return; 
         if(textInput) textInput.value = content;
         localStorage.setItem('sophie_last_input', content);
     });
-
     const delBtn = card.querySelector('.delete-btn');
     delBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
@@ -267,19 +266,24 @@ function createCardUI(content, date) {
         localStorage.setItem('sophie_lessons', JSON.stringify(lessons)); 
         card.remove(); 
     });
-
     if(notebookGallery) notebookGallery.appendChild(card);
 }
 
-// --- 8. VOCES Y REPRODUCCIÓN (RONDA 1: SOLO VOCABULARIO) ---
+// --- 8. VOCES Y REPRODUCCIÓN (SEGURO PARA iPHONE) ---
+let currentUtterance = null; // Variable global para que iOS no borre la voz
+
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
-        const ut = new SpeechSynthesisUtterance(text);
-        ut.lang = lang;
-        ut.rate = 0.9;
-        ut.onend = resolve;
-        window.speechSynthesis.speak(ut);
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = lang;
+        currentUtterance.rate = 0.9;
+        
+        // Cuando termine o si da error, que deje seguir la app
+        currentUtterance.onend = resolve;
+        currentUtterance.onerror = resolve; 
+        
+        window.speechSynthesis.speak(currentUtterance);
     });
 }
 
@@ -302,6 +306,10 @@ if(playSessionBtn) {
         isPlaying = true;
         playSessionBtn.innerHTML = "⏸️ Sitzung pausieren";
         playSessionBtn.style.background = "#ff9800"; 
+        
+        // Obligamos a leer la cajita azul del menú de arriba de verdad
+        const actualModeSelect = document.getElementById('audioMode');
+        const mode = actualModeSelect ? actualModeSelect.value : 'basic';
 
         for (let row of rows) {
             if (!isPlaying) break; 
@@ -313,7 +321,18 @@ if(playSessionBtn) {
             
             if (!isPlaying) break;
             await speak(row.dataset.text2, row.dataset.voice2);
+
+            // Ahora sí, si está en modo "full" y hay un texto de ejemplo
+            if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
+                if (!isPlaying) break;
+                await new Promise(r => setTimeout(r, 1000)); 
+                if (!isPlaying) break;
+                await speak(row.dataset.example, row.dataset.voice1); 
+            }
+
             row.style.background = "transparent";
+            if (!isPlaying) break;
+            await new Promise(r => setTimeout(r, 1500)); 
         }
 
         isPlaying = false;
@@ -322,7 +341,7 @@ if(playSessionBtn) {
     };
 }
 
-// --- 9. SISTEMA DE QUIZ BILINGÜE ---
+// --- 9. SISTEMA DE QUIZ ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
@@ -342,7 +361,7 @@ let currentCorrectAnswer = "";
 if(quizBtn) {
     quizBtn.onclick = () => {
         const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("¡Bitte lade zuerst eine Lektion hoch, um das Quiz zu starten!");
+        if (rows.length === 0) return alert("¡Bitte lade zuerst eine Lektion hoch!");
         quizOverlay.style.display = 'flex';
         nextQuestion();
     };
@@ -373,7 +392,7 @@ document.getElementById('closeQuiz').onclick = () => {
     quizOverlay.style.display = 'none';
 };
 
-// --- 10. EXPORTAR COPIA DE SEGURIDAD (.json) ---
+// --- 10. EXPORTAR (.json) ---
 if (exportBtn) {
     exportBtn.addEventListener('click', () => {
         const lessons = localStorage.getItem('sophie_lessons');
