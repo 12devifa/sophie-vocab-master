@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - EDICIÓN MULTILINGÜE + INVERTIR
+// SOPHIE: VOCAB MASTER - EDICIÓN PRO (CONTEXTO Y EJEMPLOS)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -12,9 +12,9 @@ const newNoteBtn = document.getElementById('newNoteBtn');
 const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
 const langSelect = document.getElementById('langSelect');
-const swapLangBtn = document.getElementById('swapLangBtn'); // Nuevo botón
+const swapLangBtn = document.getElementById('swapLangBtn'); 
 
-let isSwapped = false; // Memoria para saber si está invertido
+let isSwapped = false; 
 
 // --- 1. MODO CLARO / OSCURO ---
 if (themeToggle) {
@@ -63,7 +63,6 @@ if (textInput) {
 if (swapLangBtn) {
     swapLangBtn.addEventListener('click', () => {
         isSwapped = !isSwapped;
-        // Cambia el color del botón para avisar que está activado
         swapLangBtn.style.background = isSwapped ? "#c8e6c9" : "#e0e0e0"; 
     });
 }
@@ -78,14 +77,13 @@ function getLangConfig(mode, swapped) {
         case 'pt-de': flag1='🇵🇹'; flag2='🇩🇪'; voice1='pt-PT'; voice2='de-DE'; break;
         default: flag1='🇫🇷'; flag2='🇩🇪'; voice1='fr-FR'; voice2='de-DE';
     }
-    // Si la hija pulsó "Invertir", le damos la vuelta a todo
     if (swapped) {
         return { flag1: flag2, flag2: flag1, voice1: voice2, voice2: voice1 };
     }
     return { flag1, flag2, voice1, voice2 };
 }
 
-// --- 5. SUBIR ARCHIVOS (AHORA CON PORTUGUÉS) ---
+// --- 5. SUBIR ARCHIVOS ---
 if (fileUpload) {
     fileUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -117,7 +115,6 @@ if (fileUpload) {
                 
             } else if (file.type.startsWith("image/")) {
                 textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
-                // ¡Añadido 'por' para leer portugués!
                 const result = await Tesseract.recognize(file, 'deu+fra+eng+spa+por');
                 textInput.value = result.data.text;
                 localStorage.setItem('sophie_last_input', textInput.value);
@@ -134,7 +131,7 @@ if (fileUpload) {
     });
 }
 
-// --- 6. PROCESAR TEXTO (LAB) ---
+// --- 6. PROCESAR TEXTO (AHORA CON EJEMPLOS OCULTOS) ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
@@ -142,39 +139,79 @@ if (processBtn) {
 
         labList.innerHTML = '';
         const lines = rawText.split('\n');
-        
-        // Consultamos la configuración (idioma e invertido)
         const mode = langSelect ? langSelect.value : 'fr-de';
         const config = getLangConfig(mode, isSwapped);
 
         lines.forEach(line => {
             if (!line.trim()) return;
-            // Quitamos los corchetes de pronunciación
+            
+            // 1. Limpiamos corchetes
             let cleanLine = line.replace(/\[.*?\]/g, ''); 
+            
+            // 2. Buscamos si hay un ejemplo (marcado con | )
+            let exampleText = "";
+            if (cleanLine.includes('|')) {
+                const partsWithExample = cleanLine.split('|');
+                cleanLine = partsWithExample[0]; // Nos quedamos con el vocabulario
+                exampleText = partsWithExample[1].trim(); // Guardamos el ejemplo
+            }
+
+            // 3. Separamos el vocabulario
             let parts = cleanLine.includes('→') ? cleanLine.split('→') : cleanLine.trim().split(/\s{2,}/);
 
             if (parts.length >= 2) {
                 const row = document.createElement('div');
                 row.className = 'lab-row';
-                row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
+                // Cambiamos el diseño a columna para que quepa el botón debajo
+                row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; gap:8px;";
                 
                 let text1 = parts[0].trim();
                 let text2 = parts.slice(-1)[0].trim();
 
-                // Si está invertido, intercambiamos los textos
                 if (isSwapped) {
                     let temp = text1;
                     text1 = text2;
                     text2 = temp;
                 }
 
-                // Guardamos los datos incluyendo las voces exactas
                 row.dataset.text1 = text1;
                 row.dataset.text2 = text2;
                 row.dataset.voice1 = config.voice1;
                 row.dataset.voice2 = config.voice2;
 
-                row.innerHTML = `<span>${config.flag1} ${text1}</span> <span>${config.flag2} ${text2}</span>`;
+                // Contenedor principal de las banderas
+                const vocabContainer = document.createElement('div');
+                vocabContainer.style = "display:flex; justify-content:space-between; width:100%;";
+                vocabContainer.innerHTML = `<span>${config.flag1} ${text1}</span> <span>${config.flag2} ${text2}</span>`;
+                row.appendChild(vocabContainer);
+
+                // Si detectamos un ejemplo, creamos el cajón secreto
+                if (exampleText !== "") {
+                    const btnCtx = document.createElement('button');
+                    btnCtx.innerHTML = "📖 Mostrar contexto";
+                    btnCtx.style = "font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #f3f4f6; cursor: pointer; align-self: flex-start; color: #4b5563; font-weight: bold;";
+                    
+                    const divCtx = document.createElement('div');
+                    divCtx.style = "display: none; background: #e0f2fe; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #0369a1; margin-top: 5px; font-style: italic;";
+                    divCtx.innerHTML = `💡 ${exampleText}`;
+
+                    // Lógica para abrir/cerrar
+                    btnCtx.onclick = () => {
+                        if (divCtx.style.display === 'none') {
+                            divCtx.style.display = 'block';
+                            btnCtx.innerHTML = "🙈 Ocultar contexto";
+                            btnCtx.style.background = "#dbeafe";
+                        } else {
+                            divCtx.style.display = 'none';
+                            btnCtx.innerHTML = "📖 Mostrar contexto";
+                            btnCtx.style.background = "#f3f4f6";
+                        }
+                    };
+
+                    row.appendChild(btnCtx);
+                    row.appendChild(divCtx);
+                }
+
                 labList.appendChild(row);
             }
         });
@@ -234,7 +271,7 @@ function createCardUI(content, date) {
     if(notebookGallery) notebookGallery.appendChild(card);
 }
 
-// --- 8. VOCES Y REPRODUCCIÓN ---
+// --- 8. VOCES Y REPRODUCCIÓN (RONDA 1: SOLO VOCABULARIO) ---
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
@@ -269,8 +306,8 @@ if(playSessionBtn) {
         for (let row of rows) {
             if (!isPlaying) break; 
             row.style.background = "#fff9c4";
-            await speak(row.dataset.text1, row.dataset.voice1);
             
+            await speak(row.dataset.text1, row.dataset.voice1);
             if (!isPlaying) break; 
             await new Promise(r => setTimeout(r, 1000));
             
@@ -314,10 +351,7 @@ if(quizBtn) {
 function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    
-    // El quiz pregunta por el texto 1 para responder el texto 2
     document.getElementById('quizQuestion').innerText = `Traduce / Übersetze:\n"${randomRow.dataset.text1}"`;
-    
     currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
     const input = document.getElementById('quizInput');
     input.value = "";
