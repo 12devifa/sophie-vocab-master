@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - EDICIÓN BILINGÜE
+// SOPHIE: VOCAB MASTER - EDICIÓN MULTILINGÜE + INVERTIR
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -11,7 +11,10 @@ const quizBtn = document.getElementById('quizBtn');
 const newNoteBtn = document.getElementById('newNoteBtn');
 const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
-const langSelect = document.getElementById('langSelect'); // <- Nuevo selector
+const langSelect = document.getElementById('langSelect');
+const swapLangBtn = document.getElementById('swapLangBtn'); // Nuevo botón
+
+let isSwapped = false; // Memoria para saber si está invertido
 
 // --- 1. MODO CLARO / OSCURO ---
 if (themeToggle) {
@@ -56,7 +59,33 @@ if (textInput) {
     });
 }
 
-// --- 4. SUBIR ARCHIVOS (AHORA CON ESPAÑOL) ---
+// --- 4. CONFIGURADOR DE IDIOMAS Y BOTÓN INVERTIR ---
+if (swapLangBtn) {
+    swapLangBtn.addEventListener('click', () => {
+        isSwapped = !isSwapped;
+        // Cambia el color del botón para avisar que está activado
+        swapLangBtn.style.background = isSwapped ? "#c8e6c9" : "#e0e0e0"; 
+    });
+}
+
+function getLangConfig(mode, swapped) {
+    let flag1, flag2, voice1, voice2;
+    switch(mode) {
+        case 'fr-de': flag1='🇫🇷'; flag2='🇩🇪'; voice1='fr-FR'; voice2='de-DE'; break;
+        case 'en-es': flag1='🇬🇧'; flag2='🇪🇸'; voice1='en-US'; voice2='es-ES'; break;
+        case 'es-de': flag1='🇪🇸'; flag2='🇩🇪'; voice1='es-ES'; voice2='de-DE'; break;
+        case 'en-de': flag1='🇬🇧'; flag2='🇩🇪'; voice1='en-US'; voice2='de-DE'; break;
+        case 'pt-de': flag1='🇵🇹'; flag2='🇩🇪'; voice1='pt-PT'; voice2='de-DE'; break;
+        default: flag1='🇫🇷'; flag2='🇩🇪'; voice1='fr-FR'; voice2='de-DE';
+    }
+    // Si la hija pulsó "Invertir", le damos la vuelta a todo
+    if (swapped) {
+        return { flag1: flag2, flag2: flag1, voice1: voice2, voice2: voice1 };
+    }
+    return { flag1, flag2, voice1, voice2 };
+}
+
+// --- 5. SUBIR ARCHIVOS (AHORA CON PORTUGUÉS) ---
 if (fileUpload) {
     fileUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -88,8 +117,8 @@ if (fileUpload) {
                 
             } else if (file.type.startsWith("image/")) {
                 textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
-                // ¡Añadido 'spa' para leer español!
-                const result = await Tesseract.recognize(file, 'deu+fra+eng+spa');
+                // ¡Añadido 'por' para leer portugués!
+                const result = await Tesseract.recognize(file, 'deu+fra+eng+spa+por');
                 textInput.value = result.data.text;
                 localStorage.setItem('sophie_last_input', textInput.value);
                 
@@ -105,7 +134,7 @@ if (fileUpload) {
     });
 }
 
-// --- 5. PROCESAR TEXTO (BANDERAS AUTOMÁTICAS) ---
+// --- 6. PROCESAR TEXTO (LAB) ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
@@ -114,13 +143,13 @@ if (processBtn) {
         labList.innerHTML = '';
         const lines = rawText.split('\n');
         
-        // Leemos qué idioma ha elegido tu hija
+        // Consultamos la configuración (idioma e invertido)
         const mode = langSelect ? langSelect.value : 'fr-de';
-        const flag1 = mode === 'fr-de' ? '🇫🇷' : '🇬🇧';
-        const flag2 = mode === 'fr-de' ? '🇩🇪' : '🇪🇸';
+        const config = getLangConfig(mode, isSwapped);
 
         lines.forEach(line => {
             if (!line.trim()) return;
+            // Quitamos los corchetes de pronunciación
             let cleanLine = line.replace(/\[.*?\]/g, ''); 
             let parts = cleanLine.includes('→') ? cleanLine.split('→') : cleanLine.trim().split(/\s{2,}/);
 
@@ -129,11 +158,23 @@ if (processBtn) {
                 row.className = 'lab-row';
                 row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
                 
-                const text1 = parts[0].trim();
-                const text2 = parts.slice(-1)[0].trim();
+                let text1 = parts[0].trim();
+                let text2 = parts.slice(-1)[0].trim();
+
+                // Si está invertido, intercambiamos los textos
+                if (isSwapped) {
+                    let temp = text1;
+                    text1 = text2;
+                    text2 = temp;
+                }
+
+                // Guardamos los datos incluyendo las voces exactas
                 row.dataset.text1 = text1;
                 row.dataset.text2 = text2;
-                row.innerHTML = `<span>${flag1} ${text1}</span> <span>${flag2} ${text2}</span>`;
+                row.dataset.voice1 = config.voice1;
+                row.dataset.voice2 = config.voice2;
+
+                row.innerHTML = `<span>${config.flag1} ${text1}</span> <span>${config.flag2} ${text2}</span>`;
                 labList.appendChild(row);
             }
         });
@@ -141,7 +182,7 @@ if (processBtn) {
     });
 }
 
-// --- 6. GUARDADO Y GALERÍA ---
+// --- 7. GUARDADO Y GALERÍA ---
 function saveLesson(content) {
     let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     const title = content.trim().split('\n')[0].substring(0, 30);
@@ -193,7 +234,7 @@ function createCardUI(content, date) {
     if(notebookGallery) notebookGallery.appendChild(card);
 }
 
-// --- 7. VOCES Y REPRODUCCIÓN (VOCES INTELIGENTES) ---
+// --- 8. VOCES Y REPRODUCCIÓN ---
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
@@ -224,22 +265,17 @@ if(playSessionBtn) {
         isPlaying = true;
         playSessionBtn.innerHTML = "⏸️ Sitzung pausieren";
         playSessionBtn.style.background = "#ff9800"; 
-        
-        // Leemos qué idiomas usar para las voces
-        const mode = langSelect ? langSelect.value : 'fr-de';
-        const voice1 = mode === 'fr-de' ? 'fr-FR' : 'en-US';
-        const voice2 = mode === 'fr-de' ? 'de-DE' : 'es-ES';
 
         for (let row of rows) {
             if (!isPlaying) break; 
             row.style.background = "#fff9c4";
-            await speak(row.dataset.text1, voice1);
+            await speak(row.dataset.text1, row.dataset.voice1);
             
             if (!isPlaying) break; 
             await new Promise(r => setTimeout(r, 1000));
             
             if (!isPlaying) break;
-            await speak(row.dataset.text2, voice2);
+            await speak(row.dataset.text2, row.dataset.voice2);
             row.style.background = "transparent";
         }
 
@@ -249,7 +285,7 @@ if(playSessionBtn) {
     };
 }
 
-// --- 8. SISTEMA DE QUIZ BILINGÜE ---
+// --- 9. SISTEMA DE QUIZ BILINGÜE ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
@@ -257,9 +293,9 @@ quizOverlay.innerHTML = `
         SOPHIE QUIZ 🧠
     </div>
     <div id="quizQuestion" class="quiz-card">Lädt...</div>
-    <input type="text" id="quizInput" placeholder="Übersetzung eingeben / Escribe la traducción..." autocomplete="off">
-    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen / Comprobar</button>
-    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden / Salir</button>
+    <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
+    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
+    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
 `;
 quizOverlay.style.display = 'none'; 
 document.body.appendChild(quizOverlay);
@@ -279,13 +315,8 @@ function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     
-    // Cambiar la pregunta según el idioma
-    const mode = langSelect ? langSelect.value : 'fr-de';
-    if (mode === 'fr-de') {
-        document.getElementById('quizQuestion').innerText = `Was bedeutet "${randomRow.dataset.text1}" auf Deutsch?`;
-    } else {
-        document.getElementById('quizQuestion').innerText = `¿Qué significa "${randomRow.dataset.text1}" en Español?`;
-    }
+    // El quiz pregunta por el texto 1 para responder el texto 2
+    document.getElementById('quizQuestion').innerText = `Traduce / Übersetze:\n"${randomRow.dataset.text1}"`;
     
     currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
     const input = document.getElementById('quizInput');
@@ -295,15 +326,11 @@ function nextQuestion() {
 
 document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
-    const mode = langSelect ? langSelect.value : 'fr-de';
-    
     if (userAns === currentCorrectAnswer) {
-        if(mode === 'fr-de') alert("¡Excelente! 🎉 Ausgezeichnet!");
-        else alert("¡Excelente! 🎉 ¡Muy bien!");
+        alert("¡Excelente! 🎉 Richtig!");
         nextQuestion();
     } else {
-        if(mode === 'fr-de') alert(`Fast... Die richtige Antwort war: ${currentCorrectAnswer.toUpperCase()}`);
-        else alert(`Casi... La respuesta correcta era: ${currentCorrectAnswer.toUpperCase()}`);
+        alert(`Fast... Correcto / Richtig: ${currentCorrectAnswer.toUpperCase()}`);
         nextQuestion();
     }
 };
@@ -312,14 +339,11 @@ document.getElementById('closeQuiz').onclick = () => {
     quizOverlay.style.display = 'none';
 };
 
-// --- 9. EXPORTAR COPIA DE SEGURIDAD (.json) ---
+// --- 10. EXPORTAR COPIA DE SEGURIDAD (.json) ---
 if (exportBtn) {
     exportBtn.addEventListener('click', () => {
         const lessons = localStorage.getItem('sophie_lessons');
-        if (!lessons || lessons === '[]') {
-            alert('Es gibt noch keine Notizen zum Exportieren.');
-            return;
-        }
+        if (!lessons || lessons === '[]') return alert('Es gibt noch keine Notizen.');
         const blob = new Blob([lessons], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
