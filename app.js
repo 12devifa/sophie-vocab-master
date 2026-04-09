@@ -1,8 +1,7 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - APP.JS LIMPIO Y REPARADO
+// SOPHIE: VOCAB MASTER - EDICIÓN BILINGÜE
 // ==============================================================
 
-// --- 1. REFERENCIAS DEL DOM (Una sola vez para no liar al navegador) ---
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
 const labList = document.getElementById('labList');
@@ -12,21 +11,20 @@ const quizBtn = document.getElementById('quizBtn');
 const newNoteBtn = document.getElementById('newNoteBtn');
 const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
+const langSelect = document.getElementById('langSelect'); // <- Nuevo selector
 
-// --- 2. MODO CLARO / OSCURO (El Sol y la Luna) ---
+// --- 1. MODO CLARO / OSCURO ---
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-theme');
         const isLight = document.body.classList.contains('light-theme');
         themeToggle.innerText = isLight ? '🌙' : '☀️';
-        // Guardamos la preferencia en la memoria
         try { localStorage.setItem('sophie_light_mode', isLight); } catch(e){}
     });
 }
 
-// --- 3. CARGA INICIAL (MEMORIA DE ELEFANTE) ---
+// --- 2. CARGA INICIAL ---
 window.addEventListener('DOMContentLoaded', () => {
-    // Restaurar luz
     try {
         const isLight = localStorage.getItem('sophie_light_mode') === 'true';
         if (isLight) {
@@ -37,16 +35,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     } catch(e){}
 
-    // Restaurar Texto
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText && textInput) textInput.value = savedText;
 
-    // Restaurar Galería
     const saved = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     saved.forEach(l => createCardUI(l.content, l.date));
 });
 
-// --- 4. NUEVA NOTA Y GUARDADO AUTOMÁTICO ---
+// --- 3. NUEVA NOTA Y GUARDADO ---
 if (newNoteBtn) {
     newNoteBtn.addEventListener('click', () => {
         textInput.value = "";
@@ -60,7 +56,7 @@ if (textInput) {
     });
 }
 
-// --- 5. SUBIR ARCHIVOS (MOTOR NUEVO PDF/TXT/IMAGEN) ---
+// --- 4. SUBIR ARCHIVOS (AHORA CON ESPAÑOL) ---
 if (fileUpload) {
     fileUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -80,7 +76,6 @@ if (fileUpload) {
                 
             } else if (file.type === "application/pdf") {
                 const arrayBuffer = await file.arrayBuffer();
-                // pdfjsLib está instalado en tu HTML
                 const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 let fullText = "";
                 for (let i = 1; i <= pdf.numPages; i++) {
@@ -93,8 +88,8 @@ if (fileUpload) {
                 
             } else if (file.type.startsWith("image/")) {
                 textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
-                // Tesseract está instalado en tu HTML
-                const result = await Tesseract.recognize(file, 'deu+fra+eng');
+                // ¡Añadido 'spa' para leer español!
+                const result = await Tesseract.recognize(file, 'deu+fra+eng+spa');
                 textInput.value = result.data.text;
                 localStorage.setItem('sophie_last_input', textInput.value);
                 
@@ -110,7 +105,7 @@ if (fileUpload) {
     });
 }
 
-// --- 6. PROCESAR TEXTO (LAB) ---
+// --- 5. PROCESAR TEXTO (BANDERAS AUTOMÁTICAS) ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
@@ -118,6 +113,11 @@ if (processBtn) {
 
         labList.innerHTML = '';
         const lines = rawText.split('\n');
+        
+        // Leemos qué idioma ha elegido tu hija
+        const mode = langSelect ? langSelect.value : 'fr-de';
+        const flag1 = mode === 'fr-de' ? '🇫🇷' : '🇬🇧';
+        const flag2 = mode === 'fr-de' ? '🇩🇪' : '🇪🇸';
 
         lines.forEach(line => {
             if (!line.trim()) return;
@@ -129,11 +129,11 @@ if (processBtn) {
                 row.className = 'lab-row';
                 row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
                 
-                const fr = parts[0].trim();
-                const de = parts.slice(-1)[0].trim();
-                row.dataset.fr = fr;
-                row.dataset.de = de;
-                row.innerHTML = `<span>🇫🇷 ${fr}</span> <span>🇩🇪 ${de}</span>`;
+                const text1 = parts[0].trim();
+                const text2 = parts.slice(-1)[0].trim();
+                row.dataset.text1 = text1;
+                row.dataset.text2 = text2;
+                row.innerHTML = `<span>${flag1} ${text1}</span> <span>${flag2} ${text2}</span>`;
                 labList.appendChild(row);
             }
         });
@@ -141,7 +141,7 @@ if (processBtn) {
     });
 }
 
-// --- 7. GUARDADO Y GALERÍA ---
+// --- 6. GUARDADO Y GALERÍA ---
 function saveLesson(content) {
     let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     const title = content.trim().split('\n')[0].substring(0, 30);
@@ -193,7 +193,7 @@ function createCardUI(content, date) {
     if(notebookGallery) notebookGallery.appendChild(card);
 }
 
-// --- 8. VOCES Y REPRODUCCIÓN (PLAY/PAUSE) ---
+// --- 7. VOCES Y REPRODUCCIÓN (VOCES INTELIGENTES) ---
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
@@ -224,17 +224,22 @@ if(playSessionBtn) {
         isPlaying = true;
         playSessionBtn.innerHTML = "⏸️ Sitzung pausieren";
         playSessionBtn.style.background = "#ff9800"; 
+        
+        // Leemos qué idiomas usar para las voces
+        const mode = langSelect ? langSelect.value : 'fr-de';
+        const voice1 = mode === 'fr-de' ? 'fr-FR' : 'en-US';
+        const voice2 = mode === 'fr-de' ? 'de-DE' : 'es-ES';
 
         for (let row of rows) {
             if (!isPlaying) break; 
             row.style.background = "#fff9c4";
-            await speak(row.dataset.fr, 'fr-FR');
+            await speak(row.dataset.text1, voice1);
             
             if (!isPlaying) break; 
             await new Promise(r => setTimeout(r, 1000));
             
             if (!isPlaying) break;
-            await speak(row.dataset.de, 'de-DE');
+            await speak(row.dataset.text2, voice2);
             row.style.background = "transparent";
         }
 
@@ -244,7 +249,7 @@ if(playSessionBtn) {
     };
 }
 
-// --- 9. SISTEMA DE QUIZ ---
+// --- 8. SISTEMA DE QUIZ BILINGÜE ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
@@ -252,11 +257,11 @@ quizOverlay.innerHTML = `
         SOPHIE QUIZ 🧠
     </div>
     <div id="quizQuestion" class="quiz-card">Lädt...</div>
-    <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
-    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
-    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
+    <input type="text" id="quizInput" placeholder="Übersetzung eingeben / Escribe la traducción..." autocomplete="off">
+    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen / Comprobar</button>
+    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden / Salir</button>
 `;
-quizOverlay.style.display = 'none'; // Oculto hasta que le den al botón
+quizOverlay.style.display = 'none'; 
 document.body.appendChild(quizOverlay);
 
 let currentCorrectAnswer = "";
@@ -273,8 +278,16 @@ if(quizBtn) {
 function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    document.getElementById('quizQuestion').innerText = `Was bedeutet "${randomRow.dataset.fr}" auf Deutsch?`;
-    currentCorrectAnswer = randomRow.dataset.de.toLowerCase().trim();
+    
+    // Cambiar la pregunta según el idioma
+    const mode = langSelect ? langSelect.value : 'fr-de';
+    if (mode === 'fr-de') {
+        document.getElementById('quizQuestion').innerText = `Was bedeutet "${randomRow.dataset.text1}" auf Deutsch?`;
+    } else {
+        document.getElementById('quizQuestion').innerText = `¿Qué significa "${randomRow.dataset.text1}" en Español?`;
+    }
+    
+    currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
     const input = document.getElementById('quizInput');
     input.value = "";
     input.focus();
@@ -282,11 +295,15 @@ function nextQuestion() {
 
 document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
+    const mode = langSelect ? langSelect.value : 'fr-de';
+    
     if (userAns === currentCorrectAnswer) {
-        alert("¡Excelente! 🎉 Ausgezeichnet! 🎉 Gut gemacht.");
+        if(mode === 'fr-de') alert("¡Excelente! 🎉 Ausgezeichnet!");
+        else alert("¡Excelente! 🎉 ¡Muy bien!");
         nextQuestion();
     } else {
-        alert(`Fast... Die richtige Antwort war: ${currentCorrectAnswer.toUpperCase()}`);
+        if(mode === 'fr-de') alert(`Fast... Die richtige Antwort war: ${currentCorrectAnswer.toUpperCase()}`);
+        else alert(`Casi... La respuesta correcta era: ${currentCorrectAnswer.toUpperCase()}`);
         nextQuestion();
     }
 };
@@ -295,7 +312,7 @@ document.getElementById('closeQuiz').onclick = () => {
     quizOverlay.style.display = 'none';
 };
 
-// --- 10. EXPORTAR COPIA DE SEGURIDAD (.json) ---
+// --- 9. EXPORTAR COPIA DE SEGURIDAD (.json) ---
 if (exportBtn) {
     exportBtn.addEventListener('click', () => {
         const lessons = localStorage.getItem('sophie_lessons');
