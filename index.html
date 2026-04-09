@@ -22,9 +22,15 @@
 
         <main class="grid-layout">
             <section class="card input-col">
-                <div class="card-header">
-                    <span class="icon">📥</span>
-                    <h2>Eingabe</h2>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center;">
+                        <span class="icon">📥</span>
+                        <h2>Eingabe</h2>
+                    </div>
+                    <select id="langSelect" style="padding: 5px 10px; border-radius: 8px; border: 1px solid #ccc; font-weight: bold; cursor: pointer; background: #f5f5f5; color: #333;">
+                        <option value="fr-de">🇫🇷 FR → 🇩🇪 DE</option>
+                        <option value="en-es">🇬🇧 EN → 🇪🇸 ES</option>
+                    </select>
                 </div>
                 <textarea id="textInput" placeholder="Hier schreiben oder einfügen..."></textarea>
                 
@@ -64,7 +70,7 @@
             </section>
         </main>
     </div>
-    <script src="app.js?v=final"></script>
+    <script src="app.js?v=final2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
 </body>
