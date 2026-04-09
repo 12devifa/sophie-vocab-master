@@ -1,3 +1,55 @@
+// --- 11. SUBIR ARCHIVOS (PDF / TXT / IMÁGENES) ---
+const fileUpload = document.getElementById('fileUpload');
+const textInput = document.getElementById('textInput');
+
+if (fileUpload) {
+    fileUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Le avisamos a tu hija que estamos trabajando
+        textInput.value = "Lese Datei... Bitte warten... ⏳"; 
+
+        try {
+            if (file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = (evento) => {
+                    textInput.value = evento.target.result;
+                };
+                reader.readAsText(file);
+                
+            } else if (file.type === "application/pdf") {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = "";
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(item => item.str).join(" ") + "\n\n";
+                }
+                textInput.value = fullText;
+                
+            } else if (file.type.startsWith("image/")) {
+                textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
+                Tesseract.recognize(file, 'deu+fra+eng', {
+                    logger: m => console.log(m)
+                }).then(({ data: { text } }) => {
+                    textInput.value = text;
+                });
+                
+            } else {
+                textInput.value = "❌ Format wird nicht unterstützt. Bitte TXT, PDF oder Bild wählen.";
+            }
+        } catch (error) {
+            textInput.value = "❌ Fehler beim Lesen der Datei.";
+            console.error(error);
+        }
+        
+        fileUpload.value = '';
+    });
+}
+
+
 // --- 8. MODO CLARO / OSCURO ---
 const themeToggle = document.getElementById('themeToggle');
 
@@ -355,60 +407,3 @@ if (exportBtn) {
 }
 
 
-// --- 11. SUBIR ARCHIVOS (PDF / TXT / IMÁGENES) ---
-const fileUpload = document.getElementById('fileUpload');
-const textInput = document.getElementById('textInput');
-
-if (fileUpload) {
-    fileUpload.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Le avisamos a tu hija que estamos trabajando
-        textInput.value = "Lese Datei... Bitte warten... ⏳"; 
-
-        try {
-            if (file.type === "text/plain") {
-                // Leer archivos de texto (.txt)
-                const reader = new FileReader();
-                reader.onload = (evento) => {
-                    textInput.value = evento.target.result;
-                };
-                reader.readAsText(file);
-                
-            } else if (file.type === "application/pdf") {
-                // Leer archivos PDF (.pdf)
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                let fullText = "";
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    fullText += textContent.items.map(item => item.str).join(" ") + "\n\n";
-                }
-                textInput.value = fullText;
-                
-            } else if (file.type.startsWith("image/")) {
-                // Leer texto de fotos (¡Magia pura!)
-                textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
-                Tesseract.recognize(file, 'deu+fra+eng', {
-                    logger: m => console.log(m)
-                }).then(({ data: { text } }) => {
-                    textInput.value = text;
-                });
-                
-            } else {
-                textInput.value = "❌ Format wird nicht unterstützt. Bitte TXT, PDF oder Bild wählen.";
-            }
-        } catch (error) {
-            textInput.value = "❌ Fehler beim Lesen der Datei.";
-            console.error(error);
-        }
-        
-        // Limpiamos el botón para que pueda subir el mismo archivo si se equivoca
-        fileUpload.value = '';
-    });
-}
-
-
-    
