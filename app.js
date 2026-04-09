@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V6.1 (AUDIO SEGURO + ALTAVOZ INDIVIDUAL)
+// SOPHIE: VOCAB MASTER - V6.2 (100% DEUTSCH UI + AUDIO SEGURO)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -13,6 +13,7 @@ const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
 const langSelect = document.getElementById('langSelect');
 const swapLangBtn = document.getElementById('swapLangBtn'); 
+const audioMode = document.getElementById('audioMode'); 
 
 let isSwapped = false; 
 
@@ -179,13 +180,13 @@ if (processBtn) {
 
                 if (exampleText !== "") {
                     const btnCtx = document.createElement('button');
-                    btnCtx.innerHTML = "📖 Mostrar contexto";
+                    // TRADUCIDO AL ALEMÁN
+                    btnCtx.innerHTML = "📖 Kontext anzeigen";
                     btnCtx.style = "font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #f3f4f6; cursor: pointer; align-self: flex-start; color: #4b5563; font-weight: bold;";
                     
                     const divCtx = document.createElement('div');
                     divCtx.style = "display: none; background: #e0f2fe; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #0369a1; margin-top: 5px; font-style: italic;";
                     
-                    // AÑADIDO: Botón de altavoz al lado del texto
                     divCtx.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span>💡 ${exampleText}</span>
@@ -193,21 +194,22 @@ if (processBtn) {
                         </div>
                     `;
 
-                    // Lógica para que hable al tocar el altavoz
                     const speakerBtn = divCtx.querySelector('.play-example');
                     speakerBtn.onclick = (e) => {
-                        e.stopPropagation(); // Evitar que se pulse otra cosa sin querer
+                        e.stopPropagation(); 
                         speak(exampleText, config.voice1);
                     };
 
                     btnCtx.onclick = () => {
                         if (divCtx.style.display === 'none') {
                             divCtx.style.display = 'block';
-                            btnCtx.innerHTML = "🙈 Ocultar contexto";
+                            // TRADUCIDO AL ALEMÁN
+                            btnCtx.innerHTML = "🙈 Kontext ausblenden";
                             btnCtx.style.background = "#dbeafe";
                         } else {
                             divCtx.style.display = 'none';
-                            btnCtx.innerHTML = "📖 Mostrar contexto";
+                            // TRADUCIDO AL ALEMÁN
+                            btnCtx.innerHTML = "📖 Kontext anzeigen";
                             btnCtx.style.background = "#f3f4f6";
                         }
                     };
@@ -269,8 +271,8 @@ function createCardUI(content, date) {
     if(notebookGallery) notebookGallery.appendChild(card);
 }
 
-// --- 8. VOCES Y REPRODUCCIÓN (SEGURO PARA iPHONE) ---
-let currentUtterance = null; // Variable global para que iOS no borre la voz
+// --- 8. VOCES Y REPRODUCCIÓN ---
+let currentUtterance = null; 
 
 async function speak(text, lang) {
     return new Promise(resolve => {
@@ -279,7 +281,6 @@ async function speak(text, lang) {
         currentUtterance.lang = lang;
         currentUtterance.rate = 0.9;
         
-        // Cuando termine o si da error, que deje seguir la app
         currentUtterance.onend = resolve;
         currentUtterance.onerror = resolve; 
         
@@ -293,7 +294,8 @@ const playSessionBtn = document.getElementById('playSession');
 if(playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("¡Bitte zuerst eine Lektion laden!");
+        // TRADUCIDO AL ALEMÁN
+        if (rows.length === 0) return alert("Bitte zuerst eine Lektion laden!");
 
         if (isPlaying) {
             isPlaying = false;
@@ -307,7 +309,6 @@ if(playSessionBtn) {
         playSessionBtn.innerHTML = "⏸️ Sitzung pausieren";
         playSessionBtn.style.background = "#ff9800"; 
         
-        // Obligamos a leer la cajita azul del menú de arriba de verdad
         const actualModeSelect = document.getElementById('audioMode');
         const mode = actualModeSelect ? actualModeSelect.value : 'basic';
 
@@ -322,7 +323,6 @@ if(playSessionBtn) {
             if (!isPlaying) break;
             await speak(row.dataset.text2, row.dataset.voice2);
 
-            // Ahora sí, si está en modo "full" y hay un texto de ejemplo
             if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
                 if (!isPlaying) break;
                 await new Promise(r => setTimeout(r, 1000)); 
@@ -361,7 +361,8 @@ let currentCorrectAnswer = "";
 if(quizBtn) {
     quizBtn.onclick = () => {
         const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("¡Bitte lade zuerst eine Lektion hoch!");
+        // TRADUCIDO AL ALEMÁN
+        if (rows.length === 0) return alert("Bitte lade zuerst eine Lektion hoch!");
         quizOverlay.style.display = 'flex';
         nextQuestion();
     };
@@ -370,7 +371,8 @@ if(quizBtn) {
 function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    document.getElementById('quizQuestion').innerText = `Traduce / Übersetze:\n"${randomRow.dataset.text1}"`;
+    // TRADUCIDO AL ALEMÁN
+    document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`;
     currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
     const input = document.getElementById('quizInput');
     input.value = "";
@@ -380,10 +382,12 @@ function nextQuestion() {
 document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
     if (userAns === currentCorrectAnswer) {
-        alert("¡Excelente! 🎉 Richtig!");
+        // TRADUCIDO AL ALEMÁN
+        alert("Ausgezeichnet! 🎉 Richtig!");
         nextQuestion();
     } else {
-        alert(`Fast... Correcto / Richtig: ${currentCorrectAnswer.toUpperCase()}`);
+        // TRADUCIDO AL ALEMÁN
+        alert(`Fast... Die richtige Antwort ist: ${currentCorrectAnswer.toUpperCase()}`);
         nextQuestion();
     }
 };
