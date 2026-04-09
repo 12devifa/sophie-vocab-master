@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V6.3 (QUIZ PROFESIONAL SIN ALERTAS)
+// SOPHIE: VOCAB MASTER - V7.0 (SISTEMA DE RACHAS 🔥)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -16,6 +16,60 @@ const swapLangBtn = document.getElementById('swapLangBtn');
 const audioMode = document.getElementById('audioMode'); 
 
 let isSwapped = false; 
+
+// --- 0. SISTEMA DE RACHAS (STREAKS) ---
+function loadStreak() {
+    let streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
+    const streakEl = document.getElementById('streakNumber');
+    if(streakEl) streakEl.innerText = streak;
+}
+
+function updateStreak() {
+    const now = new Date();
+    // Normalizamos a medianoche para evitar problemas con la hora
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    let lastActivity = localStorage.getItem('sophie_last_activity_time');
+    let streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
+
+    if (lastActivity) {
+        lastActivity = parseInt(lastActivity);
+        const diffTime = Math.abs(today - lastActivity);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+        if (diffDays === 0) {
+            // Ya estudió hoy, no sumamos más pero mantenemos la racha
+        } else if (diffDays === 1) {
+            // Estudió ayer, ¡mantiene la racha y suma!
+            streak++;
+            animateStreak();
+        } else {
+            // Pasó más de un día, pierde la racha y vuelve a empezar
+            streak = 1;
+            animateStreak();
+        }
+    } else {
+        // Es su primer día usando la app
+        streak = 1;
+        animateStreak();
+    }
+
+    localStorage.setItem('sophie_last_activity_time', today.toString());
+    localStorage.setItem('sophie_streak', streak.toString());
+    
+    const streakEl = document.getElementById('streakNumber');
+    if(streakEl) streakEl.innerText = streak;
+}
+
+function animateStreak() {
+    const box = document.getElementById('streakCounter');
+    if (box) {
+        box.style.transform = "scale(1.2) rotate(5deg)";
+        setTimeout(() => {
+            box.style.transform = "scale(1) rotate(0deg)";
+        }, 400);
+    }
+}
 
 // --- 1. MODO CLARO / OSCURO ---
 if (themeToggle) {
@@ -38,6 +92,8 @@ window.addEventListener('DOMContentLoaded', () => {
             if(themeToggle) themeToggle.innerText = '☀️';
         }
     } catch(e){}
+
+    loadStreak(); // Cargamos el fueguito al inicio
 
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText && textInput) textInput.value = savedText;
@@ -89,10 +145,8 @@ if (fileUpload) {
     fileUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         textInput.value = "Lese Datei... Bitte warten... ⏳";
         if(processBtn) processBtn.innerText = "⌛ SOPHIE liest...";
-
         try {
             if (file.type === "text/plain") {
                 const reader = new FileReader();
@@ -113,7 +167,7 @@ if (fileUpload) {
                 textInput.value = fullText;
                 localStorage.setItem('sophie_last_input', fullText);
             } else if (file.type.startsWith("image/")) {
-                textInput.value = "Bild wird analysiert... ⏳ (Das kann einen Moment dauern)";
+                textInput.value = "Bild wird analysiert... ⏳";
                 const result = await Tesseract.recognize(file, 'deu+fra+eng+spa+por');
                 textInput.value = result.data.text;
                 localStorage.setItem('sophie_last_input', textInput.value);
@@ -133,7 +187,6 @@ if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
         if (!rawText.trim()) return;
-
         labList.innerHTML = '';
         const lines = rawText.split('\n');
         const mode = langSelect ? langSelect.value : 'fr-de';
@@ -141,36 +194,26 @@ if (processBtn) {
 
         lines.forEach(line => {
             if (!line.trim()) return;
-            
             let cleanLine = line.replace(/\[.*?\]/g, ''); 
             let exampleText = "";
-            
             if (cleanLine.includes('|')) {
                 const partsWithExample = cleanLine.split('|');
                 cleanLine = partsWithExample[0]; 
                 exampleText = partsWithExample[1].trim(); 
             }
-
             let parts = cleanLine.includes('→') ? cleanLine.split('→') : cleanLine.trim().split(/\s{2,}/);
 
             if (parts.length >= 2) {
                 const row = document.createElement('div');
                 row.className = 'lab-row';
                 row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; gap:8px;";
-                
                 let text1 = parts[0].trim();
                 let text2 = parts.slice(-1)[0].trim();
-
                 if (isSwapped) {
-                    let temp = text1;
-                    text1 = text2;
-                    text2 = temp;
+                    let temp = text1; text1 = text2; text2 = temp;
                 }
-
-                row.dataset.text1 = text1;
-                row.dataset.text2 = text2;
-                row.dataset.voice1 = config.voice1;
-                row.dataset.voice2 = config.voice2;
+                row.dataset.text1 = text1; row.dataset.text2 = text2;
+                row.dataset.voice1 = config.voice1; row.dataset.voice2 = config.voice2;
                 row.dataset.example = exampleText; 
 
                 const vocabContainer = document.createElement('div');
@@ -182,23 +225,16 @@ if (processBtn) {
                     const btnCtx = document.createElement('button');
                     btnCtx.innerHTML = "📖 Kontext anzeigen";
                     btnCtx.style = "font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #f3f4f6; cursor: pointer; align-self: flex-start; color: #4b5563; font-weight: bold;";
-                    
                     const divCtx = document.createElement('div');
                     divCtx.style = "display: none; background: #e0f2fe; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #0369a1; margin-top: 5px; font-style: italic;";
-                    
                     divCtx.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span>💡 ${exampleText}</span>
                             <button class="play-example" title="Anhören" style="background:white; border:1px solid #bae6fd; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; flex-shrink:0; margin-left:10px;">🔊</button>
                         </div>
                     `;
-
                     const speakerBtn = divCtx.querySelector('.play-example');
-                    speakerBtn.onclick = (e) => {
-                        e.stopPropagation(); 
-                        speak(exampleText, config.voice1);
-                    };
-
+                    speakerBtn.onclick = (e) => { e.stopPropagation(); speak(exampleText, config.voice1); };
                     btnCtx.onclick = () => {
                         if (divCtx.style.display === 'none') {
                             divCtx.style.display = 'block';
@@ -210,7 +246,6 @@ if (processBtn) {
                             btnCtx.style.background = "#f3f4f6";
                         }
                     };
-
                     row.appendChild(btnCtx);
                     row.appendChild(divCtx);
                 }
@@ -237,7 +272,6 @@ function saveLesson(content) {
     notebookGallery.innerHTML = '';
     lessons.forEach(l => createCardUI(l.content, l.date));
 }
-
 function createCardUI(content, date) {
     const title = content.trim().split('\n')[0].substring(0, 30);
     const card = document.createElement('div');
@@ -270,29 +304,24 @@ function createCardUI(content, date) {
 
 // --- 8. VOCES Y REPRODUCCIÓN ---
 let currentUtterance = null; 
-
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
         currentUtterance = new SpeechSynthesisUtterance(text);
         currentUtterance.lang = lang;
         currentUtterance.rate = 0.9;
-        
         currentUtterance.onend = resolve;
         currentUtterance.onerror = resolve; 
-        
         window.speechSynthesis.speak(currentUtterance);
     });
 }
 
 let isPlaying = false; 
 const playSessionBtn = document.getElementById('playSession');
-
 if(playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
         if (rows.length === 0) return alert("Bitte zuerst eine Lektion laden!");
-
         if (isPlaying) {
             isPlaying = false;
             window.speechSynthesis.cancel(); 
@@ -300,40 +329,36 @@ if(playSessionBtn) {
             playSessionBtn.style.background = "#4caf50"; 
             return;
         }
-
         isPlaying = true;
         playSessionBtn.innerHTML = "⏸️ Sitzung pausieren";
         playSessionBtn.style.background = "#ff9800"; 
-        
         const actualModeSelect = document.getElementById('audioMode');
         const mode = actualModeSelect ? actualModeSelect.value : 'basic';
 
         for (let row of rows) {
             if (!isPlaying) break; 
             row.style.background = "#fff9c4";
-            
             await speak(row.dataset.text1, row.dataset.voice1);
             if (!isPlaying) break; 
             await new Promise(r => setTimeout(r, 1000));
-            
             if (!isPlaying) break;
             await speak(row.dataset.text2, row.dataset.voice2);
-
             if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
                 if (!isPlaying) break;
                 await new Promise(r => setTimeout(r, 1000)); 
                 if (!isPlaying) break;
                 await speak(row.dataset.example, row.dataset.voice1); 
             }
-
             row.style.background = "transparent";
             if (!isPlaying) break;
             await new Promise(r => setTimeout(r, 1500)); 
         }
-
         isPlaying = false;
         playSessionBtn.innerHTML = "▶️ Sitzung starten";
         playSessionBtn.style.background = "#4caf50";
+        
+        // ¡Al terminar una sesión, sumamos racha!
+        updateStreak();
     };
 }
 
@@ -354,7 +379,6 @@ quizOverlay.style.display = 'none';
 document.body.appendChild(quizOverlay);
 
 let currentCorrectAnswer = "";
-
 if(quizBtn) {
     quizBtn.onclick = () => {
         const rows = document.querySelectorAll('.lab-row');
@@ -369,12 +393,9 @@ function nextQuestion() {
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`;
     currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
-    
     const input = document.getElementById('quizInput');
     input.value = "";
     input.focus();
-    
-    // Limpiamos los mensajes anteriores
     document.getElementById('quizFeedback').innerText = "";
 }
 
@@ -382,24 +403,26 @@ document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
     const feedback = document.getElementById('quizFeedback');
     const checkBtn = document.getElementById('checkBtn');
-
-    // Desactivamos el botón un segundo para que no hagan doble clic
     checkBtn.disabled = true;
 
     if (userAns === currentCorrectAnswer) {
-        feedback.style.color = "#4ade80"; // Verde brillante
+        feedback.style.color = "#4ade80"; 
         feedback.innerText = "Ausgezeichnet! 🎉 Richtig!";
+        
+        // ¡Al acertar una palabra, sumamos racha!
+        updateStreak();
+
         setTimeout(() => { 
             nextQuestion(); 
             checkBtn.disabled = false;
-        }, 1200); // Pasa a la siguiente en 1.2 segundos
+        }, 1200); 
     } else {
-        feedback.style.color = "#fca5a5"; // Rojo suave
+        feedback.style.color = "#fca5a5"; 
         feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
         setTimeout(() => { 
             nextQuestion(); 
             checkBtn.disabled = false;
-        }, 2500); // Pasa a la siguiente en 2.5 segundos para que le dé tiempo a leer
+        }, 2500); 
     }
 };
 
