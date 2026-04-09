@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V6.2 (100% DEUTSCH UI + AUDIO SEGURO)
+// SOPHIE: VOCAB MASTER - V6.3 (QUIZ PROFESIONAL SIN ALERTAS)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -180,7 +180,6 @@ if (processBtn) {
 
                 if (exampleText !== "") {
                     const btnCtx = document.createElement('button');
-                    // TRADUCIDO AL ALEMÁN
                     btnCtx.innerHTML = "📖 Kontext anzeigen";
                     btnCtx.style = "font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #f3f4f6; cursor: pointer; align-self: flex-start; color: #4b5563; font-weight: bold;";
                     
@@ -203,12 +202,10 @@ if (processBtn) {
                     btnCtx.onclick = () => {
                         if (divCtx.style.display === 'none') {
                             divCtx.style.display = 'block';
-                            // TRADUCIDO AL ALEMÁN
                             btnCtx.innerHTML = "🙈 Kontext ausblenden";
                             btnCtx.style.background = "#dbeafe";
                         } else {
                             divCtx.style.display = 'none';
-                            // TRADUCIDO AL ALEMÁN
                             btnCtx.innerHTML = "📖 Kontext anzeigen";
                             btnCtx.style.background = "#f3f4f6";
                         }
@@ -294,7 +291,6 @@ const playSessionBtn = document.getElementById('playSession');
 if(playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
-        // TRADUCIDO AL ALEMÁN
         if (rows.length === 0) return alert("Bitte zuerst eine Lektion laden!");
 
         if (isPlaying) {
@@ -341,7 +337,7 @@ if(playSessionBtn) {
     };
 }
 
-// --- 9. SISTEMA DE QUIZ ---
+// --- 9. SISTEMA DE QUIZ PROFESIONAL ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
@@ -350,6 +346,7 @@ quizOverlay.innerHTML = `
     </div>
     <div id="quizQuestion" class="quiz-card">Lädt...</div>
     <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
+    <div id="quizFeedback" style="min-height: 24px; margin: 10px 0; font-weight: bold; font-size: 1.1rem; text-align: center;"></div>
     <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
     <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
 `;
@@ -361,7 +358,6 @@ let currentCorrectAnswer = "";
 if(quizBtn) {
     quizBtn.onclick = () => {
         const rows = document.querySelectorAll('.lab-row');
-        // TRADUCIDO AL ALEMÁN
         if (rows.length === 0) return alert("Bitte lade zuerst eine Lektion hoch!");
         quizOverlay.style.display = 'flex';
         nextQuestion();
@@ -371,24 +367,39 @@ if(quizBtn) {
 function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    // TRADUCIDO AL ALEMÁN
     document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`;
     currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
+    
     const input = document.getElementById('quizInput');
     input.value = "";
     input.focus();
+    
+    // Limpiamos los mensajes anteriores
+    document.getElementById('quizFeedback').innerText = "";
 }
 
 document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
+    const feedback = document.getElementById('quizFeedback');
+    const checkBtn = document.getElementById('checkBtn');
+
+    // Desactivamos el botón un segundo para que no hagan doble clic
+    checkBtn.disabled = true;
+
     if (userAns === currentCorrectAnswer) {
-        // TRADUCIDO AL ALEMÁN
-        alert("Ausgezeichnet! 🎉 Richtig!");
-        nextQuestion();
+        feedback.style.color = "#4ade80"; // Verde brillante
+        feedback.innerText = "Ausgezeichnet! 🎉 Richtig!";
+        setTimeout(() => { 
+            nextQuestion(); 
+            checkBtn.disabled = false;
+        }, 1200); // Pasa a la siguiente en 1.2 segundos
     } else {
-        // TRADUCIDO AL ALEMÁN
-        alert(`Fast... Die richtige Antwort ist: ${currentCorrectAnswer.toUpperCase()}`);
-        nextQuestion();
+        feedback.style.color = "#fca5a5"; // Rojo suave
+        feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
+        setTimeout(() => { 
+            nextQuestion(); 
+            checkBtn.disabled = false;
+        }, 2500); // Pasa a la siguiente en 2.5 segundos para que le dé tiempo a leer
     }
 };
 
