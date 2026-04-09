@@ -2,44 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SOPHIE: Vocab Master</title>
-    <link rel="stylesheet" href="style.css?v=1"></script>
+    <link rel="stylesheet" href="style.css?v=2">
     <link rel="apple-touch-icon" href="https://fav.farm/🎧">
     <link rel="icon" href="https://fav.farm/🎧">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <button id="themeToggle" style="background:none; border:none; cursor:pointer; font-size:1.8rem; position:fixed; top:15px; right:15px; z-index: 9999; padding: 5px;" onclick="document.body.classList.toggle('light-theme'); this.innerText = document.body.classList.contains('light-theme') ? '🌙' : '☀️';">
-☀️
-</button>
+    <button id="themeToggle" style="background:none; border:none; cursor:pointer; font-size:1.8rem; position:fixed; top:15px; right:15px; z-index: 9999; padding: 5px;">
+    ☀️
+    </button>
     <div class="app-container">
         <header>
             <h1>🎧 SOPHIE: Vocab Master</h1>
             <p>Freihändiges Lernuniversum</p>
-         
-
-<audio id="bgMusic" preload="auto" crossorigin="anonymous" style="display:none;"></audio>
+            <audio id="bgMusic" preload="auto" crossorigin="anonymous" style="display:none;"></audio>
         </header>
 
         <main class="grid-layout">
-<section class="card input-col">
+            <section class="card input-col">
                 <div class="card-header">
                     <span class="icon">📥</span>
                     <h2>Eingabe</h2>
                 </div>
                 <textarea id="textInput" placeholder="Hier schreiben oder einfügen..."></textarea>
                 
-               <div style="margin-top: 15px; display: flex; gap: 10px; flex-direction: column;">
-    <button id="newNoteBtn" class="primary-btn" style="background-color: #f5f5f5; color: #333; border: 1px solid #ccc; width: 100%; border-radius: 8px; padding: 10px; cursor: pointer;">
-        + Neue Notiz
-    </button>
-    <label for="fileUpload" class="primary-btn" style="width: 100%; text-align: center; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 10px; margin-top: -5px;">
-        📄 PDF/TXT hochladen
-    </label>
-    <input type="file" id="fileUpload" accept="image/*, application/pdf, text/plain" style="display:none;">
-</div>
-<button id="processBtn" class="primary-btn" style="margin-top: 15px; width: 100%; border-radius: 8px; cursor: pointer;">Lektion verarbeiten</button>
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-direction: column;">
+                    <button id="newNoteBtn" class="primary-btn" style="background-color: #f5f5f5; color: #333; border: 1px solid #ccc; width: 100%; border-radius: 8px; padding: 10px; cursor: pointer;">
+                        + Neue Notiz
+                    </button>
+                    <label for="fileUpload" class="primary-btn" style="width: 100%; text-align: center; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 10px; margin-top: -5px;">
+                        📄 PDF/TXT hochladen
+                    </label>
+                    <input type="file" id="fileUpload" accept="image/*, application/pdf, text/plain" style="display:none;">
+                </div>
+                <button id="processBtn" class="primary-btn" style="margin-top: 15px; width: 100%; border-radius: 8px; cursor: pointer;">Lektion verarbeiten</button>
             </section>
 
             <section class="card lab-col">
@@ -48,11 +46,11 @@
                     <h2>Labor</h2>
                 </div>
                 <div id="labList" class="list-container">
-                    </div>
+                </div>
                 <button id="playSession" class="play-btn">▶ Freihändig abspielen</button>
-<button id="quizBtn" class="secondary-btn" style="margin-top: 10px; background: #673ab7; color: white; border: none; width: 100%; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">
-    🧠 Vokabel-Quiz starten
-</button>
+                <button id="quizBtn" class="secondary-btn" style="margin-top: 10px; background: #673ab7; color: white; border: none; width: 100%; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">
+                    🧠 Vokabel-Quiz starten
+                </button>
             </section>
 
             <section class="card gallery-col">
@@ -61,7 +59,7 @@
                     <h2>Galerie</h2>
                 </div>
                 <div id="notebookGallery" class="notebook-grid">
-                    </div>
+                </div>
                 <button id="exportBtn" class="secondary-btn">Exportieren (.json)</button>
             </section>
         </main>
