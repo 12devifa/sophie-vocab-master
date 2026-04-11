@@ -1,6 +1,10 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V7.0 (SISTEMA DE RACHAS 🔥)
+// SOPHIE: VOCAB MASTER - V8.0 (INTEGRACIÓN CON GEMINI IA 🧠✨)
 // ==============================================================
+
+// 👇👇👇 ¡PEGA TU LLAVE SECRETA AQUÍ ENTRE LAS COMILLAS! 👇👇👇
+const GEMINI_API_KEY = "AIzaSyCpzRuX1ujbb8ZSPE61I04ehJDOriX70Wk";
+// 👆👆👆 ----------------------------------------------- 👆👆👆
 
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
@@ -14,6 +18,7 @@ const exportBtn = document.getElementById('exportBtn');
 const langSelect = document.getElementById('langSelect');
 const swapLangBtn = document.getElementById('swapLangBtn'); 
 const audioMode = document.getElementById('audioMode'); 
+const magicOrderBtn = document.getElementById('magicOrderBtn'); // Botón mágico
 
 let isSwapped = false; 
 
@@ -26,9 +31,7 @@ function loadStreak() {
 
 function updateStreak() {
     const now = new Date();
-    // Normalizamos a medianoche para evitar problemas con la hora
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    
     let lastActivity = localStorage.getItem('sophie_last_activity_time');
     let streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
 
@@ -38,25 +41,17 @@ function updateStreak() {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
         if (diffDays === 0) {
-            // Ya estudió hoy, no sumamos más pero mantenemos la racha
+            // Ya estudió hoy
         } else if (diffDays === 1) {
-            // Estudió ayer, ¡mantiene la racha y suma!
-            streak++;
-            animateStreak();
+            streak++; animateStreak();
         } else {
-            // Pasó más de un día, pierde la racha y vuelve a empezar
-            streak = 1;
-            animateStreak();
+            streak = 1; animateStreak();
         }
     } else {
-        // Es su primer día usando la app
-        streak = 1;
-        animateStreak();
+        streak = 1; animateStreak();
     }
-
     localStorage.setItem('sophie_last_activity_time', today.toString());
     localStorage.setItem('sophie_streak', streak.toString());
-    
     const streakEl = document.getElementById('streakNumber');
     if(streakEl) streakEl.innerText = streak;
 }
@@ -65,13 +60,81 @@ function animateStreak() {
     const box = document.getElementById('streakCounter');
     if (box) {
         box.style.transform = "scale(1.2) rotate(5deg)";
-        setTimeout(() => {
-            box.style.transform = "scale(1) rotate(0deg)";
-        }, 400);
+        setTimeout(() => box.style.transform = "scale(1) rotate(0deg)", 400);
     }
 }
 
-// --- 1. MODO CLARO / OSCURO ---
+// --- 1. BOTÓN MÁGICO CON INTELIGENCIA ARTIFICIAL ✨ ---
+if (magicOrderBtn) {
+    magicOrderBtn.addEventListener('click', async () => {
+        const rawText = textInput.value;
+        if (!rawText.trim()) return alert("Bitte zuerst Text eingeben! (Por favor, introduce texto primero)");
+
+        if (GEMINI_API_KEY === "PEGA_AQUI_TU_LLAVE" || GEMINI_API_KEY === "") {
+            return alert("❌ FEHLER: Du hast deinen API-Schlüssel nicht in app.js eingefügt! (¡No has puesto la llave!)");
+        }
+
+        // Leemos qué idiomas están seleccionados para decirle a la IA
+        const mode = langSelect ? langSelect.value : 'fr-de';
+        let langPrompt = "Sprache 1 zu Sprache 2";
+        if (mode === 'fr-de') langPrompt = "Französisch zu Deutsch";
+        if (mode === 'en-es') langPrompt = "Englisch zu Spanisch";
+        if (mode === 'es-de') langPrompt = "Spanisch zu Deutsch";
+        if (mode === 'en-de') langPrompt = "Englisch zu Deutsch";
+        if (mode === 'pt-de') langPrompt = "Portugiesisch zu Deutsch";
+
+        // Cambiamos el diseño del botón mientras piensa
+        magicOrderBtn.innerHTML = "✨ KI denkt nach... ⏳ (La IA está pensando)";
+        magicOrderBtn.style.opacity = "0.7";
+        magicOrderBtn.disabled = true;
+
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        
+        // Las instrucciones secretas para la IA
+        const systemPrompt = `Du bist ein strenger Vokabel-Lehrer. Der Benutzer gibt dir eine unordentliche Liste von Wörtern. Deine Aufgabe ist es, sie in DIESEM genauen Format zu strukturieren:
+'Wort in Sprache 1 → Übersetzung in Sprache 2 | Ein passender Beispielsatz in Sprache 1'
+
+Regeln:
+1. Die Sprachen sind: ${langPrompt}.
+2. Das Trennzeichen für die Übersetzung MUSS ein Pfeil '→' sein.
+3. Das Trennzeichen für den Beispielsatz MUSS ein senkrechter Strich '|' sein.
+4. Wenn ein Beispielsatz fehlt, ERFINDE EINEN natürlichen und passenden.
+5. Antworte NUR mit der sauberen Liste. Kein 'Hallo', keine anderen Erklärungen.
+
+Unordentlicher Text:
+${rawText}`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: systemPrompt }] }]
+                })
+            });
+
+            const data = await response.json();
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                // ¡Éxito! Ponemos el texto limpio en la caja
+                textInput.value = data.candidates[0].content.parts[0].text.trim();
+                localStorage.setItem('sophie_last_input', textInput.value);
+            } else {
+                alert("❌ Fehler bei der KI-Antwort.");
+                console.log(data);
+            }
+        } catch (error) {
+            alert("❌ Verbindungsfehler zur KI.");
+            console.error(error);
+        } finally {
+            // Restauramos el botón
+            magicOrderBtn.innerHTML = "✨ Automagisch mit KI ordnen";
+            magicOrderBtn.style.opacity = "1";
+            magicOrderBtn.disabled = false;
+        }
+    });
+}
+
+// --- 2. MODO CLARO / OSCURO ---
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-theme');
@@ -81,42 +144,32 @@ if (themeToggle) {
     });
 }
 
-// --- 2. CARGA INICIAL ---
+// --- 3. CARGA INICIAL ---
 window.addEventListener('DOMContentLoaded', () => {
     try {
         const isLight = localStorage.getItem('sophie_light_mode') === 'true';
         if (isLight) {
             document.body.classList.add('light-theme');
             if(themeToggle) themeToggle.innerText = '🌙';
-        } else {
-            if(themeToggle) themeToggle.innerText = '☀️';
         }
     } catch(e){}
-
-    loadStreak(); // Cargamos el fueguito al inicio
-
+    loadStreak(); 
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText && textInput) textInput.value = savedText;
-
     const saved = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     saved.forEach(l => createCardUI(l.content, l.date));
 });
 
-// --- 3. NUEVA NOTA Y GUARDADO ---
+// --- 4. NUEVA NOTA Y CONFIG IDIOMAS ---
 if (newNoteBtn) {
     newNoteBtn.addEventListener('click', () => {
         textInput.value = "";
         localStorage.setItem('sophie_last_input', "");
     });
 }
-
 if (textInput) {
-    textInput.addEventListener('input', (e) => {
-        localStorage.setItem('sophie_last_input', e.target.value);
-    });
+    textInput.addEventListener('input', (e) => localStorage.setItem('sophie_last_input', e.target.value));
 }
-
-// --- 4. CONFIGURADOR DE IDIOMAS Y BOTÓN INVERTIR ---
 if (swapLangBtn) {
     swapLangBtn.addEventListener('click', () => {
         isSwapped = !isSwapped;
@@ -134,9 +187,7 @@ function getLangConfig(mode, swapped) {
         case 'pt-de': flag1='🇵🇹'; flag2='🇩🇪'; voice1='pt-PT'; voice2='de-DE'; break;
         default: flag1='🇫🇷'; flag2='🇩🇪'; voice1='fr-FR'; voice2='de-DE';
     }
-    if (swapped) {
-        return { flag1: flag2, flag2: flag1, voice1: voice2, voice2: voice1 };
-    }
+    if (swapped) return { flag1: flag2, flag2: flag1, voice1: voice2, voice2: voice1 };
     return { flag1, flag2, voice1, voice2 };
 }
 
@@ -150,10 +201,7 @@ if (fileUpload) {
         try {
             if (file.type === "text/plain") {
                 const reader = new FileReader();
-                reader.onload = (evento) => {
-                    textInput.value = evento.target.result;
-                    localStorage.setItem('sophie_last_input', textInput.value);
-                };
+                reader.onload = (evento) => { textInput.value = evento.target.result; localStorage.setItem('sophie_last_input', textInput.value); };
                 reader.readAsText(file);
             } else if (file.type === "application/pdf") {
                 const arrayBuffer = await file.arrayBuffer();
@@ -174,11 +222,9 @@ if (fileUpload) {
             } else {
                 textInput.value = "❌ Format wird nicht unterstützt.";
             }
-        } catch (error) {
-            textInput.value = "❌ Fehler beim Lesen der Datei.";
-        }
+        } catch (error) { textInput.value = "❌ Fehler beim Lesen der Datei."; }
         fileUpload.value = '';
-        if(processBtn) processBtn.innerText = "Lektion verarbeiten";
+        if(processBtn) processBtn.innerText = "Lektion verarbeiten (Manuell)";
     });
 }
 
@@ -209,9 +255,8 @@ if (processBtn) {
                 row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; gap:8px;";
                 let text1 = parts[0].trim();
                 let text2 = parts.slice(-1)[0].trim();
-                if (isSwapped) {
-                    let temp = text1; text1 = text2; text2 = temp;
-                }
+                if (isSwapped) { let temp = text1; text1 = text2; text2 = temp; }
+                
                 row.dataset.text1 = text1; row.dataset.text2 = text2;
                 row.dataset.voice1 = config.voice1; row.dataset.voice2 = config.voice2;
                 row.dataset.example = exampleText; 
@@ -265,8 +310,7 @@ function saveLesson(content) {
         lessons[existingIndex].content = content;
         lessons[existingIndex].date = new Date().toLocaleDateString();
     } else {
-        const lesson = { title, content, date: new Date().toLocaleDateString() };
-        lessons.push(lesson);
+        lessons.push({ title, content, date: new Date().toLocaleDateString() });
     }
     localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
     notebookGallery.innerHTML = '';
@@ -276,16 +320,7 @@ function createCardUI(content, date) {
     const title = content.trim().split('\n')[0].substring(0, 30);
     const card = document.createElement('div');
     card.className = 'gallery-card';
-    card.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
-            <div style="font-size: 1.5rem; color: #8e918f;">📓</div>
-            <div style="flex: 1; text-align: left;">
-                <div style="font-weight: bold; font-size: 0.95rem; color: #e3e3e3; margin-bottom: 3px;">${title}</div>
-                <div style="font-size: 0.75rem; color: #8e918f;">Erstellt am ${date}</div>
-            </div>
-            <button class="delete-btn" title="Löschen">🗑️</button>
-        </div>
-    `;
+    card.innerHTML = `<div style="display: flex; align-items: center; gap: 15px; width: 100%;"><div style="font-size: 1.5rem; color: #8e918f;">📓</div><div style="flex: 1; text-align: left;"><div style="font-weight: bold; font-size: 0.95rem; color: #e3e3e3; margin-bottom: 3px;">${title}</div><div style="font-size: 0.75rem; color: #8e918f;">Erstellt am ${date}</div></div><button class="delete-btn" title="Löschen">🗑️</button></div>`;
     card.addEventListener('click', (e) => {
         if(e.target.closest('.delete-btn')) return; 
         if(textInput) textInput.value = content;
@@ -356,8 +391,6 @@ if(playSessionBtn) {
         isPlaying = false;
         playSessionBtn.innerHTML = "▶️ Sitzung starten";
         playSessionBtn.style.background = "#4caf50";
-        
-        // ¡Al terminar una sesión, sumamos racha!
         updateStreak();
     };
 }
@@ -366,9 +399,7 @@ if(playSessionBtn) {
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
 quizOverlay.innerHTML = `
-    <div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-        SOPHIE QUIZ 🧠
-    </div>
+    <div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">SOPHIE QUIZ 🧠</div>
     <div id="quizQuestion" class="quiz-card">Lädt...</div>
     <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
     <div id="quizFeedback" style="min-height: 24px; margin: 10px 0; font-weight: bold; font-size: 1.1rem; text-align: center;"></div>
@@ -387,48 +418,30 @@ if(quizBtn) {
         nextQuestion();
     };
 }
-
 function nextQuestion() {
     const rows = document.querySelectorAll('.lab-row');
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`;
     currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
     const input = document.getElementById('quizInput');
-    input.value = "";
-    input.focus();
+    input.value = ""; input.focus();
     document.getElementById('quizFeedback').innerText = "";
 }
-
 document.getElementById('checkBtn').onclick = () => {
     const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
     const feedback = document.getElementById('quizFeedback');
     const checkBtn = document.getElementById('checkBtn');
     checkBtn.disabled = true;
-
     if (userAns === currentCorrectAnswer) {
-        feedback.style.color = "#4ade80"; 
-        feedback.innerText = "Ausgezeichnet! 🎉 Richtig!";
-        
-        // ¡Al acertar una palabra, sumamos racha!
+        feedback.style.color = "#4ade80"; feedback.innerText = "Ausgezeichnet! 🎉 Richtig!";
         updateStreak();
-
-        setTimeout(() => { 
-            nextQuestion(); 
-            checkBtn.disabled = false;
-        }, 1200); 
+        setTimeout(() => { nextQuestion(); checkBtn.disabled = false; }, 1200); 
     } else {
-        feedback.style.color = "#fca5a5"; 
-        feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
-        setTimeout(() => { 
-            nextQuestion(); 
-            checkBtn.disabled = false;
-        }, 2500); 
+        feedback.style.color = "#fca5a5"; feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
+        setTimeout(() => { nextQuestion(); checkBtn.disabled = false; }, 2500); 
     }
 };
-
-document.getElementById('closeQuiz').onclick = () => {
-    quizOverlay.style.display = 'none';
-};
+document.getElementById('closeQuiz').onclick = () => quizOverlay.style.display = 'none';
 
 // --- 10. EXPORTAR (.json) ---
 if (exportBtn) {
@@ -437,13 +450,9 @@ if (exportBtn) {
         if (!lessons || lessons === '[]') return alert('Es gibt noch keine Notizen.');
         const blob = new Blob([lessons], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
+        const a = document.createElement('a'); a.href = url;
         const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
         a.download = 'SOPHIE_Backup_' + fecha + '.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     });
 }
