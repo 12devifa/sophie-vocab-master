@@ -1,10 +1,6 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V8.0 (INTEGRACIÓN CON GEMINI IA 🧠✨)
+// SOPHIE: VOCAB MASTER - V8.1 (SISTEMA DE SEGURIDAD PRIVADO 🔒)
 // ==============================================================
-
-// 👇👇👇 ¡PEGA TU LLAVE SECRETA AQUÍ ENTRE LAS COMILLAS! 👇👇👇
-const GEMINI_API_KEY = "AIzaSyCpzRuX1ujbb8ZSPE61I04ehJDOriX70Wk";
-// 👆👆👆 ----------------------------------------------- 👆👆👆
 
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
@@ -18,7 +14,7 @@ const exportBtn = document.getElementById('exportBtn');
 const langSelect = document.getElementById('langSelect');
 const swapLangBtn = document.getElementById('swapLangBtn'); 
 const audioMode = document.getElementById('audioMode'); 
-const magicOrderBtn = document.getElementById('magicOrderBtn'); // Botón mágico
+const magicOrderBtn = document.getElementById('magicOrderBtn'); 
 
 let isSwapped = false; 
 
@@ -64,17 +60,20 @@ function animateStreak() {
     }
 }
 
-// --- 1. BOTÓN MÁGICO CON INTELIGENCIA ARTIFICIAL ✨ ---
+// --- 1. BOTÓN MÁGICO Y SEGURIDAD DE LLAVE ✨ ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput.value;
-        if (!rawText.trim()) return alert("Bitte zuerst Text eingeben! (Por favor, introduce texto primero)");
+        if (!rawText.trim()) return alert("Bitte zuerst Text eingeben! (Introduce texto primero)");
 
-        if (GEMINI_API_KEY === "PEGA_AQUI_TU_LLAVE" || GEMINI_API_KEY === "") {
-            return alert("❌ FEHLER: Du hast deinen API-Schlüssel nicht in app.js eingefügt! (¡No has puesto la llave!)");
+        // SISTEMA SEGURO: Pedir llave si no está guardada en el navegador
+        let userApiKey = localStorage.getItem('sophie_gemini_key');
+        if (!userApiKey) {
+            userApiKey = prompt("🔒 Sicherheit zuerst! Bitte füge hier deinen Google API Key ein (er wird nur privat in deinem Browser gespeichert):");
+            if (!userApiKey || userApiKey.trim() === "") return alert("Aktion abgebrochen. API-Key wird benötigt.");
+            localStorage.setItem('sophie_gemini_key', userApiKey.trim());
         }
 
-        // Leemos qué idiomas están seleccionados para decirle a la IA
         const mode = langSelect ? langSelect.value : 'fr-de';
         let langPrompt = "Sprache 1 zu Sprache 2";
         if (mode === 'fr-de') langPrompt = "Französisch zu Deutsch";
@@ -83,14 +82,12 @@ if (magicOrderBtn) {
         if (mode === 'en-de') langPrompt = "Englisch zu Deutsch";
         if (mode === 'pt-de') langPrompt = "Portugiesisch zu Deutsch";
 
-        // Cambiamos el diseño del botón mientras piensa
-        magicOrderBtn.innerHTML = "✨ KI denkt nach... ⏳ (La IA está pensando)";
+        magicOrderBtn.innerHTML = "✨ KI denkt nach... ⏳";
         magicOrderBtn.style.opacity = "0.7";
         magicOrderBtn.disabled = true;
 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
         
-        // Las instrucciones secretas para la IA
         const systemPrompt = `Du bist ein strenger Vokabel-Lehrer. Der Benutzer gibt dir eine unordentliche Liste von Wörtern. Deine Aufgabe ist es, sie in DIESEM genauen Format zu strukturieren:
 'Wort in Sprache 1 → Übersetzung in Sprache 2 | Ein passender Beispielsatz in Sprache 1'
 
@@ -99,7 +96,7 @@ Regeln:
 2. Das Trennzeichen für die Übersetzung MUSS ein Pfeil '→' sein.
 3. Das Trennzeichen für den Beispielsatz MUSS ein senkrechter Strich '|' sein.
 4. Wenn ein Beispielsatz fehlt, ERFINDE EINEN natürlichen und passenden.
-5. Antworte NUR mit der sauberen Liste. Kein 'Hallo', keine anderen Erklärungen.
+5. Antworte NUR mit der sauberen Liste. Kein 'Hallo', keine Erklärungen.
 
 Unordentlicher Text:
 ${rawText}`;
@@ -108,25 +105,27 @@ ${rawText}`;
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: systemPrompt }] }]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
 
             const data = await response.json();
+            
+            // Si la llave guardada era mala o Google la bloqueó, la borramos para volver a pedirla
+            if (data.error) {
+                localStorage.removeItem('sophie_gemini_key');
+                alert("❌ Fehler: API-Key ungültig oder abgelaufen. Bitte versuche es erneut mit einem neuen Key.");
+                return;
+            }
+
             if (data.candidates && data.candidates[0].content.parts[0].text) {
-                // ¡Éxito! Ponemos el texto limpio en la caja
                 textInput.value = data.candidates[0].content.parts[0].text.trim();
                 localStorage.setItem('sophie_last_input', textInput.value);
             } else {
                 alert("❌ Fehler bei der KI-Antwort.");
-                console.log(data);
             }
         } catch (error) {
             alert("❌ Verbindungsfehler zur KI.");
-            console.error(error);
         } finally {
-            // Restauramos el botón
             magicOrderBtn.innerHTML = "✨ Automagisch mit KI ordnen";
             magicOrderBtn.style.opacity = "1";
             magicOrderBtn.disabled = false;
@@ -134,21 +133,18 @@ ${rawText}`;
     });
 }
 
-// --- 2. MODO CLARO / OSCURO ---
+// --- 2. RESTO DE FUNCIONES (Diseño, carga, guardado, voces y quiz) ---
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-theme');
-        const isLight = document.body.classList.contains('light-theme');
-        themeToggle.innerText = isLight ? '🌙' : '☀️';
-        try { localStorage.setItem('sophie_light_mode', isLight); } catch(e){}
+        themeToggle.innerText = document.body.classList.contains('light-theme') ? '🌙' : '☀️';
+        try { localStorage.setItem('sophie_light_mode', document.body.classList.contains('light-theme')); } catch(e){}
     });
 }
 
-// --- 3. CARGA INICIAL ---
 window.addEventListener('DOMContentLoaded', () => {
     try {
-        const isLight = localStorage.getItem('sophie_light_mode') === 'true';
-        if (isLight) {
+        if (localStorage.getItem('sophie_light_mode') === 'true') {
             document.body.classList.add('light-theme');
             if(themeToggle) themeToggle.innerText = '🌙';
         }
@@ -160,21 +156,14 @@ window.addEventListener('DOMContentLoaded', () => {
     saved.forEach(l => createCardUI(l.content, l.date));
 });
 
-// --- 4. NUEVA NOTA Y CONFIG IDIOMAS ---
 if (newNoteBtn) {
-    newNoteBtn.addEventListener('click', () => {
-        textInput.value = "";
-        localStorage.setItem('sophie_last_input', "");
-    });
+    newNoteBtn.addEventListener('click', () => { textInput.value = ""; localStorage.setItem('sophie_last_input', ""); });
 }
 if (textInput) {
     textInput.addEventListener('input', (e) => localStorage.setItem('sophie_last_input', e.target.value));
 }
 if (swapLangBtn) {
-    swapLangBtn.addEventListener('click', () => {
-        isSwapped = !isSwapped;
-        swapLangBtn.style.background = isSwapped ? "#c8e6c9" : "#e0e0e0"; 
-    });
+    swapLangBtn.addEventListener('click', () => { isSwapped = !isSwapped; swapLangBtn.style.background = isSwapped ? "#c8e6c9" : "#e0e0e0"; });
 }
 
 function getLangConfig(mode, swapped) {
@@ -187,11 +176,9 @@ function getLangConfig(mode, swapped) {
         case 'pt-de': flag1='🇵🇹'; flag2='🇩🇪'; voice1='pt-PT'; voice2='de-DE'; break;
         default: flag1='🇫🇷'; flag2='🇩🇪'; voice1='fr-FR'; voice2='de-DE';
     }
-    if (swapped) return { flag1: flag2, flag2: flag1, voice1: voice2, voice2: voice1 };
-    return { flag1, flag2, voice1, voice2 };
+    return swapped ? { flag1: flag2, flag2: flag1, voice1: voice2, voice2: voice1 } : { flag1, flag2, voice1, voice2 };
 }
 
-// --- 5. SUBIR ARCHIVOS ---
 if (fileUpload) {
     fileUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -209,26 +196,20 @@ if (fileUpload) {
                 let fullText = "";
                 for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+                    fullText += (await page.getTextContent()).items.map(item => item.str).join(" ") + "\n";
                 }
-                textInput.value = fullText;
-                localStorage.setItem('sophie_last_input', fullText);
+                textInput.value = fullText; localStorage.setItem('sophie_last_input', fullText);
             } else if (file.type.startsWith("image/")) {
                 textInput.value = "Bild wird analysiert... ⏳";
                 const result = await Tesseract.recognize(file, 'deu+fra+eng+spa+por');
-                textInput.value = result.data.text;
-                localStorage.setItem('sophie_last_input', textInput.value);
-            } else {
-                textInput.value = "❌ Format wird nicht unterstützt.";
-            }
+                textInput.value = result.data.text; localStorage.setItem('sophie_last_input', textInput.value);
+            } else { textInput.value = "❌ Format wird nicht unterstützt."; }
         } catch (error) { textInput.value = "❌ Fehler beim Lesen der Datei."; }
         fileUpload.value = '';
         if(processBtn) processBtn.innerText = "Lektion verarbeiten (Manuell)";
     });
 }
 
-// --- 6. PROCESAR TEXTO ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
@@ -244,22 +225,18 @@ if (processBtn) {
             let exampleText = "";
             if (cleanLine.includes('|')) {
                 const partsWithExample = cleanLine.split('|');
-                cleanLine = partsWithExample[0]; 
-                exampleText = partsWithExample[1].trim(); 
+                cleanLine = partsWithExample[0]; exampleText = partsWithExample[1].trim(); 
             }
             let parts = cleanLine.includes('→') ? cleanLine.split('→') : cleanLine.trim().split(/\s{2,}/);
 
             if (parts.length >= 2) {
-                const row = document.createElement('div');
-                row.className = 'lab-row';
+                const row = document.createElement('div'); row.className = 'lab-row';
                 row.style = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; gap:8px;";
-                let text1 = parts[0].trim();
-                let text2 = parts.slice(-1)[0].trim();
+                let text1 = parts[0].trim(); let text2 = parts.slice(-1)[0].trim();
                 if (isSwapped) { let temp = text1; text1 = text2; text2 = temp; }
                 
                 row.dataset.text1 = text1; row.dataset.text2 = text2;
-                row.dataset.voice1 = config.voice1; row.dataset.voice2 = config.voice2;
-                row.dataset.example = exampleText; 
+                row.dataset.voice1 = config.voice1; row.dataset.voice2 = config.voice2; row.dataset.example = exampleText; 
 
                 const vocabContainer = document.createElement('div');
                 vocabContainer.style = "display:flex; justify-content:space-between; width:100%; align-items: center;";
@@ -272,27 +249,14 @@ if (processBtn) {
                     btnCtx.style = "font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #f3f4f6; cursor: pointer; align-self: flex-start; color: #4b5563; font-weight: bold;";
                     const divCtx = document.createElement('div');
                     divCtx.style = "display: none; background: #e0f2fe; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #0369a1; margin-top: 5px; font-style: italic;";
-                    divCtx.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>💡 ${exampleText}</span>
-                            <button class="play-example" title="Anhören" style="background:white; border:1px solid #bae6fd; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; flex-shrink:0; margin-left:10px;">🔊</button>
-                        </div>
-                    `;
+                    divCtx.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><span>💡 ${exampleText}</span><button class="play-example" title="Anhören" style="background:white; border:1px solid #bae6fd; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; flex-shrink:0; margin-left:10px;">🔊</button></div>`;
                     const speakerBtn = divCtx.querySelector('.play-example');
                     speakerBtn.onclick = (e) => { e.stopPropagation(); speak(exampleText, config.voice1); };
                     btnCtx.onclick = () => {
-                        if (divCtx.style.display === 'none') {
-                            divCtx.style.display = 'block';
-                            btnCtx.innerHTML = "🙈 Kontext ausblenden";
-                            btnCtx.style.background = "#dbeafe";
-                        } else {
-                            divCtx.style.display = 'none';
-                            btnCtx.innerHTML = "📖 Kontext anzeigen";
-                            btnCtx.style.background = "#f3f4f6";
-                        }
+                        if (divCtx.style.display === 'none') { divCtx.style.display = 'block'; btnCtx.innerHTML = "🙈 Kontext ausblenden"; btnCtx.style.background = "#dbeafe"; } 
+                        else { divCtx.style.display = 'none'; btnCtx.innerHTML = "📖 Kontext anzeigen"; btnCtx.style.background = "#f3f4f6"; }
                     };
-                    row.appendChild(btnCtx);
-                    row.appendChild(divCtx);
+                    row.appendChild(btnCtx); row.appendChild(divCtx);
                 }
                 labList.appendChild(row);
             }
@@ -301,52 +265,41 @@ if (processBtn) {
     });
 }
 
-// --- 7. GUARDADO Y GALERÍA ---
 function saveLesson(content) {
     let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     const title = content.trim().split('\n')[0].substring(0, 30);
     const existingIndex = lessons.findIndex(l => l.title === title);
-    if (existingIndex !== -1) {
-        lessons[existingIndex].content = content;
-        lessons[existingIndex].date = new Date().toLocaleDateString();
-    } else {
-        lessons.push({ title, content, date: new Date().toLocaleDateString() });
-    }
+    if (existingIndex !== -1) { lessons[existingIndex].content = content; lessons[existingIndex].date = new Date().toLocaleDateString(); } 
+    else { lessons.push({ title, content, date: new Date().toLocaleDateString() }); }
     localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
-    notebookGallery.innerHTML = '';
-    lessons.forEach(l => createCardUI(l.content, l.date));
+    notebookGallery.innerHTML = ''; lessons.forEach(l => createCardUI(l.content, l.date));
 }
+
 function createCardUI(content, date) {
     const title = content.trim().split('\n')[0].substring(0, 30);
-    const card = document.createElement('div');
-    card.className = 'gallery-card';
+    const card = document.createElement('div'); card.className = 'gallery-card';
     card.innerHTML = `<div style="display: flex; align-items: center; gap: 15px; width: 100%;"><div style="font-size: 1.5rem; color: #8e918f;">📓</div><div style="flex: 1; text-align: left;"><div style="font-weight: bold; font-size: 0.95rem; color: #e3e3e3; margin-bottom: 3px;">${title}</div><div style="font-size: 0.75rem; color: #8e918f;">Erstellt am ${date}</div></div><button class="delete-btn" title="Löschen">🗑️</button></div>`;
     card.addEventListener('click', (e) => {
         if(e.target.closest('.delete-btn')) return; 
-        if(textInput) textInput.value = content;
-        localStorage.setItem('sophie_last_input', content);
+        if(textInput) textInput.value = content; localStorage.setItem('sophie_last_input', content);
     });
     const delBtn = card.querySelector('.delete-btn');
     delBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
         let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
         lessons = lessons.filter(l => l.title !== title); 
-        localStorage.setItem('sophie_lessons', JSON.stringify(lessons)); 
-        card.remove(); 
+        localStorage.setItem('sophie_lessons', JSON.stringify(lessons)); card.remove(); 
     });
     if(notebookGallery) notebookGallery.appendChild(card);
 }
 
-// --- 8. VOCES Y REPRODUCCIÓN ---
 let currentUtterance = null; 
 async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
         currentUtterance = new SpeechSynthesisUtterance(text);
-        currentUtterance.lang = lang;
-        currentUtterance.rate = 0.9;
-        currentUtterance.onend = resolve;
-        currentUtterance.onerror = resolve; 
+        currentUtterance.lang = lang; currentUtterance.rate = 0.9;
+        currentUtterance.onend = resolve; currentUtterance.onerror = resolve; 
         window.speechSynthesis.speak(currentUtterance);
     });
 }
@@ -357,84 +310,42 @@ if(playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
         if (rows.length === 0) return alert("Bitte zuerst eine Lektion laden!");
-        if (isPlaying) {
-            isPlaying = false;
-            window.speechSynthesis.cancel(); 
-            playSessionBtn.innerHTML = "▶️ Sitzung fortsetzen";
-            playSessionBtn.style.background = "#4caf50"; 
-            return;
-        }
-        isPlaying = true;
-        playSessionBtn.innerHTML = "⏸️ Sitzung pausieren";
-        playSessionBtn.style.background = "#ff9800"; 
-        const actualModeSelect = document.getElementById('audioMode');
-        const mode = actualModeSelect ? actualModeSelect.value : 'basic';
+        if (isPlaying) { isPlaying = false; window.speechSynthesis.cancel(); playSessionBtn.innerHTML = "▶️ Sitzung fortsetzen"; playSessionBtn.style.background = "#4caf50"; return; }
+        isPlaying = true; playSessionBtn.innerHTML = "⏸️ Sitzung pausieren"; playSessionBtn.style.background = "#ff9800"; 
+        const actualModeSelect = document.getElementById('audioMode'); const mode = actualModeSelect ? actualModeSelect.value : 'basic';
 
         for (let row of rows) {
             if (!isPlaying) break; 
-            row.style.background = "#fff9c4";
-            await speak(row.dataset.text1, row.dataset.voice1);
-            if (!isPlaying) break; 
-            await new Promise(r => setTimeout(r, 1000));
-            if (!isPlaying) break;
-            await speak(row.dataset.text2, row.dataset.voice2);
+            row.style.background = "#fff9c4"; await speak(row.dataset.text1, row.dataset.voice1);
+            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
+            if (!isPlaying) break; await speak(row.dataset.text2, row.dataset.voice2);
             if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
-                if (!isPlaying) break;
-                await new Promise(r => setTimeout(r, 1000)); 
-                if (!isPlaying) break;
-                await speak(row.dataset.example, row.dataset.voice1); 
+                if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000)); 
+                if (!isPlaying) break; await speak(row.dataset.example, row.dataset.voice1); 
             }
             row.style.background = "transparent";
-            if (!isPlaying) break;
-            await new Promise(r => setTimeout(r, 1500)); 
+            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1500)); 
         }
-        isPlaying = false;
-        playSessionBtn.innerHTML = "▶️ Sitzung starten";
-        playSessionBtn.style.background = "#4caf50";
-        updateStreak();
+        isPlaying = false; playSessionBtn.innerHTML = "▶️ Sitzung starten"; playSessionBtn.style.background = "#4caf50"; updateStreak();
     };
 }
 
-// --- 9. SISTEMA DE QUIZ PROFESIONAL ---
 const quizOverlay = document.createElement('div');
 quizOverlay.className = 'quiz-overlay';
-quizOverlay.innerHTML = `
-    <div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">SOPHIE QUIZ 🧠</div>
-    <div id="quizQuestion" class="quiz-card">Lädt...</div>
-    <input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off">
-    <div id="quizFeedback" style="min-height: 24px; margin: 10px 0; font-weight: bold; font-size: 1.1rem; text-align: center;"></div>
-    <button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button>
-    <button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>
-`;
-quizOverlay.style.display = 'none'; 
-document.body.appendChild(quizOverlay);
+quizOverlay.innerHTML = `<div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">SOPHIE QUIZ 🧠</div><div id="quizQuestion" class="quiz-card">Lädt...</div><input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off"><div id="quizFeedback" style="min-height: 24px; margin: 10px 0; font-weight: bold; font-size: 1.1rem; text-align: center;"></div><button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button><button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>`;
+quizOverlay.style.display = 'none'; document.body.appendChild(quizOverlay);
 
 let currentCorrectAnswer = "";
-if(quizBtn) {
-    quizBtn.onclick = () => {
-        const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("Bitte lade zuerst eine Lektion hoch!");
-        quizOverlay.style.display = 'flex';
-        nextQuestion();
-    };
-}
+if(quizBtn) { quizBtn.onclick = () => { const rows = document.querySelectorAll('.lab-row'); if (rows.length === 0) return alert("Bitte lade zuerst eine Lektion hoch!"); quizOverlay.style.display = 'flex'; nextQuestion(); }; }
 function nextQuestion() {
-    const rows = document.querySelectorAll('.lab-row');
-    const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`;
-    currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
-    const input = document.getElementById('quizInput');
-    input.value = ""; input.focus();
-    document.getElementById('quizFeedback').innerText = "";
+    const rows = document.querySelectorAll('.lab-row'); const randomRow = rows[Math.floor(Math.random() * rows.length)];
+    document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`; currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
+    const input = document.getElementById('quizInput'); input.value = ""; input.focus(); document.getElementById('quizFeedback').innerText = "";
 }
 document.getElementById('checkBtn').onclick = () => {
-    const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
-    const feedback = document.getElementById('quizFeedback');
-    const checkBtn = document.getElementById('checkBtn');
-    checkBtn.disabled = true;
+    const userAns = document.getElementById('quizInput').value.toLowerCase().trim(); const feedback = document.getElementById('quizFeedback'); const checkBtn = document.getElementById('checkBtn'); checkBtn.disabled = true;
     if (userAns === currentCorrectAnswer) {
-        feedback.style.color = "#4ade80"; feedback.innerText = "Ausgezeichnet! 🎉 Richtig!";
-        updateStreak();
+        feedback.style.color = "#4ade80"; feedback.innerText = "Ausgezeichnet! 🎉 Richtig!"; updateStreak();
         setTimeout(() => { nextQuestion(); checkBtn.disabled = false; }, 1200); 
     } else {
         feedback.style.color = "#fca5a5"; feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
@@ -443,16 +354,11 @@ document.getElementById('checkBtn').onclick = () => {
 };
 document.getElementById('closeQuiz').onclick = () => quizOverlay.style.display = 'none';
 
-// --- 10. EXPORTAR (.json) ---
 if (exportBtn) {
     exportBtn.addEventListener('click', () => {
-        const lessons = localStorage.getItem('sophie_lessons');
-        if (!lessons || lessons === '[]') return alert('Es gibt noch keine Notizen.');
-        const blob = new Blob([lessons], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url;
-        const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
-        a.download = 'SOPHIE_Backup_' + fecha + '.json';
+        const lessons = localStorage.getItem('sophie_lessons'); if (!lessons || lessons === '[]') return alert('Es gibt noch keine Notizen.');
+        const blob = new Blob([lessons], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
+        a.download = 'SOPHIE_Backup_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.json';
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     });
 }
