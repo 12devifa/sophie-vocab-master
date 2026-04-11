@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V8.1 (SISTEMA DE SEGURIDAD PRIVADO 🔒)
+// SOPHIE: VOCAB MASTER - V8.2 (CEREBRO 2.5 Y DETECTOR DE ERRORES 🕵️‍♀️)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -18,7 +18,6 @@ const magicOrderBtn = document.getElementById('magicOrderBtn');
 
 let isSwapped = false; 
 
-// --- 0. SISTEMA DE RACHAS (STREAKS) ---
 function loadStreak() {
     let streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
     const streakEl = document.getElementById('streakNumber');
@@ -37,7 +36,6 @@ function updateStreak() {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
         if (diffDays === 0) {
-            // Ya estudió hoy
         } else if (diffDays === 1) {
             streak++; animateStreak();
         } else {
@@ -60,16 +58,14 @@ function animateStreak() {
     }
 }
 
-// --- 1. BOTÓN MÁGICO Y SEGURIDAD DE LLAVE ✨ ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput.value;
         if (!rawText.trim()) return alert("Bitte zuerst Text eingeben! (Introduce texto primero)");
 
-        // SISTEMA SEGURO: Pedir llave si no está guardada en el navegador
         let userApiKey = localStorage.getItem('sophie_gemini_key');
         if (!userApiKey) {
-            userApiKey = prompt("🔒 Sicherheit zuerst! Bitte füge hier deinen Google API Key ein (er wird nur privat in deinem Browser gespeichert):");
+            userApiKey = prompt("🔒 Sicherheit zuerst! Bitte füge hier deinen Google API Key ein:");
             if (!userApiKey || userApiKey.trim() === "") return alert("Aktion abgebrochen. API-Key wird benötigt.");
             localStorage.setItem('sophie_gemini_key', userApiKey.trim());
         }
@@ -86,6 +82,7 @@ if (magicOrderBtn) {
         magicOrderBtn.style.opacity = "0.7";
         magicOrderBtn.disabled = true;
 
+        // AQUÍ ESTÁ LA MAGIA ARREGLADA (CON ACENTOS GRAVES Y CEREBRO 2.5)
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
         
         const systemPrompt = `Du bist ein strenger Vokabel-Lehrer. Der Benutzer gibt dir eine unordentliche Liste von Wörtern. Deine Aufgabe ist es, sie in DIESEM genauen Format zu strukturieren:
@@ -110,10 +107,10 @@ ${rawText}`;
 
             const data = await response.json();
             
-            // Si la llave guardada era mala o Google la bloqueó, la borramos para volver a pedirla
+            // EL DETECTOR DE MENTIRAS
             if (data.error) {
-                localStorage.removeItem('sophie_gemini_key');
-                alert("❌ Fehler: API-Key ungültig oder abgelaufen. Bitte versuche es erneut mit einem neuen Key.");
+                localStorage.removeItem('sophie_gemini_key'); // Borramos la llave por si acaso
+                alert("❌ ERROR DE GOOGLE:\n" + data.error.message + "\n\n(He borrado tu llave de la memoria. Refresca la página e inténtalo de nuevo)");
                 return;
             }
 
@@ -121,10 +118,10 @@ ${rawText}`;
                 textInput.value = data.candidates[0].content.parts[0].text.trim();
                 localStorage.setItem('sophie_last_input', textInput.value);
             } else {
-                alert("❌ Fehler bei der KI-Antwort.");
+                alert("❌ Fehler bei der KI-Antwort. Google hat keine Wörter geschickt.");
             }
         } catch (error) {
-            alert("❌ Verbindungsfehler zur KI.");
+            alert("❌ Verbindungsfehler zur KI. Check dein Internet.");
         } finally {
             magicOrderBtn.innerHTML = "✨ Automagisch mit KI ordnen";
             magicOrderBtn.style.opacity = "1";
@@ -133,7 +130,6 @@ ${rawText}`;
     });
 }
 
-// --- 2. RESTO DE FUNCIONES (Diseño, carga, guardado, voces y quiz) ---
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-theme');
