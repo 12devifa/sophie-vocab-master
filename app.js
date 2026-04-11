@@ -1,6 +1,11 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V8.2 (CEREBRO 2.5 Y DETECTOR DE ERRORES 🕵️‍♀️)
+// SOPHIE: VOCAB MASTER - V8.3 (AUTOMATIZACIÓN MAGA Y CONFETI 🎉)
 // ==============================================================
+
+// --- INYECCIÓN DE CONFETI ---
+const confettiScript = document.createElement('script');
+confettiScript.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+document.head.appendChild(confettiScript);
 
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
@@ -82,7 +87,6 @@ if (magicOrderBtn) {
         magicOrderBtn.style.opacity = "0.7";
         magicOrderBtn.disabled = true;
 
-        // AQUÍ ESTÁ LA MAGIA ARREGLADA (CON ACENTOS GRAVES Y CEREBRO 2.5)
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
         
         const systemPrompt = `Du bist ein strenger Vokabel-Lehrer. Der Benutzer gibt dir eine unordentliche Liste von Wörtern. Deine Aufgabe ist es, sie in DIESEM genauen Format zu strukturieren:
@@ -107,9 +111,8 @@ ${rawText}`;
 
             const data = await response.json();
             
-            // EL DETECTOR DE MENTIRAS
             if (data.error) {
-                localStorage.removeItem('sophie_gemini_key'); // Borramos la llave por si acaso
+                localStorage.removeItem('sophie_gemini_key');
                 alert("❌ ERROR DE GOOGLE:\n" + data.error.message + "\n\n(He borrado tu llave de la memoria. Refresca la página e inténtalo de nuevo)");
                 return;
             }
@@ -117,6 +120,20 @@ ${rawText}`;
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 textInput.value = data.candidates[0].content.parts[0].text.trim();
                 localStorage.setItem('sophie_last_input', textInput.value);
+                
+                // --- MAGIA NUEVA: CLIC AUTOMÁTICO Y CONFETI ---
+                if(processBtn) processBtn.click(); // Creamos las tarjetas automáticamente
+                
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        colors: ['#a855f7', '#3b82f6', '#10b981', '#ffffff'] // Colores estilo SOPHIE
+                    });
+                }
+                // ----------------------------------------------
+                
             } else {
                 alert("❌ Fehler bei der KI-Antwort. Google hat keine Wörter geschickt.");
             }
@@ -295,66 +312,4 @@ async function speak(text, lang) {
         window.speechSynthesis.cancel();
         currentUtterance = new SpeechSynthesisUtterance(text);
         currentUtterance.lang = lang; currentUtterance.rate = 0.9;
-        currentUtterance.onend = resolve; currentUtterance.onerror = resolve; 
-        window.speechSynthesis.speak(currentUtterance);
-    });
-}
-
-let isPlaying = false; 
-const playSessionBtn = document.getElementById('playSession');
-if(playSessionBtn) {
-    playSessionBtn.onclick = async () => {
-        const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("Bitte zuerst eine Lektion laden!");
-        if (isPlaying) { isPlaying = false; window.speechSynthesis.cancel(); playSessionBtn.innerHTML = "▶️ Sitzung fortsetzen"; playSessionBtn.style.background = "#4caf50"; return; }
-        isPlaying = true; playSessionBtn.innerHTML = "⏸️ Sitzung pausieren"; playSessionBtn.style.background = "#ff9800"; 
-        const actualModeSelect = document.getElementById('audioMode'); const mode = actualModeSelect ? actualModeSelect.value : 'basic';
-
-        for (let row of rows) {
-            if (!isPlaying) break; 
-            row.style.background = "#fff9c4"; await speak(row.dataset.text1, row.dataset.voice1);
-            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
-            if (!isPlaying) break; await speak(row.dataset.text2, row.dataset.voice2);
-            if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
-                if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000)); 
-                if (!isPlaying) break; await speak(row.dataset.example, row.dataset.voice1); 
-            }
-            row.style.background = "transparent";
-            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1500)); 
-        }
-        isPlaying = false; playSessionBtn.innerHTML = "▶️ Sitzung starten"; playSessionBtn.style.background = "#4caf50"; updateStreak();
-    };
-}
-
-const quizOverlay = document.createElement('div');
-quizOverlay.className = 'quiz-overlay';
-quizOverlay.innerHTML = `<div style="margin-top: 20px; margin-bottom: 10px; font-weight: 800; color: #ffffff; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">SOPHIE QUIZ 🧠</div><div id="quizQuestion" class="quiz-card">Lädt...</div><input type="text" id="quizInput" placeholder="Übersetzung eingeben..." autocomplete="off"><div id="quizFeedback" style="min-height: 24px; margin: 10px 0; font-weight: bold; font-size: 1.1rem; text-align: center;"></div><button id="checkBtn" class="primary-btn" style="width:85%; background:#673ab7;">Überprüfen</button><button id="closeQuiz" style="margin-top:30px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline;">Quiz beenden</button>`;
-quizOverlay.style.display = 'none'; document.body.appendChild(quizOverlay);
-
-let currentCorrectAnswer = "";
-if(quizBtn) { quizBtn.onclick = () => { const rows = document.querySelectorAll('.lab-row'); if (rows.length === 0) return alert("Bitte lade zuerst eine Lektion hoch!"); quizOverlay.style.display = 'flex'; nextQuestion(); }; }
-function nextQuestion() {
-    const rows = document.querySelectorAll('.lab-row'); const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    document.getElementById('quizQuestion').innerText = `Übersetze:\n"${randomRow.dataset.text1}"`; currentCorrectAnswer = randomRow.dataset.text2.toLowerCase().trim();
-    const input = document.getElementById('quizInput'); input.value = ""; input.focus(); document.getElementById('quizFeedback').innerText = "";
-}
-document.getElementById('checkBtn').onclick = () => {
-    const userAns = document.getElementById('quizInput').value.toLowerCase().trim(); const feedback = document.getElementById('quizFeedback'); const checkBtn = document.getElementById('checkBtn'); checkBtn.disabled = true;
-    if (userAns === currentCorrectAnswer) {
-        feedback.style.color = "#4ade80"; feedback.innerText = "Ausgezeichnet! 🎉 Richtig!"; updateStreak();
-        setTimeout(() => { nextQuestion(); checkBtn.disabled = false; }, 1200); 
-    } else {
-        feedback.style.color = "#fca5a5"; feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
-        setTimeout(() => { nextQuestion(); checkBtn.disabled = false; }, 2500); 
-    }
-};
-document.getElementById('closeQuiz').onclick = () => quizOverlay.style.display = 'none';
-
-if (exportBtn) {
-    exportBtn.addEventListener('click', () => {
-        const lessons = localStorage.getItem('sophie_lessons'); if (!lessons || lessons === '[]') return alert('Es gibt noch keine Notizen.');
-        const blob = new Blob([lessons], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
-        a.download = 'SOPHIE_Backup_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.json';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    });
-}
+        currentUtterance.onend = resolve; currentUtter
