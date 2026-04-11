@@ -86,7 +86,7 @@ if (magicOrderBtn) {
         magicOrderBtn.style.opacity = "0.7";
         magicOrderBtn.disabled = true;
 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
         
         const systemPrompt = `Du bist ein strenger Vokabel-Lehrer. Der Benutzer gibt dir eine unordentliche Liste von Wörtern. Deine Aufgabe ist es, sie in DIESEM genauen Format zu strukturieren:
 'Wort in Sprache 1 → Übersetzung in Sprache 2 | Ein passender Beispielsatz in Sprache 1'
