@@ -105,8 +105,19 @@ ${rawText}`;
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 textInput.value = data.candidates[0].content.parts[0].text.trim();
                 localStorage.setItem('sophie_last_input', textInput.value);
-                if(processBtn) processBtn.click(); // Automatización
+                
+                // MODO DOPAMINA ACTIVADO 🧠✨
+                const termsArray = textInput.value.split('\n').filter(line => line.includes('→'));
+                document.getElementById('termCount').innerText = termsArray.length;
+                
+                magicOrderBtn.style.display = 'none'; // Escondemos el botón de IA
+                document.getElementById('wowSummary').style.display = 'block'; // Mostramos el cartel de éxito
+                processBtn.style.display = 'flex'; // Mostramos el botón START LEARNING
+                
+                // Opcional: Pequeña vibración en el móvil si es compatible
+                if (navigator.vibrate) navigator.vibrate(50); 
             }
+           
         } catch (error) {
             alert("Error de conexión a la IA.");
         } finally {
