@@ -69,8 +69,9 @@ if (magicOrderBtn) {
         const config = getLangConfig(mode, isSwapped);
         let langPrompt = `Idioma 1: ${config.name1} -> Idioma 2: ${config.name2}`;
 
-        magicOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-fade"></i> Analyzing your vocabulary...';
         magicOrderBtn.disabled = true;
+        
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
         
