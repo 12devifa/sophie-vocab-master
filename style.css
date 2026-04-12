@@ -1,212 +1,338 @@
-/* =========================================
-   SOPHIE - NOTEBOOK LM THEME (MOBILE READY)
-   ========================================= */
+/* ==============================================================
+   SOPHIE: VOCAB MASTER - STYLE CSS - V9.0 (PREMIUM DARK LOOK 💎)
+   ============================================================== */
 
+/* --- 1. IMPORTAR FUENTE PROFESIONAL (INTER) --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* --- 2. IMPORTAR ICONOS PROFESIONALES (FONTAWESOME) --- */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+/* --- 3. VARIABLES DE COLOR PREMIUM --- */
 :root {
-    --bg-main: #131314;       
-    --bg-card: #1e1f22;       
-    --text-main: #e3e3e3;     
-    --text-muted: #8e918f;    
-    --accent: #a8c7fa;        
-    --border-color: #444746;  
+    /* Modo Oscuro (Principal) */
+    --bg-color: #101010;          /* Fondo Negro Azabache */
+    --card-bg: #1E1E1E;           /* Fondo de Tarjetas Gris Oscuro */
+    --text-primary: #E0E0E0;      /* Texto Principal Gris Seda */
+    --text-secondary: #8E918F;    /* Texto Secundario */
+    --accent-purple: #BB86FC;     /* Morado Neón Suave (Acentuado) */
+    --accent-hover: #985EFF;      /* Morado Hover */
+    --border-color: #333333;      /* Líneas Divisorias */
+    --shadow-premium: 0 8px 30px rgba(0,0,0,0.5); /* Sombra Profunda */
+    
+    /* Variables de Transición */
+    --transition-fast: all 0.2s ease;
+    --font-main: 'Inter', sans-serif;
 }
 
-* { box-sizing: border-box; }
+/* --- 4. RESETEO Y ESTILOS GLOBALES --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Quitar flash azul en móvil */
+}
 
 body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: 'Inter', -apple-system, sans-serif;
-    margin: 0;
-    padding: 15px; /* Margen para móvil */
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* --- ESTRUCTURA PRINCIPAL --- */
-.container {
-    display: flex;
-    flex-direction: column; /* Apila todo en móvil */
-    gap: 20px;
-}
-
-/* En ordenadores se pone lado a lado */
-@media (min-width: 768px) {
-    .container { flex-direction: row; }
-    .gallery-col { width: 300px; order: -1; } /* Galería a la izquierda */
-    .input-section { flex: 1; }
-    .lab-col { flex: 1; }
-}
-
-/* --- TARJETAS (Cajas redondeadas) --- */
-.card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 24px; /* Estilo NotebookLM */
+/* --- 5. CONTENEDOR PRINCIPAL (ESTILO APP MÓVIL) --- */
+.app-container {
+    max-width: 480px; /* Ancho máximo estilo móvil */
+    margin: 0 auto;
+    min-height: 100vh;
     padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    padding-bottom: 100px; /* Espacio para menú inferior si lo ponemos */
 }
 
-.card-title {
-    font-size: 1.2rem;
+/* --- 6. ESTILOS DE CABECERA (HEADER) --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+h1 span {
+    color: var(--accent-purple);
+}
+
+.streak-counter {
+    background: var(--card-bg);
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-weight: 600;
-    margin-bottom: 15px;
-    color: var(--text-main);
+    color: #FF9800; /* Color Fuego */
 }
 
-/* --- TEXTAREA Y BOTONES --- */
-textarea#textInput {
+/* --- 7. ZONA DE ENTRADA (INPUT AREA) --- */
+.input-section {
+    margin-bottom: 25px;
+}
+
+textarea {
     width: 100%;
-    min-height: 200px;
-    background-color: transparent;
-    color: var(--text-main);
-    border: none;
-    font-size: 1rem;
-    line-height: 1.5;
-    resize: vertical;
+    height: 150px;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    padding: 15px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    resize: none;
+    transition: var(--transition-fast);
+}
+
+textarea:focus {
     outline: none;
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 10px rgba(187, 134, 252, 0.3);
+}
+
+/* --- 8. SELECTORES Y BOTONES DE IDIOMA --- */
+.controls-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+select {
+    flex: 1;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    appearance: none; /* Quitar flecha nativa */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23E0E0E0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px auto;
+}
+
+.icon-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.icon-btn:hover {
+    color: var(--accent-purple);
+    border-color: var(--accent-purple);
+}
+
+.icon-btn:active {
+    transform: scale(0.9);
+}
+
+/* --- 9. BOTONES PRINCIPALES (PRIMARY BUTTONS) --- */
+.primary-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 15px;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Botón Morado (Magia KI) */
+#magicOrderBtn {
+    background-color: var(--accent-purple);
+    color: #000000;
     margin-bottom: 10px;
 }
 
-textarea#textInput::placeholder { color: var(--text-muted); }
-
-.primary-btn {
-    background-color: var(--accent);
-    color: #062e6f !important;
-    border: none;
-    padding: 14px;
-    border-radius: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-    margin-top: 10px;
-    font-size: 1rem;
+#magicOrderBtn:hover {
+    background-color: var(--accent-hover);
 }
 
-/* --- GALERÍA --- */
-.gallery-card {
-    background-color: #2a2b2f;
-    border-radius: 16px;
+/* Botón Azul (Lektion) */
+#processBtn {
+    background-color: transparent;
+    border: 2px solid var(--accent-purple);
+    color: var(--accent-purple);
+}
+
+#processBtn:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+}
+
+.primary-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* --- 10. ZONA DE LECCIONES (LAB AREA) --- */
+.lab-section {
+    margin-top: 30px;
+}
+
+h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lab-row {
+    background-color: var(--card-bg);
+    border-radius: 15px;
     padding: 15px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-premium);
+    transition: var(--transition-fast);
+}
+
+.vocab-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.vocab-word {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.vocab-word span.flag {
+    font-size: 1.2rem;
+}
+
+/* Botones de Contexto y Audio */
+.play-example {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-purple);
     cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.play-example:hover {
+    background: rgba(187, 134, 252, 0.2);
+    transform: scale(1.1);
+}
+
+/* --- 11. HISTORIAL (NOTEBOOK GALLERY) --- */
+.gallery-section {
+    margin-top: 40px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 30px;
+}
+
+.gallery-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: var(--transition-fast);
     border: 1px solid transparent;
 }
 
-.gallery-card:hover { border-color: var(--accent); }
+.gallery-card:hover {
+    border-color: var(--border-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-premium);
+}
 
-/* --- QUIZ OVERLAY (¡Restaurado!) --- */
+.gallery-card i.fa-book {
+    font-size: 1.4rem;
+    color: var(--text-secondary);
+}
+
+/* --- 12. QUIZ OVERLAY PREMIUM --- */
 .quiz-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(19, 19, 20, 0.95); /* Fondo oscuro semitransparente */
-    z-index: 9999;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    background-color: rgba(16, 16, 16, 0.95);
+    backdrop-filter: blur(10px); /* Efecto borroso de fondo */
 }
 
 .quiz-card {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-    color: white;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid var(--accent-purple);
+    box-shadow: 0 0 30px rgba(187, 134, 252, 0.2);
 }
 
-#quizInput {
+/* --- 13. MENÚ DE HERRAMIENTAS (OPCIONAL ARRIBA O ABAJO) --- */
+.tools-menu {
+    display: flex;
+    justify-content: space-around;
+    background: var(--card-bg);
     padding: 15px;
-    border-radius: 12px;
-    border: 2px solid var(--accent);
-    background: transparent;
-    color: white;
-    font-size: 1.2rem;
-    width: 90%;
-    text-align: center;
+    border-radius: 15px;
+    border: 1px solid var(--border-color);
     margin-bottom: 20px;
-    outline: none;
 }
 
-/* --- 🚑 PARCHES DE EMERGENCIA --- */
-
-/* Botón de Play (Sitzung starten / Abspielen) */
-#playSession, .play-btn, button[id^="play"] {
-    background-color: #1e8e3e !important; /* Verde Google */
-    color: white !important;
-    border: none !important;
-    padding: 14px !important;
-    border-radius: 30px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    width: 100% !important;
-    margin-top: 10px !important;
-    font-size: 1rem !important;
-    text-align: center !important;
-}
-
-/* Tarjetas de la Galería (Fondo oscuro, texto claro) */
-#notebookGallery > div {
-    background-color: #2a2b2f !important;
-    color: #e3e3e3 !important;
-    border-radius: 16px !important;
-    border: 1px solid #444746 !important;
-    padding: 15px !important;
-    margin-bottom: 12px !important;
-}
-
-
-/* --- ESTILOS DE LA GALERÍA PREMIUM --- */
-#notebookGallery {
-    padding: 10px 0;
-}
-
-.gallery-card {
-    background-color: transparent !important;
-    border: none !important;
-    padding: 12px 10px !important;
-    margin-bottom: 5px !important;
-    cursor: pointer;
-    border-radius: 8px !important;
-    transition: background-color 0.2s ease;
-}
-
-/* Brillo sutil al pasar el ratón */
-.gallery-card:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important; 
-}
-
-/* Papelera escondida por defecto */
-.delete-btn {
-    background: transparent;
+.tool-btn {
+    background: none;
     border: none;
-    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
     cursor: pointer;
-    opacity: 0; 
-    transition: all 0.2s ease;
-    padding: 5px;
+    transition: var(--transition-fast);
 }
 
-/* La papelera aparece cuando pasas el ratón por la tarjeta (o tocas en el móvil) */
-.gallery-card:hover .delete-btn {
-    opacity: 1; 
+.tool-btn i {
+    font-size: 1.2rem;
 }
 
-/* --- TEMA CLARO (LIGHT MODE) --- */
-body.light-theme {
-    --bg-main: #f0f4f9;       /* Fondo principal gris clarito */
-    --bg-sidebar: #ffffff;    /* Fondo de galería blanco puro */
-    --bg-card: #ffffff;       /* Fondo de cajas blanco puro */
-    --text-main: #1f1f1f;     /* Texto oscuro para que se lea bien */
-    --text-muted: #444746;    /* Texto secundario gris */
-    --border-color: #c4c7c5;  /* Bordes suaves */
-}
-
-/* Ajuste sutil para que la galería se vea bien en blanco al pasar el ratón */
-body.light-theme .gallery-card:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important; 
-}
-
-.delete-btn:hover {
-    transform: scale(1.2);
+.tool-btn:hover {
+    color: var(--accent-purple);
 }
