@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V9.3 (QA TESTED & QUIZ REVIVAL 🧠💎)
+// SOPHIE: VOCAB MASTER - V9.4 (AUDIO LOOP & MAGIC TRANSLATE RESTORED 💎)
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -15,9 +15,11 @@ const langSelect = document.getElementById('langSelect');
 const swapLangBtn = document.getElementById('swapLangBtn'); 
 const audioMode = document.getElementById('audioMode'); 
 const magicOrderBtn = document.getElementById('magicOrderBtn'); 
+const playSessionBtn = document.getElementById('playSession'); // Recuperado
 
 let isSwapped = false; 
 let currentCorrectAnswer = "";
+let isPlaying = false; // Estado del audio manos libres
 
 // --- GESTIÓN DEL TEMA (SOL / LUNA) ---
 if (themeToggle) {
@@ -34,18 +36,15 @@ if (themeToggle) {
 
 // --- CARGA INICIAL & QUIZ CREATION ---
 window.addEventListener('DOMContentLoaded', () => {
-    // 1. Recuperar Tema
     const savedTheme = localStorage.getItem('sophie_theme');
     if (savedTheme === 'light' && themeToggle) {
         themeToggle.checked = true;
         document.body.classList.add('light-theme');
     }
 
-    // 2. Cargar historial con diseño nuevo
     const savedLessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     savedLessons.forEach(l => createCardUI(l.content, l.date));
 
-    // 3. ¡REVIVIR EL QUIZ MÁGICAMENTE! (Dynamically creating overlay)
     createQuizOverlayUI();
 
     loadStreak(); 
@@ -53,17 +52,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedText && textInput) textInput.value = savedText;
 });
 
-// --- LÓGICA DE LA IA (GEMINI 2.5) ---
+// --- LÓGICA DE LA IA (MAGIA UNIVERSAL RESTAURADA) ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput.value;
         if (!rawText.trim()) return alert("Por favor, introduce texto primero.");
-
-        // SOLUCIÓN PUNTO A-2: QA Check - Si ya está ordenado, no preguntar a la IA
-        if (rawText.includes('→')) {
-            alert("⚠️ Estos textos ya parecen estar organizados con flechas! Si quieres cambiar de idioma, bórralo y reescribe las palabras.");
-            return;
-        }
 
         let userApiKey = localStorage.getItem('sophie_gemini_key');
         if (!userApiKey) {
@@ -74,26 +67,24 @@ if (magicOrderBtn) {
 
         const mode = langSelect.value;
         const config = getLangConfig(mode, isSwapped);
-        // SOLUCIÓN PUNTO A-1: Instrucción explícita del idioma de la frase
-        let langPrompt = `Idioma 1 (Estudio/Frase): ${config.name1} -> Idioma 2 (Traducción): ${config.name2}`;
+        let langPrompt = `Idioma 1: ${config.name1} -> Idioma 2: ${config.name2}`;
 
-        magicOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ordenando...';
+        magicOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
         magicOrderBtn.disabled = true;
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
         
-        // SOLUCIÓN PUNTO A-1: System Prompt Actualizado
-        const systemPrompt = `You are a strict language teacher. Your task is to organize messy vocabulary lists.
-FORMAT: Messy Input Word(s) -> Word 1 → Translation 2 | An example sentence in LANGUAGE 1.
+        // System prompt modificado para RE-TRADUCIR si es necesario
+        const systemPrompt = `You are a strict language teacher. 
+TASK: Organize vocabulary or TRANSLATE existing lists into the exact requested languages.
+REQUESTED LANGUAGES: ${langPrompt}.
+FORMAT: Word in Language 1 → Translation in Language 2 | Example sentence in Language 1.
 RULES:
-1. Organize the word(s) into Language 1 and Language 2 based on the selection: ${langPrompt}.
-2. Use '→' to separate Word 1 and Word 2.
-3. Use '|' to separate the vocabulary part from the example sentence.
-4. IMPORTANT: The example sentence MUST always be written in LANGUAGE 1 (the first language of the pair).
-5. Ensure the messy inputs are structured into clean cards.
-6. Only reply with the organized list. No introductions.
+1. If the input is already formatted with '→', your job is to TRANSLATE the entire list into the new REQUESTED LANGUAGES.
+2. The example sentence MUST always be written in Language 1.
+3. Reply ONLY with the formatted list. No intros.
 
-MESSY INPUT:
+INPUT TEXT:
 ${rawText}`;
 
         try {
@@ -113,7 +104,7 @@ ${rawText}`;
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 textInput.value = data.candidates[0].content.parts[0].text.trim();
                 localStorage.setItem('sophie_last_input', textInput.value);
-                if(processBtn) processBtn.click(); // ¡Automatización activa!
+                if(processBtn) processBtn.click(); // Automatización
             }
         } catch (error) {
             alert("Error de conexión a la IA.");
@@ -124,19 +115,18 @@ ${rawText}`;
     });
 }
 
-// --- CREAR TARJETAS (SOLUCIÓN PUNTO D & DISEÑO PREMIUM MOBILE-READY) ---
+// --- CREAR TARJETAS (TEXTO VISIBLE RESTAURADO Y DATOS PARA AUDIO) ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
         if (!rawText.trim()) return;
-        labList.innerHTML = ''; // Limpiar laboratorio
+        labList.innerHTML = ''; 
         const lines = rawText.split('\n');
         const config = getLangConfig(langSelect.value, isSwapped);
 
         lines.forEach(line => {
             if (!line.includes('→')) return;
             
-            // Separar Vocabulario de la Frase
             let exampleText = "";
             let vocabPart = line;
             if (line.includes('|')) {
@@ -145,7 +135,6 @@ if (processBtn) {
                 if (parts[1]) exampleText = parts[1].trim();
             }
 
-            // Separar Palabra 1 de Palabra 2
             let word1 = "", word2 = "";
             if (vocabPart.includes('→')) {
                 const words = vocabPart.split('→');
@@ -153,24 +142,32 @@ if (processBtn) {
                 if (words[1]) word2 = words[1].trim();
             }
 
-            if (!word1 || !word2) return; // Saltarse líneas malformadas
+            if (!word1 || !word2) return;
 
             const row = document.createElement('div');
             row.className = 'lab-row';
             
+            // Guardamos datos invisibles en el HTML para el botón "Escuchar todo"
+            row.dataset.text1 = word1;
+            row.dataset.text2 = word2;
+            row.dataset.voice1 = config.voice1;
+            row.dataset.voice2 = config.voice2;
+            row.dataset.example = exampleText;
+            
+            // Eliminado el "color:#fff" fijo. Ahora respeta el tema claro/oscuro
             row.innerHTML = `
                 <div class="vocab-container" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                    <div class="vocab-word" style="font-weight:600; color:#fff; display:flex; align-items:center; gap:8px;">
+                    <div class="vocab-word" style="font-weight:600; display:flex; align-items:center; gap:8px;">
                         <span class="flag">${config.flag1}</span> ${word1}
                     </div>
-                    <div class="vocab-word" style="font-weight:600; color:#fff; display:flex; align-items:center; gap:8px;">
+                    <div class="vocab-word" style="font-weight:600; display:flex; align-items:center; gap:8px;">
                         <span class="flag">${config.flag2}</span> ${word2}
                     </div>
                 </div>
                 ${exampleText ? `
-                <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:8px;">
                     <small style="color:var(--text-secondary); font-style:italic; font-size:0.85rem;">💡 ${exampleText}</small>
-                    <button class="play-example" onclick="speak('${exampleText.replace(/'/g, "\\'")}', '${config.voice1}')" style="background:rgba(255,255,255,0.05); border:none; border-radius:50%; width:35px; height:35px; color:var(--accent-purple); cursor:pointer;">
+                    <button class="play-example" onclick="speak('${exampleText.replace(/'/g, "\\'")}', '${config.voice1}')" style="background:transparent; border:none; border-radius:50%; width:35px; height:35px; color:var(--accent-purple); cursor:pointer;">
                         <i class="fas fa-volume-up"></i>
                     </button>
                 </div>` : ''}
@@ -179,6 +176,45 @@ if (processBtn) {
         });
         saveLesson(rawText);
     });
+}
+
+// --- MOTOR AUDIO MANOS LIBRES (RESTAURADO) ---
+if(playSessionBtn) {
+    playSessionBtn.onclick = async () => {
+        const rows = document.querySelectorAll('.lab-row');
+        if (rows.length === 0) return alert("Por favor, procesa una lección primero.");
+        
+        if (isPlaying) { 
+            isPlaying = false; 
+            window.speechSynthesis.cancel(); 
+            playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo'; 
+            return; 
+        }
+        
+        isPlaying = true; 
+        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar'; 
+        const mode = audioMode ? audioMode.value : 'basic';
+
+        for (let row of rows) {
+            if (!isPlaying) break; 
+            row.style.borderColor = "var(--accent-purple)"; // Resaltar tarjeta actual
+            
+            await speak(row.dataset.text1, row.dataset.voice1);
+            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
+            
+            if (!isPlaying) break; await speak(row.dataset.text2, row.dataset.voice2);
+            
+            if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
+                if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000)); 
+                if (!isPlaying) break; await speak(row.dataset.example, row.dataset.voice1); 
+            }
+            
+            row.style.borderColor = "var(--border-color)"; // Quitar resalte
+            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1500)); 
+        }
+        isPlaying = false; 
+        playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo'; 
+    };
 }
 
 // --- FUNCIONES DE APOYO & LOCALIZATION ---
@@ -195,10 +231,14 @@ function getLangConfig(mode, swapped) {
 }
 
 async function speak(text, lang) {
-    window.speechSynthesis.cancel();
-    const ut = new SpeechSynthesisUtterance(text);
-    ut.lang = lang;
-    window.speechSynthesis.speak(ut);
+    return new Promise(resolve => {
+        window.speechSynthesis.cancel();
+        let currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = lang;
+        currentUtterance.onend = resolve;
+        currentUtterance.onerror = resolve;
+        window.speechSynthesis.speak(currentUtterance);
+    });
 }
 
 function saveLesson(content) {
@@ -221,10 +261,10 @@ function createCardUI(content, date) {
     const card = document.createElement('div');
     card.className = 'gallery-card';
     card.innerHTML = `
-        <div style="display:flex; align-items:center; gap:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding:10px 0;">
+        <div style="display:flex; align-items:center; gap:15px; border-bottom:1px solid var(--border-color); padding:10px 0;">
             <i class="fas fa-book-bookmark" style="color:var(--accent-purple); font-size:1.4rem;"></i>
             <div>
-                <div style="font-weight:700; font-size:0.95rem; color:#fff;">${title}...</div>
+                <div style="font-weight:700; font-size:0.95rem;">${title}...</div>
                 <div style="font-size:0.75rem; color:var(--text-secondary)">${date}</div>
             </div>
         </div>
@@ -239,37 +279,34 @@ function loadStreak() {
     if(streakEl) streakEl.innerText = streak;
 }
 
-// Botones auxiliares
 if(newNoteBtn) newNoteBtn.onclick = () => { textInput.value = ""; labList.innerHTML = ""; localStorage.setItem('sophie_last_input', ""); };
 if(swapLangBtn) swapLangBtn.onclick = () => { isSwapped = !isSwapped; swapLangBtn.classList.toggle('active'); };
-if(exportBtn) exportBtn.onclick = () => alert("Misión: Crear Backup. (Socia, esto lo haremos en V10!)");
 
-// --- SOLUCIÓN PUNTO C: DYNAMIC QUIZ CREATION & REVIVAL ---
+// --- LÓGICA DEL QUIZ (MANTENIDA) ---
 function createQuizOverlayUI() {
-    if (document.getElementById('quizOverlay')) return; // Evitar duplicados
+    if (document.getElementById('quizOverlay')) return; 
 
     const quizOverlay = document.createElement('div');
     quizOverlay.id = 'quizOverlay';
     quizOverlay.className = 'quiz-overlay';
-    quizOverlay.style = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,14,23,0.95); backdrop-filter:blur(12px); z-index:2000; flex-direction:column; align-items:center; justify-content:center; padding:30px;";
+    quizOverlay.style = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:2000; flex-direction:column; align-items:center; justify-content:center; padding:30px;";
     
     quizOverlay.innerHTML = `
-        <div class="quiz-card" style="background:var(--card-bg); border-radius:25px; padding:30px; border:1px solid var(--accent-purple); box-shadow:0 0 40px rgba(187,134,252,0.3); width:100%; max-width:400px; text-align:center;">
-            <div style="font-weight:800; color:#ffffff; font-size:1.4rem; letter-spacing:1px; margin-bottom:20px;">SOPHIE QUIZ 🧠</div>
-            <div id="quizQuestion" style="font-size:1.2rem; font-weight:600; color:#fff; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:15px; border-radius:15px;">Lädt...</div>
-            <input type="text" id="quizInput" placeholder="Introduce traducción..." autocomplete="off" style="width:100%; padding:15px; background:rgba(0,0,0,0.1); border:1px solid var(--border-color); border-radius:12px; color:#fff; margin-bottom:10px;">
+        <div class="quiz-card" style="background:var(--bg-color); border-radius:25px; padding:30px; border:1px solid var(--accent-purple); box-shadow:0 0 40px rgba(187,134,252,0.3); width:100%; max-width:400px; text-align:center;">
+            <div style="font-weight:800; color:var(--text-primary); font-size:1.4rem; letter-spacing:1px; margin-bottom:20px;">SOPHIE QUIZ 🧠</div>
+            <div id="quizQuestion" style="font-size:1.2rem; font-weight:600; color:var(--text-primary); margin-bottom:15px; background:var(--card-bg); padding:15px; border-radius:15px;">Lädt...</div>
+            <input type="text" id="quizInput" placeholder="Introduce traducción..." autocomplete="off" style="width:100%; padding:15px; background:var(--card-bg); border:1px solid var(--border-color); border-radius:12px; color:var(--text-primary); margin-bottom:10px;">
             <div id="quizFeedback" style="min-height:24px; margin:10px 0; font-weight:bold; font-size:1rem;"></div>
             <button id="checkBtn" style="width:100%; padding:15px; border:none; border-radius:15px; background:var(--accent-purple); color:#111827; font-weight:700; cursor:pointer;">Überprüfen</button>
-            <button id="closeQuiz" style="margin-top:20px; background:none; border:none; color:#999; font-size:0.9rem; text-decoration:underline; cursor:pointer;">Quiz beenden</button>
+            <button id="closeQuiz" style="margin-top:20px; background:none; border:none; color:var(--text-secondary); font-size:0.9rem; text-decoration:underline; cursor:pointer;">Quiz beenden</button>
         </div>
     `;
     document.body.appendChild(quizOverlay);
 
-    // Lógica del Quiz
     if (quizBtn) {
         quizBtn.onclick = () => {
             const rows = document.querySelectorAll('.lab-row');
-            if (rows.length === 0) return alert("Por favor, lade zuerst eine Lektion hoch!");
+            if (rows.length === 0) return alert("Por favor, procesa una lección primero.");
             quizOverlay.style.display = 'flex';
             nextQuizQuestion();
         };
@@ -284,7 +321,6 @@ function nextQuizQuestion() {
     const randomRow = rows[Math.floor(Math.random() * rows.length)];
     const langInput = randomRow.querySelectorAll('.vocab-word');
     
-    // Seleccionar palabra 1 y respuesta correcta
     const word1Text = langInput[0].innerText;
     currentCorrectAnswer = langInput[1].innerText.toLowerCase().trim();
 
