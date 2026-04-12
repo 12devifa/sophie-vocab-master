@@ -1,5 +1,5 @@
 /* ==============================================================
-   SOPHIE: VOCAB MASTER - STYLE CSS - V9.0 (PREMIUM DARK LOOK 💎)
+   SOPHIE: VOCAB MASTER - STYLE CSS - V9.1 (LUXURY WOW EDITION 💎✨)
    ============================================================== */
 
 /* --- 1. IMPORTAR FUENTE PROFESIONAL (INTER) --- */
@@ -8,49 +8,76 @@
 /* --- 2. IMPORTAR ICONOS PROFESIONALES (FONTAWESOME) --- */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-/* --- 3. VARIABLES DE COLOR PREMIUM --- */
+/* --- 3. VARIABLES DE COLOR LUXURY --- */
 :root {
-    /* Modo Oscuro (Principal) */
-    --bg-color: #101010;          /* Fondo Negro Azabache */
-    --card-bg: #1E1E1E;           /* Fondo de Tarjetas Gris Oscuro */
-    --text-primary: #E0E0E0;      /* Texto Principal Gris Seda */
-    --text-secondary: #8E918F;    /* Texto Secundario */
-    --accent-purple: #BB86FC;     /* Morado Neón Suave (Acentuado) */
-    --accent-hover: #985EFF;      /* Morado Hover */
-    --border-color: #333333;      /* Líneas Divisorias */
-    --shadow-premium: 0 8px 30px rgba(0,0,0,0.5); /* Sombra Profunda */
+    /* Modo Oscuro (Aurora Borealis) */
+    --color-fondo-1: #0a0e17;      /* Negro Noche */
+    --color-fondo-2: #1c1130;      /* Morado Aterciopelado */
+    --color-fondo-3: #112d3c;      /* Azul Noche */
     
-    /* Variables de Transición */
-    --transition-fast: all 0.2s ease;
+    --card-bg: rgba(255, 255, 255, 0.03); /* Cristal Esmerilado ultra sutil */
+    --text-primary: #f8fafc;
+    --text-secondary: #a1a1aa;
+    --accent-purple: #BB86FC;     /* Morado Neón Suave */
+    --accent-hover: #985EFF;
+    --border-color: rgba(255, 255, 255, 0.08); /* Líneas Divisorias sutiles */
+    
+    /* Variables de Transición y Fuente */
+    --transition-premium: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); /* Transición suave */
     --font-main: 'Inter', sans-serif;
 }
 
-/* --- 4. RESETEO Y ESTILOS GLOBALES --- */
+/* Modo Claro (Dorado/Glow) - ¡Aquí está tu sol reencarnado! */
+body.light-theme {
+    --color-fondo-1: #fffbeb;      /* Crema Suave */
+    --color-fondo-2: #fff7ed;      /* Naranja muy suave */
+    --color-fondo-3: #f0fdf4;      /* Verde muy suave */
+    
+    --card-bg: rgba(255, 255, 255, 0.8); /* Cristal Blanco */
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --accent-purple: #FFD700;     /* Dorado Sun-Kissed */
+    --accent-hover: #fcd34d;
+    --border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* --- 4. RESETEO Y FONDO ANIMADO ADICTIVO (AURORA) --- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* Quitar flash azul en móvil */
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     font-family: var(--font-main);
-    background-color: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
-}
-
-/* --- 5. CONTENEDOR PRINCIPAL (ESTILO APP MÓVIL) --- */
-.app-container {
-    max-width: 480px; /* Ancho máximo estilo móvil */
-    margin: 0 auto;
     min-height: 100vh;
-    padding: 20px;
-    padding-bottom: 100px; /* Espacio para menú inferior si lo ponemos */
+    
+    /* EL FONDO AURORA BOREALIS ADICTIVO */
+    background: linear-gradient(-45deg, var(--color-fondo-1), var(--color-fondo-2), var(--color-fondo-3), var(--color-fondo-2));
+    background-size: 400% 400%;
+    animation: auroraAnimation 15s ease infinite; /* Animación hipnótica */
+    transition: background 1s ease; /* Transición suave al cambiar el modo */
 }
 
-/* --- 6. ESTILOS DE CABECERA (HEADER) --- */
+@keyframes auroraAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- 5. CONTENEDOR PRINCIPAL (ESTILO APP MÓVIL LUXURY) --- */
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+/* --- 6. ESTILOS DE CABECERA (HEADER PREMIUM) --- */
 header {
     display: flex;
     justify-content: space-between;
@@ -62,12 +89,13 @@ h1 {
     font-size: 1.5rem;
     font-weight: 800;
     color: #ffffff;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+    text-shadow: 0 0 10px rgba(187, 134, 252, 0.3); /* Resplandor */
 }
 
-h1 span {
-    color: var(--accent-purple);
-}
+body.light-theme h1 { color: #111827; text-shadow: none; }
+
+h1 span { color: var(--accent-purple); }
 
 .streak-counter {
     background: var(--card-bg);
@@ -78,32 +106,32 @@ h1 span {
     align-items: center;
     gap: 8px;
     font-weight: 600;
-    color: #FF9800; /* Color Fuego */
+    color: #FFB74D; /* Color Fuego Sun */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* --- 7. ZONA DE ENTRADA (INPUT AREA) --- */
-.input-section {
-    margin-bottom: 25px;
-}
+/* --- 7. ZONA DE ENTRADA (INPUT AREA PREMIUM) --- */
+.input-section { margin-bottom: 25px; }
 
 textarea {
     width: 100%;
     height: 150px;
     background-color: var(--card-bg);
     color: var(--text-primary);
-    border: 2px solid var(--border-color);
-    border-radius: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
     padding: 15px;
     font-family: var(--font-main);
     font-size: 0.95rem;
     resize: none;
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
+    backdrop-filter: blur(5px); /* Efecto Glassmorphism */
 }
 
 textarea:focus {
     outline: none;
     border-color: var(--accent-purple);
-    box-shadow: 0 0 10px rgba(187, 134, 252, 0.3);
+    box-shadow: 0 0 15px rgba(187, 134, 252, 0.2);
 }
 
 /* --- 8. SELECTORES Y BOTONES DE IDIOMA --- */
@@ -119,29 +147,31 @@ select {
     background-color: var(--card-bg);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 10px;
     font-family: var(--font-main);
     font-size: 0.9rem;
-    appearance: none; /* Quitar flecha nativa */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23E0E0E0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22/%3E%3C/svg%3E');
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22/%3E%3C/svg%3E');
     background-repeat: no-repeat;
     background-position: right 10px top 50%;
     background-size: 12px auto;
 }
 
+body.light-theme select { color: #111827; }
+
 .icon-btn {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
-    border-radius: 10px;
-    width: 40px;
-    height: 40px;
+    border-radius: 12px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
 }
 
 .icon-btn:hover {
@@ -149,21 +179,19 @@ select {
     border-color: var(--accent-purple);
 }
 
-.icon-btn:active {
-    transform: scale(0.9);
-}
+.icon-btn:active { transform: scale(0.92); }
 
-/* --- 9. BOTONES PRINCIPALES (PRIMARY BUTTONS) --- */
+/* --- 9. BOTONES PRINCIPALES (PRIMARY BUTTONS LUXURY) --- */
 .primary-btn {
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     border: none;
-    border-radius: 15px;
+    border-radius: 18px;
     font-family: var(--font-main);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.05rem;
     cursor: pointer;
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,15 +202,18 @@ select {
 /* Botón Morado (Magia KI) */
 #magicOrderBtn {
     background-color: var(--accent-purple);
-    color: #000000;
+    color: #111827;
     margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #magicOrderBtn:hover {
     background-color: var(--accent-hover);
+    box-shadow: 0 0 15px rgba(187, 134, 252, 0.4);
 }
 
-/* Botón Azul (Lektion) */
+/* Botón Azul (Lektion verarbeiten) */
 #processBtn {
     background-color: transparent;
     border: 2px solid var(--accent-purple);
@@ -198,29 +229,36 @@ select {
     box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-/* --- 10. ZONA DE LECCIONES (LAB AREA) --- */
-.lab-section {
-    margin-top: 30px;
-}
+/* --- 10. ZONA DE LECCIONES (LAB AREA PREMIUM) --- */
+.lab-section { margin-top: 30px; }
 
 h2 {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 15px;
+    margin-bottom: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
+body.light-theme h2 { color: #111827; }
+
 .lab-row {
     background-color: var(--card-bg);
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 10px;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-premium);
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
+    backdrop-filter: blur(5px);
+}
+
+/* EL EFECTO WOW DE TARJETA FLOTANTE */
+.lab-row:hover {
+    border-color: var(--accent-purple);
+    box-shadow: 0 8px 30px rgba(187, 134, 252, 0.15); /* Resplandor suave al pasar el ratón */
+    transform: translateY(-3px);
 }
 
 .vocab-container {
@@ -232,38 +270,39 @@ h2 {
 
 .vocab-word {
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
-.vocab-word span.flag {
-    font-size: 1.2rem;
-}
+body.light-theme .vocab-word { color: #111827; }
 
-/* Botones de Contexto y Audio */
+/* Botones de Audio Premium */
 .play-example {
     background: rgba(255,255,255,0.05);
     border: none;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--accent-purple);
     cursor: pointer;
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
 }
+
+body.light-theme .play-example { background: rgba(0,0,0,0.05); }
 
 .play-example:hover {
     background: rgba(187, 134, 252, 0.2);
     transform: scale(1.1);
+    color: #ffffff;
 }
 
-/* --- 11. HISTORIAL (NOTEBOOK GALLERY) --- */
+/* --- 11. HISTORIAL (NOTEBOOK GALLERY LUXURY) --- */
 .gallery-section {
     margin-top: 40px;
     border-top: 1px solid var(--border-color);
@@ -272,48 +311,51 @@ h2 {
 
 .gallery-card {
     background-color: var(--card-bg);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 10px;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 12px;
     cursor: pointer;
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
     border: 1px solid transparent;
 }
 
 .gallery-card:hover {
-    border-color: var(--border-color);
+    border-color: var(--accent-purple);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-premium);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
 .gallery-card i.fa-book {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     color: var(--text-secondary);
+    text-shadow: 0 0 5px rgba(255,255,255,0.2);
 }
 
-/* --- 12. QUIZ OVERLAY PREMIUM --- */
+/* --- 12. QUIZ OVERLAY PREMIU M (GLASSMORPHISM) --- */
 .quiz-overlay {
-    background-color: rgba(16, 16, 16, 0.95);
-    backdrop-filter: blur(10px); /* Efecto borroso de fondo */
+    background-color: rgba(10, 14, 23, 0.9);
+    backdrop-filter: blur(12px); /* Mucho más borroso */
 }
 
 .quiz-card {
     background-color: var(--card-bg);
-    border-radius: 20px;
-    padding: 25px;
+    border-radius: 25px;
+    padding: 30px;
     border: 1px solid var(--accent-purple);
-    box-shadow: 0 0 30px rgba(187, 134, 252, 0.2);
+    box-shadow: 0 0 40px rgba(187, 134, 252, 0.3);
 }
 
-/* --- 13. MENÚ DE HERRAMIENTAS (OPCIONAL ARRIBA O ABAJO) --- */
+/* --- 13. MENÚ DE HERRAMIENTAS (GLASSMORPHISM) --- */
 .tools-menu {
     display: flex;
     justify-content: space-around;
     background: var(--card-bg);
     padding: 15px;
-    border-radius: 15px;
+    border-radius: 18px;
     border: 1px solid var(--border-color);
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .tool-btn {
@@ -324,15 +366,75 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     cursor: pointer;
-    transition: var(--transition-fast);
+    transition: var(--transition-premium);
 }
 
 .tool-btn i {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
 }
 
 .tool-btn:hover {
     color: var(--accent-purple);
+    transform: scale(1.05);
 }
+
+/* --- EL SOL Y LA LUNA LUXURY (INTERRUPTOR ANIMADO) --- */
+.theme-switch-wrapper {
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.theme-switch-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255,255,255,0.1);
+    transition: .4s;
+    border-radius: 34px;
+    border: 1px solid var(--border-color);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 3px;
+    background-color: var(--text-secondary);
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-purple);
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
+    background-color: #111827; /* Sol Dorado */
+}
+
+/* Iconos dentro del slider */
+.slider .slider-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    transition: var(--transition-premium);
+}
+
+.slider .fa-moon { left: 8px; color: var(--text-primary); opacity: 1; }
+.slider .fa-sun { right: 8px; color: #111827; opacity: 0; }
+
+input:checked + .slider .fa-moon { opacity: 0; }
+input:checked + .slider .fa-sun { opacity: 1; }
