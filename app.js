@@ -72,7 +72,7 @@ if (magicOrderBtn) {
         magicOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
         magicOrderBtn.disabled = true;
 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
         
         // System prompt modificado para RE-TRADUCIR si es necesario
         const systemPrompt = `You are a strict language teacher. 
