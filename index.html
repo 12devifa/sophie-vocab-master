@@ -49,7 +49,7 @@
         </div>
 
         <main>
-            <section class="input-section">
+       <section class="input-section">
                 <div class="controls-row">
                     <select id="langSelect">
                         <option value="fr-de">FR Francés / DE Alemán</option>
@@ -63,15 +63,24 @@
                     </button>
                 </div>
 
-                <textarea id="textInput" placeholder="Pega aquí tus palabras o frases desordenadas..."></textarea>
+                <textarea id="textInput" placeholder="Learn exactly what you need. Paste your messy words, notes or phrases here..."></textarea>
                 <input type="file" id="fileUpload" style="display: none;" accept=".txt,.pdf,image/*">
 
                 <button id="magicOrderBtn" class="primary-btn">
-                    <i class="fas fa-wand-magic-sparkles"></i> Ordenar con IA
+                    <i class="fas fa-wand-magic-sparkles"></i> Transform my text
                 </button>
                 
-                <button id="processBtn" class="primary-btn" style="margin-top: 10px;">
-                    <i class="fas fa-layer-group"></i> Crear Tarjetas
+                <div id="wowSummary" style="display: none; text-align: center; padding: 20px; margin-top: 15px; background: rgba(187,134,252,0.05); border: 1px solid var(--accent-purple); border-radius: 18px; box-shadow: 0 0 20px rgba(187,134,252,0.1);">
+                    <h3 style="color: #ffffff; margin-bottom: 12px; font-size: 1.2rem;">🧩 Your learning set is ready</h3>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8;">
+                        <div style="color: var(--accent-purple); font-weight: bold; font-size: 1rem;">📊 <span id="termCount">0</span> key terms detected</div>
+                        <div>⚡ Optimized for fast learning</div>
+                        <div>🎧 Audio training ready</div>
+                    </div>
+                </div>
+
+                <button id="processBtn" class="primary-btn" style="margin-top: 15px; display: none; background: #ffffff; color: #111827;">
+                    <i class="fas fa-play"></i> Start learning
                 </button>
             </section>
 
