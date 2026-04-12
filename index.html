@@ -1,104 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>SOPHIE: Vocab Master</title>
-    <link rel="stylesheet" href="style.css?v=2">
-    <link rel="apple-touch-icon" href="https://fav.farm/🎧">
-    <link rel="icon" href="https://fav.farm/🎧">
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SOPHIE | Vocab Master AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <button id="themeToggle" style="background:none; border:none; cursor:pointer; font-size:1.8rem; position:fixed; top:15px; right:15px; z-index: 9999; padding: 5px;">
-    ☀️
-    </button>
-    
-    <div id="streakCounter" title="Lern-Serie!" style="position:fixed; top:20px; right:70px; z-index: 9999; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 4px 12px; border-radius: 20px; font-weight: 900; color: #e65100; border: 1px solid #ffb74d; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 6px rgba(230, 81, 0, 0.15); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-        🔥 <span id="streakNumber">0</span>
-    </div>
 
     <div class="app-container">
         <header>
-            <h1>🎧 SOPHIE: Vocab Master</h1>
-            <p>Freihändiges Lernuniversum</p>
-            <audio id="bgMusic" preload="auto" crossorigin="anonymous" style="display:none;"></audio>
+            <h1>SOPHIE<span>.ai</span></h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="streakCounter" class="streak-counter">
+                    <i class="fas fa-fire"></i> <span id="streakNumber">0</span>
+                </div>
+                <label class="theme-switch-wrapper">
+                    <input type="checkbox" id="themeToggle">
+                    <div class="slider">
+                        <i class="fas fa-moon slider-icon"></i>
+                        <i class="fas fa-sun slider-icon"></i>
+                    </div>
+                </label>
+            </div>
         </header>
 
-        <main class="grid-layout">
-            <section class="card input-col">
-                <div class="card-header" style="display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center;">
-                        <span class="icon">📥</span>
-                        <h2>Eingabe</h2>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                        <select id="langSelect" style="flex-grow: 1; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-weight: bold; cursor: pointer; background: #f5f5f5; color: #333;">
-                            <option value="fr-de">🇫🇷 FR / 🇩🇪 DE</option>
-                            <option value="en-es">🇬🇧 EN / 🇪🇸 ES</option>
-                            <option value="es-de">🇪🇸 ES / 🇩🇪 DE</option>
-                            <option value="en-de">🇬🇧 EN / 🇩🇪 DE</option>
-                            <option value="pt-de">🇵🇹 PT / 🇩🇪 DE</option>
-                        </select>
-                        <button id="swapLangBtn" title="Richtung wechseln" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; background: #e0e0e0; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
-                            🔄
-                        </button>
-                    </div>
-                </div>
-                
-                <textarea id="textInput" placeholder="Hier schreiben oder einfügen..."></textarea>
-                
-                <button id="magicOrderBtn" style="margin-top: 10px; width: 100%; border-radius: 8px; padding: 12px; cursor: pointer; background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%); color: white; font-weight: bold; font-size: 1rem; border: none; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    ✨ Automagisch mit KI ordnen
-                </button>
-                
-                <div style="margin-top: 15px; display: flex; gap: 10px; flex-direction: column;">
-                    <button id="newNoteBtn" class="primary-btn" style="background-color: #f5f5f5; color: #333; border: 1px solid #ccc; width: 100%; border-radius: 8px; padding: 10px; cursor: pointer;">
-                        + Neue Notiz
-                    </button>
-                    <label for="fileUpload" class="primary-btn" style="width: 100%; text-align: center; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 10px; margin-top: -5px;">
-                        📄 PDF/TXT/Bild hochladen
-                    </label>
-                    <input type="file" id="fileUpload" accept="image/*, application/pdf, text/plain" style="display:none;">
-                </div>
-                
-                <button id="processBtn" class="primary-btn" style="margin-top: 15px; width: 100%; border-radius: 8px; cursor: pointer; background: #3b82f6;">Lektion verarbeiten (Manuell)</button>
-            </section>
+        <div class="tools-menu">
+            <button class="tool-btn" id="newNoteBtn">
+                <i class="fas fa-plus-circle"></i>
+                <span>Nuevo</span>
+            </button>
+            <button class="tool-btn" onclick="document.getElementById('fileUpload').click()">
+                <i class="fas fa-file-import"></i>
+                <span>Importar</span>
+            </button>
+            <button class="tool-btn" id="quizBtn">
+                <i class="fas fa-brain"></i>
+                <span>Quiz</span>
+            </button>
+            <button class="tool-btn" id="exportBtn">
+                <i class="fas fa-download"></i>
+                <span>Backup</span>
+            </button>
+        </div>
 
-            <section class="card lab-col">
-                <div class="card-header">
-                    <span class="icon">🧪</span>
-                    <h2>Labor</h2>
-                </div>
-                <div id="labList" class="list-container">
-                </div>
-                
-                <div style="margin-bottom: 10px; display: flex; width: 100%;">
-                    <select id="audioMode" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #bae6fd; font-weight: bold; background: #e0f2fe; color: #0369a1; cursor: pointer;">
-                        <option value="basic">🎧 Audio: Nur Vokabeln</option>
-                        <option value="full">📖 Audio: Mit Kontext</option>
+        <main>
+            <section class="input-section">
+                <div class="controls-row">
+                    <select id="langSelect">
+                        <option value="fr-de">FR Francés / DE Alemán</option>
+                        <option value="en-es">EN Inglés / ES Español</option>
+                        <option value="es-de">ES Español / DE Alemán</option>
+                        <option value="en-de">EN Inglés / DE Alemán</option>
+                        <option value="pt-de">PT Portugués / DE Alemán</option>
                     </select>
+                    <button class="icon-btn" id="swapLangBtn" title="Invertir Idiomas">
+                        <i class="fas fa-retweet"></i>
+                    </button>
                 </div>
 
-                <button id="playSession" class="play-btn">▶ Freihändig abspielen</button>
-                <button id="quizBtn" class="secondary-btn" style="margin-top: 10px; background: #673ab7; color: white; border: none; width: 100%; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer;">
-                    🧠 Vokabel-Quiz starten
+                <textarea id="textInput" placeholder="Pega aquí tus palabras o frases desordenadas..."></textarea>
+                <input type="file" id="fileUpload" style="display: none;" accept=".txt,.pdf,image/*">
+
+                <button id="magicOrderBtn" class="primary-btn">
+                    <i class="fas fa-wand-magic-sparkles"></i> Ordenar con IA
+                </button>
+                
+                <button id="processBtn" class="primary-btn" style="margin-top: 10px;">
+                    <i class="fas fa-layer-group"></i> Crear Tarjetas
                 </button>
             </section>
 
-            <section class="card gallery-col">
-                <div class="card-header">
-                    <span class="icon">🖼️</span>
-                    <h2>Galerie</h2>
+            <section class="lab-section">
+                <h2><i class="fas fa-flask"></i> Laboratorio de Estudio</h2>
+                <div class="controls-row">
+                    <select id="audioMode">
+                        <option value="basic">Sólo Vocabulario</option>
+                        <option value="full">Vocabulario + Frases</option>
+                    </select>
+                    <button id="playSession" class="icon-btn" style="width: auto; padding: 0 15px; gap: 8px;">
+                        <i class="fas fa-play"></i> Escuchar todo
+                    </button>
                 </div>
-                <div id="notebookGallery" class="notebook-grid">
-                </div>
-                <button id="exportBtn" class="secondary-btn">Exportieren (.json)</button>
+                <div id="labList">
+                    </div>
+            </section>
+
+            <section class="gallery-section">
+                <h2><i class="fas fa-box-archive"></i> Mi Biblioteca</h2>
+                <div id="notebookGallery">
+                    </div>
             </section>
         </main>
     </div>
-    <script src="app.js?v=final6"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
