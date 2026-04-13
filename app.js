@@ -73,7 +73,7 @@ if (magicOrderBtn) {
         magicOrderBtn.disabled = true;
         
 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userApiKey}`;
         
         // System prompt modificado para RE-TRADUCIR si es necesario
         const systemPrompt = `You are a strict language teacher. 
