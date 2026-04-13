@@ -440,45 +440,101 @@ input:checked + .slider .fa-moon { opacity: 0; }
 input:checked + .slider .fa-sun { opacity: 1; }
 
 
-/* --- 14. PANTALLA DE BIENVENIDA (SPLASH SCREEN) --- */
+/* --- 14. PANTALLA DE BIENVENIDA (SPLASH SCREEN) ALIVE SYSTEM 🧠🔥 --- */
 .splash-screen {
     position: fixed;
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    background: #0a0e17; /* Fondo oscuro elegante */
-    z-index: 9999; /* Por encima de todo */
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* La pantalla se queda 1.5s y luego tarda 1s en desaparecer */
-    animation: fadeOutSplash 1s ease forwards;
-    animation-delay: 1.5s; 
+    text-align: center;
+    
+    /* Fondo inicial oscuro que luego mutará a morado profundo */
+    background-color: #030408; /* Negro casi puro */
+    background-image: radial-gradient(circle at center, rgba(28, 17, 48, 0) 0%, transparent 70%);
+    
+    /* Doble animación: Desaparecer al final + Fondo vivo */
+    animation: 
+        aliveBackground 3s ease forwards,
+        fadeOutSplashPremium 0.8s ease forwards;
+    animation-delay: 0s, 3.5s; 
 }
 
+.splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px; /* Un poco más juntos para cohesión visual */
+}
+
+/* LOGO Y JERARQUÍA */
 .splash-logo {
     font-size: 3.5rem;
     font-weight: 800;
     color: #ffffff;
-    letter-spacing: -1px;
-    /* Animación de latido */
-    animation: pulseLogo 1.5s ease-in-out infinite;
+    letter-spacing: -1.5px;
 }
 
-.splash-logo span {
+.logo-name {
+    opacity: 0;
+    display: inline-block;
+    animation: fadedInPremium 0.6s ease forwards;
+    animation-delay: 0.2s;
+}
+
+.logo-ai {
     color: var(--accent-purple);
+    opacity: 0;
+    display: inline-block;
+    /* Aparece y luego empieza a respirar (pulse) infinitamente */
+    animation: 
+        fadedInPremium 0.6s ease forwards,
+        breathGlow 2s ease-in-out infinite alternate;
+    animation-delay: 0.8s, 1.4s;
 }
 
-/* Instrucciones para que desaparezca */
-@keyframes fadeOutSplash {
+/* EL TAGLINE (MÁS PRESENCIA Y CONTRASTE) */
+.splash-tagline {
+    font-size: 1.15rem; /* Más grande */
+    font-weight: 500; /* Más peso */
+    color: #f4f4f5; /* Blanco suave (Zinc-200), menos gris */
+    letter-spacing: 0.5px;
+    opacity: 0;
+    /* Micro fade-in sutil desde abajo */
+    animation: taglineReveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: 1.3s; 
+}
+
+/* --- MICRO-ANIMACIONES APPLE LEVEL --- */
+
+/* 1. Transición de fondo (Negro a Morado profundo) */
+@keyframes aliveBackground {
+    0% { background-image: radial-gradient(circle at center, rgba(28, 17, 48, 0) 0%, transparent 70%); }
+    100% { background-image: radial-gradient(circle at center, rgba(50, 20, 80, 0.6) 0%, transparent 80%); }
+}
+
+/* 2. Fade in estándar */
+@keyframes fadedInPremium {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 3. Fade in premium del Tagline */
+@keyframes taglineReveal {
+    0% { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* 4. Respiración de la Inteligencia (Pulse glow) */
+@keyframes breathGlow {
+    0% { text-shadow: 0 0 10px rgba(187,134,252,0.3); }
+    100% { text-shadow: 0 0 25px rgba(187,134,252,0.9), 0 0 10px rgba(187,134,252,0.6); }
+}
+
+/* 5. Desvanecimiento de la pantalla */
+@keyframes fadeOutSplashPremium {
     0% { opacity: 1; visibility: visible; }
     100% { opacity: 0; visibility: hidden; }
-}
-
-/* Instrucciones para el latido del logo */
-@keyframes pulseLogo {
-    0% { transform: scale(1); text-shadow: 0 0 10px rgba(187,134,252,0.2); }
-    50% { transform: scale(1.05); text-shadow: 0 0 30px rgba(187,134,252,0.8); }
-    100% { transform: scale(1); text-shadow: 0 0 10px rgba(187,134,252,0.2); }
 }
