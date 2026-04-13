@@ -440,7 +440,214 @@ input:checked + .slider .fa-moon { opacity: 0; }
 input:checked + .slider .fa-sun { opacity: 1; }
 
 
+/* ==============================================================
+   REDISEÑO APPLE PREMIUM - V11.0 💎
+   ============================================================== */
+
+/* Fondo General Deep Navy/Black */
+body {
+    background-color: #050508;
+    background-image: radial-gradient(circle at top, #130b24 0%, transparent 60%);
+    color: #f4f4f5; /* Blanco suave, no gris muerto */
+}
+
+/* --- HEADER MINIMALISTA --- */
+.apple-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0 40px 0;
+}
+
+.logo-small {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.logo-small span {
+    color: var(--accent-purple);
+}
+
+.header-tools {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.streak-pill {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- HERO SECTION --- */
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+}
+
+.hero-subtitle {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #a1a1aa; /* Soft gray */
+    margin-bottom: 40px;
+}
+
+/* --- INPUT DOMINANTE --- */
+.input-wrapper {
+    width: 100%;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+#textInput {
+    width: 100%;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 25px;
+    color: #ffffff;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    resize: none;
+}
+
+#textInput:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(187, 134, 252, 0.5);
+    outline: none;
+    box-shadow: 0 0 30px rgba(187, 134, 252, 0.1);
+}
+
+#textInput::placeholder {
+    color: #52525b;
+}
+
+/* Selector de idioma sutil */
+.minimal-lang-selector {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.minimal-lang-selector select {
+    background: transparent;
+    border: none;
+    color: #a1a1aa;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: center;
+    outline: none;
+}
+
+/* --- BOTÓN PRINCIPAL (EL REY) --- */
+.apple-primary-btn {
+    background: #ffffff;
+    color: #000000;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 18px 40px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+}
+
+.apple-primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255,255,255,0.2);
+}
+
+.micro-promise {
+    font-size: 0.85rem;
+    color: #71717a;
+    margin-top: 15px;
+    letter-spacing: 0.5px;
+}
+
+/* --- MENÚ SECUNDARIO (LIBRARY) --- */
+.secondary-tools-menu {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tool-btn {
+    background: rgba(255, 255, 255, 0.03);
+    color: #a1a1aa;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+/* Premium WOW Summary Box */
+.premium-summary {
+    margin-top: 25px;
+    padding: 25px;
+    background: rgba(187, 134, 252, 0.05);
+    border: 1px solid rgba(187, 134, 252, 0.3);
+    border-radius: 20px;
+    text-align: left;
+    width: 100%;
+}
+
+.premium-summary h3 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.summary-details {
+    color: #a1a1aa;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.stat-highlight {
+    color: var(--accent-purple);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+
 /* --- 14. PANTALLA DE BIENVENIDA (SPLASH SCREEN) ALIVE SYSTEM 🧠🔥 --- */
+
 .splash-screen {
     position: fixed;
     top: 0; left: 0; 
