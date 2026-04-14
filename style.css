@@ -745,3 +745,174 @@ body {
     0% { opacity: 1; visibility: visible; }
     100% { opacity: 0; visibility: hidden; }
 }
+
+/* ==============================================================
+   COGNITIVE DASHBOARD (SISTEMA DE PROGRESO) 🧠🧬
+   ============================================================== */
+.cognitive-dashboard {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px;
+    background: rgba(20, 20, 25, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 30px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.level-badge {
+    background: rgba(187, 134, 252, 0.15);
+    color: var(--accent-purple);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Brain Progress Bar */
+.brain-progress-container {
+    margin-bottom: 35px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: #e4e4e7;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.progress-percentage {
+    color: var(--accent-purple);
+    font-weight: 700;
+}
+
+.brain-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.brain-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #c084fc);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(187, 134, 252, 0.5);
+}
+
+.neuro-insight {
+    font-size: 0.85rem;
+    color: #71717a;
+    margin-top: 12px;
+    font-style: italic;
+    text-align: right;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px 10px;
+    border-radius: 20px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-card i {
+    font-size: 1.2rem;
+    color: var(--accent-purple);
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Smart Insight Box */
+.smart-insight-box {
+    background: linear-gradient(145deg, rgba(187, 134, 252, 0.1), rgba(187, 134, 252, 0.02));
+    border: 1px solid rgba(187, 134, 252, 0.2);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.insight-header {
+    color: var(--accent-purple);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.smart-insight-box p {
+    color: #d4d4d8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.smart-insight-box strong {
+    color: #fff;
+}
+
+.secondary-btn-minimal {
+    background: transparent;
+    color: #a1a1aa;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 25px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.secondary-btn-minimal:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
