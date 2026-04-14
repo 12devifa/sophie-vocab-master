@@ -953,3 +953,13 @@ body {
     border-color: rgba(187, 134, 252, 0.4);
     box-shadow: 0 0 15px rgba(187, 134, 252, 0.1);
 }
+
+/* --- MICROCOPY DINÁMICO --- */
+.goal-microcopy {
+    font-size: 0.9rem;
+    color: var(--accent-purple);
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
