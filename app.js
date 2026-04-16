@@ -111,32 +111,33 @@ if (magicOrderBtn) {
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + userApiKey;
 
         const systemPrompt = `
-        Eres SOPHIE.ai, una experta en neuroaprendizaje y políglota nativa.
-        MISIÓN: El usuario quiere aprender el texto. Su objetivo es: "${window.userCurrentGoal}".
-        Idiomas configurados: ${langPrompt}.
+        Eres SOPHIE.ai, una experta en neuroaprendizaje y traductora políglota nativa.
+        MISIÓN: El usuario te ha dado un texto. Tu trabajo es TRADUCIRLO TODO a los nuevos idiomas seleccionados, sin importar en qué idioma estaba escrito originalmente.
+        
+        NUEVOS IDIOMAS SELECCIONADOS:
+        - Idioma Destino (El que quiere aprender): ${config.name1}
+        - Idioma Base (Su idioma de apoyo): ${config.name2}
 
-        REGLA DE ORO DE IDIOMA: 
-        1. El campo "original" es lo que el usuario quiere aprender (Target Language).
-        2. El campo "translation" es el idioma de apoyo del usuario (Base Language).
-        3. IMPORTANTE: El campo "context" (ejemplo) DEBE estar escrito SIEMPRE y ÚNICAMENTE en el idioma que el usuario está APRENDIENDO (Target Language). No uses español para explicar términos en inglés.
+        REGLAS ESTRICTAS E INQUEBRANTABLES: 
+        1. ¡IGNORA si el texto original ya estaba traducido a otros idiomas! DEBES re-traducir todos los conceptos a ${config.name1} y ${config.name2}.
+        2. El campo "original" DEBE estar SIEMPRE en ${config.name1}.
+        3. El campo "translation" DEBE estar SIEMPRE en ${config.name2}.
+        4. El campo "context" (ejemplo) DEBE estar escrito SIEMPRE y ÚNICAMENTE en ${config.name1} (frase real y natural).
 
-        PASOS:
-        1. Detecta automáticamente el idioma del texto original.
-        2. Traduce y formatea adecuadamente según el objetivo (${window.userCurrentGoal}).
-        3. Crea un "wow_message" corto en el idioma de aprendizaje.
+        OBJETIVO: "${window.userCurrentGoal}".
 
-        TEXTO A ANALIZAR:
+        TEXTO A ANALIZAR Y TRADUCIR:
         "${rawText}"
 
-        DEVUELVE ÚNICAMENTE UN JSON:
+        DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA:
         {
-          "detected_language": "Idioma",
-          "wow_message": "Mensaje motivador",
+          "detected_language": "Idioma original detectado",
+          "wow_message": "Mensaje motivador corto en ${config.name1}",
           "flashcards": [
             {
-              "original": "Palabra/Frase en idioma destino",
-              "translation": "Traducción al idioma apoyo",
-              "context": "Ejemplo REAL y NATURAL únicamente en el idioma destino"
+              "original": "Palabra/Frase en ${config.name1}",
+              "translation": "Traducción en ${config.name2}",
+              "context": "Ejemplo en ${config.name1}"
             }
           ]
         }
