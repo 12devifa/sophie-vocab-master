@@ -102,7 +102,7 @@ if (magicOrderBtn) {
         magicOrderBtn.disabled = true;
 
         // URL a prueba de fallos matemáticos (Concatenación segura)
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + userApiKey;
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + userApiKey;
 
         const systemPrompt = `
         Eres SOPHIE.ai, una experta en neuroaprendizaje.
