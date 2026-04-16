@@ -1,5 +1,5 @@
 // ==============================================================
-// SOPHIE: VOCAB MASTER - V9.4 (AUDIO LOOP & MAGIC TRANSLATE RESTORED 💎)
+// SOPHIE.ai - VERSIÓN DEFINITIVA (CEREBRO JSON + AUDIO + GOALS) 💎
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
@@ -9,19 +9,20 @@ const notebookGallery = document.getElementById('notebookGallery');
 const fileUpload = document.getElementById('fileUpload');
 const quizBtn = document.getElementById('quizBtn');
 const newNoteBtn = document.getElementById('newNoteBtn');
-const themeToggle = document.getElementById('themeToggle'); 
+const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
 const langSelect = document.getElementById('langSelect');
-const swapLangBtn = document.getElementById('swapLangBtn'); 
-const audioMode = document.getElementById('audioMode'); 
-const magicOrderBtn = document.getElementById('magicOrderBtn'); 
-const playSessionBtn = document.getElementById('playSession'); // Recuperado
+const swapLangBtn = document.getElementById('swapLangBtn');
+const audioMode = document.getElementById('audioMode');
+const magicOrderBtn = document.getElementById('magicOrderBtn');
+const playSessionBtn = document.getElementById('playSession');
 
-let isSwapped = false; 
+let isSwapped = false;
 let currentCorrectAnswer = "";
-let isPlaying = false; // Estado del audio manos libres
+let isPlaying = false;
+window.userCurrentGoal = 'auto'; // Variable global para la meta
 
-// --- GESTIÓN DEL TEMA (SOL / LUNA) ---
+// --- 1. GESTIÓN DEL TEMA Y CARGA INICIAL ---
 if (themeToggle) {
     themeToggle.addEventListener('change', () => {
         if (themeToggle.checked) {
@@ -34,7 +35,6 @@ if (themeToggle) {
     });
 }
 
-// --- CARGA INICIAL & QUIZ CREATION ---
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('sophie_theme');
     if (savedTheme === 'light' && themeToggle) {
@@ -46,70 +46,88 @@ window.addEventListener('DOMContentLoaded', () => {
     savedLessons.forEach(l => createCardUI(l.content, l.date));
 
     createQuizOverlayUI();
-
-    loadStreak(); 
+    loadStreak();
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText && textInput) textInput.value = savedText;
+
+    // --- LÓGICA DE LOS BOTONES DE METAS (GOALS) ---
+    const goalChips = document.querySelectorAll('.goal-chip');
+    const microcopyText = document.getElementById('goalMicrocopy');
+    const goalMessages = {
+        'auto': '⏱ Even 5 minutes makes a difference',
+        'work': '💼 Optimized for meetings & professional communication',
+        'travel': '✈️ Focus on real-life travel situations',
+        'exam': '🎓 Prioritizing high-retention learning'
+    };
+
+    goalChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            goalChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            window.userCurrentGoal = chip.getAttribute('data-goal');
+            if(microcopyText) {
+                microcopyText.style.opacity = 0;
+                setTimeout(() => {
+                    microcopyText.textContent = goalMessages[window.userCurrentGoal];
+                    microcopyText.style.opacity = 1;
+                }, 200);
+            }
+        });
+    });
 });
 
-// --- LÓGICA DE LA IA (NUEVO CEREBRO: GOALS & JSON) ---
+// --- 2. LÓGICA DE LA IA (EL SÚPER CEREBRO JSON) ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
-        const rawText = textInput.value;
-        if (!rawText.trim()) return alert("Please, paste some text first.");
+        const rawText = textInput ? textInput.value : "";
+        if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-        // 🚨 1. TU NUEVA API KEY DE GOOGLE AI STUDIO AQUÍ (Entre las comillas)
-        // 🔒 SISTEMA SEGURO DE API KEY (El guardaespaldas de Sophie)
+        // Sistema Seguro de API Key
         let userApiKey = localStorage.getItem('sophie_gemini_key');
         if (!userApiKey) {
-            // El texto entre comillas es lo que leerá el usuario, NO tu clave
             userApiKey = prompt("🔒 Por favor, pega aquí tu Google API Key:");
             if (!userApiKey) {
                 alert("Necesitas una API Key para continuar.");
-                return; 
+                return;
             }
             localStorage.setItem('sophie_gemini_key', userApiKey.trim());
         }
-            localStorage.setItem('sophie_gemini_key', userApiKey.trim());
-        }
-        const currentGoal = window.userCurrentGoal || 'auto';
-        const mode = langSelect.value;
+
+        const mode = langSelect ? langSelect.value : 'fr-de';
         const config = getLangConfig(mode, isSwapped);
         let langPrompt = `Idioma 1: ${config.name1} -> Idioma 2: ${config.name2}`;
 
-        magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-fade"></i> Analyzing your vocabulary...';
+        const originalBtnHTML = magicOrderBtn.innerHTML;
+        magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-pulse"></i> Analyzing...';
         magicOrderBtn.disabled = true;
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
 
-        // 2. EL SÚPER PROMPT (Donde ocurre la magia de la detección)
         const systemPrompt = `
         Eres SOPHIE.ai, una experta en neuroaprendizaje.
-        
-        MISIÓN:
-        El usuario quiere aprender el siguiente texto. Su objetivo actual es: "${currentGoal}".
-        Los idiomas de destino son: ${langPrompt}.
+        MISIÓN: El usuario quiere aprender el siguiente texto. Su objetivo es: "${window.userCurrentGoal}".
+        Idiomas: ${langPrompt}.
 
         PASOS:
         1. Detecta automáticamente el idioma del texto original.
         2. Traduce y formatea las palabras a ${config.name2}.
-           - Si es 'work': usa lenguaje profesional.
-           - Si es 'travel': enfócate en supervivencia práctica.
-           - Si es 'exam': lenguaje académico y preciso.
-        3. Crea un "wow_message" en inglés, corto y directo a la meta (Ej: "You're ready for your meeting!").
+           - Si es 'work': profesional.
+           - Si es 'travel': supervivencia práctica.
+           - Si es 'exam': académico.
+        3. Crea un "wow_message" en inglés, corto y directo a la meta (Ej: "You're ready for your trip!").
 
         TEXTO DEL USUARIO:
         "${rawText}"
 
-        DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA EXACTA (sin markdown):
+        DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA EXACTA:
         {
           "detected_language": "Idioma detectado (Ej: Francés)",
           "wow_message": "Tu frase motivadora",
           "flashcards": [
             {
-              "original": "palabra o frase",
+              "original": "palabra o frase original",
               "translation": "traducción",
-              "context": "ejemplo corto en el idioma original"
+              "context": "ejemplo corto de uso"
             }
           ]
         }
@@ -119,22 +137,28 @@ if (magicOrderBtn) {
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     contents: [{ parts: [{ text: systemPrompt }] }],
                     generationConfig: { response_mime_type: "application/json", temperature: 0.7 }
                 })
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error?.message || "Error desconocido");
+                if(response.status === 400 || response.status === 403) {
+                     localStorage.removeItem('sophie_gemini_key'); // Borramos clave mala
+                     throw new Error("Clave API incorrecta. Refresca la página y pon tu nueva clave.");
+                }
+                throw new Error(`Error de Google: ${response.status}`);
             }
 
             const data = await response.json();
-            const aiResponseText = data.candidates[0].content.parts[0].text;
-            const parsedData = JSON.parse(aiResponseText);
+            let aiResponseText = data.candidates[0].content.parts[0].text;
             
-            // 3. RECONSTRUIR EL TEXTO PARA TUS TARJETAS
+            // Limpieza de formato (Crucial para que no se rompa)
+            aiResponseText = aiResponseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const parsedData = JSON.parse(aiResponseText);
+
+            // Reconstruir texto
             let finalFormattedText = "";
             parsedData.flashcards.forEach(card => {
                 finalFormattedText += `${card.original} → ${card.translation} | ${card.context}\n`;
@@ -142,46 +166,50 @@ if (magicOrderBtn) {
 
             textInput.value = finalFormattedText.trim();
             localStorage.setItem('sophie_last_input', textInput.value);
-            
-            // 4. MODO DOPAMINA Y ACTUALIZACIÓN VISUAL 🧠✨
+
+            // UI Updates
             const wowSummary = document.getElementById('wowSummary');
-            wowSummary.innerHTML = `
-                <h3 style="color: #4ade80; margin-bottom: 10px;">✨ ${parsedData.wow_message}</h3>
-                <div class="summary-details" style="display: flex; flex-direction: column; gap: 8px; color: #d4d4d8;">
-                    <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> terms detected</div>
-                    <div>🌍 Language Detected: <strong>${parsedData.detected_language}</strong></div>
-                    <div>🎯 Optimized for: <strong>${currentGoal.toUpperCase()}</strong></div>
-                </div>
-            `;
+            if(wowSummary) {
+                wowSummary.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">✨ ${parsedData.wow_message}</h3>
+                    <div class="summary-details" style="display: flex; flex-direction: column; gap: 8px; color: #d4d4d8;">
+                        <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> terms detected</div>
+                        <div>🌍 Language: <strong>${parsedData.detected_language}</strong></div>
+                        <div>🎯 Optimized for: <strong>${window.userCurrentGoal.toUpperCase()}</strong></div>
+                    </div>
+                `;
+                wowSummary.style.display = 'block';
+            }
             
-            magicOrderBtn.style.display = 'none'; 
-            wowSummary.style.display = 'block'; 
-            processBtn.style.display = 'flex'; 
-            
-            if (navigator.vibrate) navigator.vibrate(50); 
-           
+            magicOrderBtn.style.display = 'none';
+            if(processBtn) processBtn.style.display = 'flex';
+
+            // Disparar las tarjetas
+            if(processBtn) processBtn.click();
+            if (navigator.vibrate) navigator.vibrate(50);
+
         } catch (error) {
-            alert("Socia, tuvimos un problema con la API: " + error.message);
             console.error(error);
+            alert("Error: " + error.message);
         } finally {
-            magicOrderBtn.innerHTML = '<i class="fas fa-play"></i> Start learning';
+            magicOrderBtn.innerHTML = originalBtnHTML;
             magicOrderBtn.disabled = false;
         }
     });
 }
 
-// --- CREAR TARJETAS (TEXTO VISIBLE RESTAURADO Y DATOS PARA AUDIO) ---
+// --- 3. CREAR TARJETAS VISUALES ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
         const rawText = textInput.value;
         if (!rawText.trim()) return;
-        labList.innerHTML = ''; 
+        if(labList) labList.innerHTML = '';
+        
         const lines = rawText.split('\n');
         const config = getLangConfig(langSelect.value, isSwapped);
 
         lines.forEach(line => {
             if (!line.includes('→')) return;
-            
             let exampleText = "";
             let vocabPart = line;
             if (line.includes('|')) {
@@ -201,15 +229,12 @@ if (processBtn) {
 
             const row = document.createElement('div');
             row.className = 'lab-row';
-            
-            // Guardamos datos invisibles en el HTML para el botón "Escuchar todo"
             row.dataset.text1 = word1;
             row.dataset.text2 = word2;
             row.dataset.voice1 = config.voice1;
             row.dataset.voice2 = config.voice2;
             row.dataset.example = exampleText;
-            
-            // Eliminado el "color:#fff" fijo. Ahora respeta el tema claro/oscuro
+
             row.innerHTML = `
                 <div class="vocab-container" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <div class="vocab-word" style="font-weight:600; display:flex; align-items:center; gap:8px;">
@@ -227,32 +252,32 @@ if (processBtn) {
                     </button>
                 </div>` : ''}
             `;
-            labList.appendChild(row);
+            if(labList) labList.appendChild(row);
         });
         saveLesson(rawText);
     });
 }
 
-// --- MOTOR AUDIO MANOS LIBRES (RESTAURADO) ---
+// --- 4. MOTOR DE AUDIO ---
 if(playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("Por favor, procesa una lección primero.");
+        if (rows.length === 0) return alert("Procesa una lección primero.");
         
-        if (isPlaying) { 
-            isPlaying = false; 
-            window.speechSynthesis.cancel(); 
-            playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo'; 
-            return; 
+        if (isPlaying) {
+            isPlaying = false;
+            window.speechSynthesis.cancel();
+            playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+            return;
         }
         
-        isPlaying = true; 
-        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar'; 
+        isPlaying = true;
+        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
         const mode = audioMode ? audioMode.value : 'basic';
 
         for (let row of rows) {
-            if (!isPlaying) break; 
-            row.style.borderColor = "var(--accent-purple)"; // Resaltar tarjeta actual
+            if (!isPlaying) break;
+            row.style.borderColor = "var(--accent-purple)";
             
             await speak(row.dataset.text1, row.dataset.voice1);
             if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
@@ -260,19 +285,19 @@ if(playSessionBtn) {
             if (!isPlaying) break; await speak(row.dataset.text2, row.dataset.voice2);
             
             if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
-                if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000)); 
-                if (!isPlaying) break; await speak(row.dataset.example, row.dataset.voice1); 
+                if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
+                if (!isPlaying) break; await speak(row.dataset.example, row.dataset.voice1);
             }
             
-            row.style.borderColor = "var(--border-color)"; // Quitar resalte
-            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1500)); 
+            row.style.borderColor = "var(--border-color)";
+            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1500));
         }
-        isPlaying = false; 
-        playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo'; 
+        isPlaying = false;
+        playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
     };
 }
 
-// --- FUNCIONES DE APOYO & LOCALIZATION ---
+// --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
     let configs = {
         'fr-de': { f1:'🇫🇷', f2:'🇩🇪', v1:'fr-FR', v2:'de-DE', n1:'Französisch', n2:'Deutsch' },
@@ -281,7 +306,7 @@ function getLangConfig(mode, swapped) {
         'en-de': { f1:'🇬🇧', f2:'🇩🇪', v1:'en-US', v2:'de-DE', n1:'English', n2:'Deutsch' },
         'pt-de': { f1:'🇵🇹', f2:'🇩🇪', v1:'pt-PT', v2:'de-DE', n1:'Português', n2:'Deutsch' }
     };
-    let c = configs[mode] || configs['fr-de'];
+    let c = configs[mode] || configs['en-es'];
     return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
 }
 
@@ -307,8 +332,10 @@ function saveLesson(content) {
         lessons.push({ title, content, date: new Date().toLocaleDateString() });
     }
     localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
-    notebookGallery.innerHTML = "";
-    lessons.forEach(l => createCardUI(l.content, l.date));
+    if(notebookGallery) {
+        notebookGallery.innerHTML = "";
+        lessons.forEach(l => createCardUI(l.content, l.date));
+    }
 }
 
 function createCardUI(content, date) {
@@ -324,7 +351,12 @@ function createCardUI(content, date) {
             </div>
         </div>
     `;
-    card.onclick = () => { textInput.value = content; localStorage.setItem('sophie_last_input', content); if(processBtn) processBtn.click(); };
+    card.onclick = () => { 
+        if(textInput) textInput.value = content; 
+        localStorage.setItem('sophie_last_input', content); 
+        if(processBtn) processBtn.click(); 
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
     if(notebookGallery) notebookGallery.prepend(card);
 }
 
@@ -334,13 +366,12 @@ function loadStreak() {
     if(streakEl) streakEl.innerText = streak;
 }
 
-if(newNoteBtn) newNoteBtn.onclick = () => { textInput.value = ""; labList.innerHTML = ""; localStorage.setItem('sophie_last_input', ""); };
+if(newNoteBtn) newNoteBtn.onclick = () => { if(textInput) textInput.value = ""; if(labList) labList.innerHTML = ""; localStorage.setItem('sophie_last_input', ""); };
 if(swapLangBtn) swapLangBtn.onclick = () => { isSwapped = !isSwapped; swapLangBtn.classList.toggle('active'); };
 
-// --- LÓGICA DEL QUIZ (MANTENIDA) ---
+// --- 6. QUIZ LOGIC ---
 function createQuizOverlayUI() {
-    if (document.getElementById('quizOverlay')) return; 
-
+    if (document.getElementById('quizOverlay')) return;
     const quizOverlay = document.createElement('div');
     quizOverlay.id = 'quizOverlay';
     quizOverlay.className = 'quiz-overlay';
