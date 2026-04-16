@@ -358,7 +358,16 @@ function createCardUI(content, date) {
     card.onclick = () => { 
         if(textInput) textInput.value = content; 
         localStorage.setItem('sophie_last_input', content); 
+        
+        // Esto hace que al hacer clic, se generen los botones de play automáticamente
+        const processBtn = document.getElementById('processBtn');
+        const wowSummary = document.getElementById('wowSummary');
+        const magicOrderBtn = document.getElementById('magicOrderBtn');
+        
         if(processBtn) processBtn.click(); 
+        if(wowSummary) wowSummary.style.display = 'none';
+        if(magicOrderBtn) magicOrderBtn.style.display = 'none'; 
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     if(notebookGallery) notebookGallery.prepend(card);
