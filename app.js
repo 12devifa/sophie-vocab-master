@@ -438,3 +438,17 @@ function checkQuizAnswer() {
         setTimeout(() => { nextQuizQuestion(); checkBtn.disabled = false; feedback.innerText = ""; feedback.style.color = ""; }, 2500); 
     }
 }
+
+// --- BOTÓN NUEVA NOTA (+) ---
+if(newNoteBtn) {
+    newNoteBtn.onclick = () => { 
+        if(textInput) textInput.value = ""; 
+        if(labList) labList.innerHTML = ""; 
+        const wowSummary = document.getElementById('wowSummary');
+        const magicOrderBtn = document.getElementById('magicOrderBtn');
+        if(wowSummary) wowSummary.style.display = 'none';
+        if(magicOrderBtn) magicOrderBtn.style.display = 'flex';
+        localStorage.setItem('sophie_last_input', ""); 
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+}
