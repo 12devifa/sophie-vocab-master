@@ -978,3 +978,33 @@ body {
     box-shadow: 0 0 25px rgba(187, 134, 252, 0.8), inset 0 0 10px rgba(0,0,0,0.1);
     transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* =========================================
+   ⚡ SOPHIE STREAK EVOLUTION (NIVELES PRO)
+   ========================================= */
+
+/* Transición suave para que no cambie de golpe */
+.streak-pill {
+    transition: all 0.4s ease;
+}
+
+/* Nivel 2: 5+ Días (Glow sutil y elegante) */
+.glow-tier-1 {
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+/* Nivel 3: 10+ Días (Glow dinámico y premium) */
+.glow-tier-2 {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+    border: 1px solid rgba(251, 191, 36, 0.8);
+    background: rgba(251, 191, 36, 0.15);
+    animation: pulse-energy 2s infinite alternate;
+}
+
+/* Animación de latido de energía para los 10+ días */
+@keyframes pulse-energy {
+    0% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+    100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8); }
+}
