@@ -76,21 +76,21 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// --- 2. LÓGICA DE LA IA (EL SÚPER CEREBRO JSON) ---
+// --- 2. LÓGICA DE LA IA (EL SÚPER CEREBRO JSON - MODO DETECTIVE) ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput ? textInput.value : "";
         if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-       // Sistema Seguro de API Key (Caja Fuerte V2)
-        let userApiKey = localStorage.getItem('sophie_api_final');
+        // Sistema Seguro de API Key (V5 - Definitivo)
+        let userApiKey = localStorage.getItem('sophie_key_5');
         if (!userApiKey) {
-            userApiKey = prompt("🔒 Por favor, pega aquí tu Google API Key (la que empieza por AQ...):");
+            userApiKey = prompt("🔒 Pega tu clave de Google (SÍ, la que empieza por AQ...):");
             if (!userApiKey) {
                 alert("Necesitas una API Key para continuar.");
                 return;
             }
-            localStorage.setItem('sophie_api_final', userApiKey.trim());
+            localStorage.setItem('sophie_key_5', userApiKey.trim());
         }
 
         const mode = langSelect ? langSelect.value : 'fr-de';
@@ -101,33 +101,34 @@ if (magicOrderBtn) {
         magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-pulse"></i> Analyzing...';
         magicOrderBtn.disabled = true;
 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
+        // URL a prueba de fallos matemáticos (Concatenación segura)
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + userApiKey;
 
         const systemPrompt = `
         Eres SOPHIE.ai, una experta en neuroaprendizaje.
-        MISIÓN: El usuario quiere aprender el siguiente texto. Su objetivo es: "${window.userCurrentGoal}".
+        MISIÓN: El usuario quiere aprender el texto. Su objetivo es: "${window.userCurrentGoal}".
         Idiomas: ${langPrompt}.
 
         PASOS:
         1. Detecta automáticamente el idioma del texto original.
-        2. Traduce y formatea las palabras a ${config.name2}.
+        2. Traduce y formatea a ${config.name2}.
            - Si es 'work': profesional.
-           - Si es 'travel': supervivencia práctica.
+           - Si es 'travel': supervivencia.
            - Si es 'exam': académico.
-        3. Crea un "wow_message" en inglés, corto y directo a la meta (Ej: "You're ready for your trip!").
+        3. Crea un "wow_message" en inglés corto (Ej: "Ready for your trip!").
 
-        TEXTO DEL USUARIO:
+        TEXTO:
         "${rawText}"
 
-        DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA EXACTA:
+        DEVUELVE ÚNICAMENTE UN JSON:
         {
-          "detected_language": "Idioma detectado (Ej: Francés)",
-          "wow_message": "Tu frase motivadora",
+          "detected_language": "Idioma",
+          "wow_message": "Mensaje",
           "flashcards": [
             {
-              "original": "palabra o frase original",
+              "original": "palabra",
               "translation": "traducción",
-              "context": "ejemplo corto de uso"
+              "context": "ejemplo"
             }
           ]
         }
@@ -144,21 +145,19 @@ if (magicOrderBtn) {
             });
 
             if (!response.ok) {
-                if(response.status === 400 || response.status === 403) {
-                     localStorage.removeItem('sophie_gemini_key'); // Borramos clave mala
-                     throw new Error("Clave API incorrecta. Refresca la página y pon tu nueva clave.");
-                }
-                throw new Error(`Error de Google: ${response.status}`);
+                // 🚨 EL DETECTIVE DE ERRORES EN ACCIÓN 🚨
+                const errorDetails = await response.json();
+                alert("🚨 GOOGLE NOS HA DICHO ESTO EXACTAMENTE:\n\n" + JSON.stringify(errorDetails, null, 2));
+                localStorage.removeItem('sophie_key_5'); // Borramos la clave para que te deje intentar de nuevo
+                throw new Error("Fallo de comunicación. Lee el cartel de alerta.");
             }
 
             const data = await response.json();
             let aiResponseText = data.candidates[0].content.parts[0].text;
             
-            // Limpieza de formato (Crucial para que no se rompa)
             aiResponseText = aiResponseText.replace(/```json/gi, '').replace(/```/g, '').trim();
             const parsedData = JSON.parse(aiResponseText);
 
-            // Reconstruir texto
             let finalFormattedText = "";
             parsedData.flashcards.forEach(card => {
                 finalFormattedText += `${card.original} → ${card.translation} | ${card.context}\n`;
@@ -167,7 +166,6 @@ if (magicOrderBtn) {
             textInput.value = finalFormattedText.trim();
             localStorage.setItem('sophie_last_input', textInput.value);
 
-            // UI Updates
             const wowSummary = document.getElementById('wowSummary');
             if(wowSummary) {
                 wowSummary.innerHTML = `
@@ -184,13 +182,11 @@ if (magicOrderBtn) {
             magicOrderBtn.style.display = 'none';
             if(processBtn) processBtn.style.display = 'flex';
 
-            // Disparar las tarjetas
             if(processBtn) processBtn.click();
             if (navigator.vibrate) navigator.vibrate(50);
 
         } catch (error) {
             console.error(error);
-            alert("Error: " + error.message);
         } finally {
             magicOrderBtn.innerHTML = originalBtnHTML;
             magicOrderBtn.disabled = false;
