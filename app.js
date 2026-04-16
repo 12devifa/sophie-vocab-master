@@ -82,15 +82,15 @@ if (magicOrderBtn) {
         const rawText = textInput ? textInput.value : "";
         if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-        // Sistema Seguro de API Key
-        let userApiKey = localStorage.getItem('sophie_gemini_key');
+       // Sistema Seguro de API Key (Caja Fuerte V2)
+        let userApiKey = localStorage.getItem('sophie_api_final');
         if (!userApiKey) {
-            userApiKey = prompt("🔒 Por favor, pega aquí tu Google API Key:");
+            userApiKey = prompt("🔒 Por favor, pega aquí tu Google API Key (la que empieza por AQ...):");
             if (!userApiKey) {
                 alert("Necesitas una API Key para continuar.");
                 return;
             }
-            localStorage.setItem('sophie_gemini_key', userApiKey.trim());
+            localStorage.setItem('sophie_api_final', userApiKey.trim());
         }
 
         const mode = langSelect ? langSelect.value : 'fr-de';
