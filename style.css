@@ -963,3 +963,18 @@ body {
     opacity: 0.9;
     transition: opacity 0.3s ease;
 }
+
+/* --- SEÑAL AI Y MICRO-FEEDBACK TÁCTIL --- */
+.ai-signal {
+    font-size: 0.8rem;
+    color: #52525b; /* Un gris un poco más oscuro para que no compita con la promesa principal */
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Efecto de pulsación (glow y contracción rápida) */
+.apple-primary-btn:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 0 25px rgba(187, 134, 252, 0.8), inset 0 0 10px rgba(0,0,0,0.1);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
