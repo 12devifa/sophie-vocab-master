@@ -378,9 +378,31 @@ function createCardUI(content, date) {
 }
 
 function loadStreak() {
-    const streak = localStorage.getItem('sophie_streak') || 0;
-    const streakEl = document.getElementById('streakNumber');
-    if(streakEl) streakEl.innerText = streak;
+    const streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
+    const streakCounter = document.getElementById('streakCounter');
+    
+    if (streakCounter) {
+        // Quitamos los brillos antiguos por si acaso
+        streakCounter.classList.remove('glow-tier-1', 'glow-tier-2');
+
+        let iconHTML = '';
+
+        // Lógica PRO de evolución visual
+        if (streak >= 10) {
+            iconHTML = `<i class="fas fa-bolt" style="color: #fbbf24;"></i>✨`;
+            streakCounter.classList.add('glow-tier-2'); // Glow dinámico
+        } else if (streak >= 5) {
+            iconHTML = `<i class="fas fa-bolt" style="color: #fbbf24;"></i>✨`;
+            streakCounter.classList.add('glow-tier-1'); // Glow sutil
+        } else if (streak >= 1) {
+            iconHTML = `<i class="fas fa-bolt" style="color: #fbbf24;"></i>`;
+        } else {
+            iconHTML = `<i class="fas fa-bolt" style="color: #6b7280;"></i>`; // Gris si está en 0
+        }
+
+        // Actualizamos el botón completo
+        streakCounter.innerHTML = `${iconHTML} <span id="streakNumber" style="margin-left: 5px; font-weight: bold; color: white;">${streak}</span>`;
+    }
 }
 
 if(newNoteBtn) newNoteBtn.onclick = () => { if(textInput) textInput.value = ""; if(labList) labList.innerHTML = ""; localStorage.setItem('sophie_last_input', ""); };
