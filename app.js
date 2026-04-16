@@ -362,14 +362,15 @@ function createCardUI(content, date) {
         if(textInput) textInput.value = content; 
         localStorage.setItem('sophie_last_input', content); 
         
-        // Esto hace que al hacer clic, se generen los botones de play automáticamente
         const processBtn = document.getElementById('processBtn');
         const wowSummary = document.getElementById('wowSummary');
         const magicOrderBtn = document.getElementById('magicOrderBtn');
         
-       if(processBtn) processBtn.click(); 
+        if(processBtn) processBtn.click(); 
         if(wowSummary) wowSummary.style.display = 'none';
-        if(magicOrderBtn) magicOrderBtn.style.display = 'flex'; // <--- SOLUCIONADO
+        
+        // 🔥 AQUÍ ESTÁ EL TRUCO: Le decimos que SIEMPRE se muestre ('flex') 🔥
+        if(magicOrderBtn) magicOrderBtn.style.display = 'flex'; 
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
