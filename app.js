@@ -52,76 +52,119 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedText && textInput) textInput.value = savedText;
 });
 
-// --- LÓGICA DE LA IA (MAGIA UNIVERSAL RESTAURADA) ---
+// --- LÓGICA DE LA IA (NUEVO CEREBRO: GOALS & JSON) ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput.value;
-        if (!rawText.trim()) return alert("Por favor, introduce texto primero.");
+        if (!rawText.trim()) return alert("Please, paste some text first.");
 
+        // 🚨 1. TU NUEVA API KEY DE GOOGLE AI STUDIO AQUÍ (Entre las comillas)
+        // 🔒 SISTEMA SEGURO DE API KEY (El guardaespaldas de Sophie)
         let userApiKey = localStorage.getItem('sophie_gemini_key');
         if (!userApiKey) {
-            userApiKey = prompt("🔒 Introduce tu Google API Key:");
-            if (!userApiKey) return;
+            // El texto entre comillas es lo que leerá el usuario, NO tu clave
+            userApiKey = prompt("🔒 Por favor, pega aquí tu Google API Key:");
+            if (!userApiKey) {
+                alert("Necesitas una API Key para continuar.");
+                return; 
+            }
             localStorage.setItem('sophie_gemini_key', userApiKey.trim());
         }
-
+            localStorage.setItem('sophie_gemini_key', userApiKey.trim());
+        }
+        const currentGoal = window.userCurrentGoal || 'auto';
         const mode = langSelect.value;
         const config = getLangConfig(mode, isSwapped);
         let langPrompt = `Idioma 1: ${config.name1} -> Idioma 2: ${config.name2}`;
 
         magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-fade"></i> Analyzing your vocabulary...';
         magicOrderBtn.disabled = true;
-        
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
-        
-        // System prompt modificado para RE-TRADUCIR si es necesario
-        const systemPrompt = `You are a strict language teacher. 
-TASK: Organize vocabulary or TRANSLATE existing lists into the exact requested languages.
-REQUESTED LANGUAGES: ${langPrompt}.
-FORMAT: Word in Language 1 → Translation in Language 2 | Example sentence in Language 1.
-RULES:
-1. If the input is already formatted with '→', your job is to TRANSLATE the entire list into the new REQUESTED LANGUAGES.
-2. The example sentence MUST always be written in Language 1.
-3. Reply ONLY with the formatted list. No intros.
 
-INPUT TEXT:
-${rawText}`;
+        // 2. EL SÚPER PROMPT (Donde ocurre la magia de la detección)
+        const systemPrompt = `
+        Eres SOPHIE.ai, una experta en neuroaprendizaje.
+        
+        MISIÓN:
+        El usuario quiere aprender el siguiente texto. Su objetivo actual es: "${currentGoal}".
+        Los idiomas de destino son: ${langPrompt}.
+
+        PASOS:
+        1. Detecta automáticamente el idioma del texto original.
+        2. Traduce y formatea las palabras a ${config.name2}.
+           - Si es 'work': usa lenguaje profesional.
+           - Si es 'travel': enfócate en supervivencia práctica.
+           - Si es 'exam': lenguaje académico y preciso.
+        3. Crea un "wow_message" en inglés, corto y directo a la meta (Ej: "You're ready for your meeting!").
+
+        TEXTO DEL USUARIO:
+        "${rawText}"
+
+        DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA EXACTA (sin markdown):
+        {
+          "detected_language": "Idioma detectado (Ej: Francés)",
+          "wow_message": "Tu frase motivadora",
+          "flashcards": [
+            {
+              "original": "palabra o frase",
+              "translation": "traducción",
+              "context": "ejemplo corto en el idioma original"
+            }
+          ]
+        }
+        `;
 
         try {
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
+                body: JSON.stringify({ 
+                    contents: [{ parts: [{ text: systemPrompt }] }],
+                    generationConfig: { response_mime_type: "application/json", temperature: 0.7 }
+                })
             });
 
-            const data = await response.json();
-            if (data.error) {
-                alert("Error de Google: " + data.error.message);
-                localStorage.removeItem('sophie_gemini_key');
-                return;
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || "Error desconocido");
             }
 
-            if (data.candidates && data.candidates[0].content.parts[0].text) {
-                textInput.value = data.candidates[0].content.parts[0].text.trim();
-                localStorage.setItem('sophie_last_input', textInput.value);
-                
-                // MODO DOPAMINA ACTIVADO 🧠✨
-                const termsArray = textInput.value.split('\n').filter(line => line.includes('→'));
-                document.getElementById('termCount').innerText = termsArray.length;
-                
-                magicOrderBtn.style.display = 'none'; // Escondemos el botón de IA
-                document.getElementById('wowSummary').style.display = 'block'; // Mostramos el cartel de éxito
-                processBtn.style.display = 'flex'; // Mostramos el botón START LEARNING
-                
-                // Opcional: Pequeña vibración en el móvil si es compatible
-                if (navigator.vibrate) navigator.vibrate(50); 
-            }
+            const data = await response.json();
+            const aiResponseText = data.candidates[0].content.parts[0].text;
+            const parsedData = JSON.parse(aiResponseText);
+            
+            // 3. RECONSTRUIR EL TEXTO PARA TUS TARJETAS
+            let finalFormattedText = "";
+            parsedData.flashcards.forEach(card => {
+                finalFormattedText += `${card.original} → ${card.translation} | ${card.context}\n`;
+            });
+
+            textInput.value = finalFormattedText.trim();
+            localStorage.setItem('sophie_last_input', textInput.value);
+            
+            // 4. MODO DOPAMINA Y ACTUALIZACIÓN VISUAL 🧠✨
+            const wowSummary = document.getElementById('wowSummary');
+            wowSummary.innerHTML = `
+                <h3 style="color: #4ade80; margin-bottom: 10px;">✨ ${parsedData.wow_message}</h3>
+                <div class="summary-details" style="display: flex; flex-direction: column; gap: 8px; color: #d4d4d8;">
+                    <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> terms detected</div>
+                    <div>🌍 Language Detected: <strong>${parsedData.detected_language}</strong></div>
+                    <div>🎯 Optimized for: <strong>${currentGoal.toUpperCase()}</strong></div>
+                </div>
+            `;
+            
+            magicOrderBtn.style.display = 'none'; 
+            wowSummary.style.display = 'block'; 
+            processBtn.style.display = 'flex'; 
+            
+            if (navigator.vibrate) navigator.vibrate(50); 
            
         } catch (error) {
-            alert("Error de conexión a la IA.");
+            alert("Socia, tuvimos un problema con la API: " + error.message);
+            console.error(error);
         } finally {
-            magicOrderBtn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Ordenar con IA';
+            magicOrderBtn.innerHTML = '<i class="fas fa-play"></i> Start learning';
             magicOrderBtn.disabled = false;
         }
     });
