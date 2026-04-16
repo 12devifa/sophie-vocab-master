@@ -188,7 +188,7 @@ if (magicOrderBtn) {
                 wowSummary.style.display = 'block';
             }
             
-            magicOrderBtn.style.display = 'none';
+            magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
 
             if(processBtn) processBtn.click();
