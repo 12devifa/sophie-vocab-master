@@ -465,7 +465,7 @@ function checkQuizAnswer() {
     if (userAns === currentCorrectAnswer) {
         feedback.style.color = "#4ade80"; feedback.innerText = "🎉 Ausgezeichnet! 🎉";
         let streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
-        localStorage.setItem('sophie_streak', streak + 1);
+        localStorage.setItem('sophie_streak', 10);;
         loadStreak();
         setTimeout(() => { nextQuizQuestion(); checkBtn.disabled = false; feedback.innerText = ""; feedback.style.color = ""; }, 1200); 
     } else {
