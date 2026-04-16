@@ -305,11 +305,13 @@ if(playSessionBtn) {
 // --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
     let configs = {
-        'fr-de': { f1:'🇫🇷', f2:'🇩🇪', v1:'fr-FR', v2:'de-DE', n1:'Französisch', n2:'Deutsch' },
+        'fr-de': { f1:'🇫🇷', f2:'🇩🇪', v1:'fr-FR', v2:'de-DE', n1:'Français', n2:'Deutsch' },
         'en-es': { f1:'🇬🇧', f2:'🇪🇸', v1:'en-US', v2:'es-ES', n1:'English', n2:'Español' },
         'es-de': { f1:'🇪🇸', f2:'🇩🇪', v1:'es-ES', v2:'de-DE', n1:'Español', n2:'Deutsch' },
         'en-de': { f1:'🇬🇧', f2:'🇩🇪', v1:'en-US', v2:'de-DE', n1:'English', n2:'Deutsch' },
-        'pt-de': { f1:'🇵🇹', f2:'🇩🇪', v1:'pt-PT', v2:'de-DE', n1:'Português', n2:'Deutsch' }
+        'pt-de': { f1:'🇵🇹', f2:'🇩🇪', v1:'pt-PT', v2:'de-DE', n1:'Português', n2:'Deutsch' },
+        'de-es': { f1:'🇩🇪', f2:'🇪🇸', v1:'de-DE', v2:'es-ES', n1:'Deutsch', n2:'Español' },
+        'de-en': { f1:'🇩🇪', f2:'🇬🇧', v1:'de-DE', v2:'en-US', n1:'Deutsch', n2:'English' }
     };
     let c = configs[mode] || configs['en-es'];
     return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
