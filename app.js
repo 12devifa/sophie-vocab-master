@@ -367,9 +367,9 @@ function createCardUI(content, date) {
         const wowSummary = document.getElementById('wowSummary');
         const magicOrderBtn = document.getElementById('magicOrderBtn');
         
-        if(processBtn) processBtn.click(); 
+       if(processBtn) processBtn.click(); 
         if(wowSummary) wowSummary.style.display = 'none';
-        if(magicOrderBtn) magicOrderBtn.style.display = 'none'; 
+        if(magicOrderBtn) magicOrderBtn.style.display = 'flex'; // <--- SOLUCIONADO
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
