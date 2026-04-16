@@ -105,30 +105,32 @@ if (magicOrderBtn) {
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + userApiKey;
 
         const systemPrompt = `
-        Eres SOPHIE.ai, una experta en neuroaprendizaje.
+        Eres SOPHIE.ai, una experta en neuroaprendizaje y políglota nativa.
         MISIÓN: El usuario quiere aprender el texto. Su objetivo es: "${window.userCurrentGoal}".
-        Idiomas: ${langPrompt}.
+        Idiomas configurados: ${langPrompt}.
+
+        REGLA DE ORO DE IDIOMA: 
+        1. El campo "original" es lo que el usuario quiere aprender (Target Language).
+        2. El campo "translation" es el idioma de apoyo del usuario (Base Language).
+        3. IMPORTANTE: El campo "context" (ejemplo) DEBE estar escrito SIEMPRE y ÚNICAMENTE en el idioma que el usuario está APRENDIENDO (Target Language). No uses español para explicar términos en inglés.
 
         PASOS:
         1. Detecta automáticamente el idioma del texto original.
-        2. Traduce y formatea a ${config.name2}.
-           - Si es 'work': profesional.
-           - Si es 'travel': supervivencia.
-           - Si es 'exam': académico.
-        3. Crea un "wow_message" en inglés corto (Ej: "Ready for your trip!").
+        2. Traduce y formatea adecuadamente según el objetivo (${window.userCurrentGoal}).
+        3. Crea un "wow_message" corto en el idioma de aprendizaje.
 
-        TEXTO:
+        TEXTO A ANALIZAR:
         "${rawText}"
 
         DEVUELVE ÚNICAMENTE UN JSON:
         {
           "detected_language": "Idioma",
-          "wow_message": "Mensaje",
+          "wow_message": "Mensaje motivador",
           "flashcards": [
             {
-              "original": "palabra",
-              "translation": "traducción",
-              "context": "ejemplo"
+              "original": "Palabra/Frase en idioma destino",
+              "translation": "Traducción al idioma apoyo",
+              "context": "Ejemplo REAL y NATURAL únicamente en el idioma destino"
             }
           ]
         }
