@@ -75,6 +75,12 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+    if(closeDashboardBtn) {
+        closeDashboardBtn.onclick = () => {
+            document.getElementById('cognitiveDashboard').style.display = 'none';
+        };
+    }
 
 // --- 2. LÓGICA DE LA IA (EL SÚPER CEREBRO JSON - MODO DETECTIVE) ---
 if (magicOrderBtn) {
