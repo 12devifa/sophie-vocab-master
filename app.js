@@ -487,3 +487,5 @@ if(newNoteBtn) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 }
+
+updateDashboardStats();
