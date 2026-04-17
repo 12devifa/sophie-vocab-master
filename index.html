@@ -117,9 +117,9 @@
             <button id="closeDashboardBtn" class="secondary-btn-minimal" onclick="document.getElementById('cognitiveDashboard').style.display = 'none';">Back to Lab</button>
         </section>
 
-        <section class="secondary-tools-menu">
+       <section class="secondary-tools-menu">
            <button class="tool-btn" title="Add New" onclick="localStorage.removeItem('sophie_last_input'); location.reload();"><i class="fas fa-plus"></i></button>
-            <button class="tool-btn" title="My Library" onclick="document.getElementById('cognitiveDashboard').style.display = 'block';"><i class="fas fa-folder-open"></i></button>
+            <button class="tool-btn" title="My Library" onclick="document.getElementById('cognitiveDashboard').style.display = 'block'; updateDashboardStats();"><i class="fas fa-folder-open"></i></button>
         </section>
             <section class="lab-section">
                 <h2><i class="fas fa-brain"></i> Train your brain</h2>
@@ -146,6 +146,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
- <script src="app.js?v=9000"></script>
+<script src="app.js?v=99999"></script>
 </body>
 </html>
