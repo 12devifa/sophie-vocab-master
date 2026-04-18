@@ -506,7 +506,7 @@ if(newNoteBtn) {
     };
 }
 
-updateDashboardStats();
+// updateDashboardStats(); // Desactivado hasta que programemos la Fase 3
 
 // --- CONTROL DE VELOCIDAD DE AUDIO ---
 window.audioSpeed = 1.0;
