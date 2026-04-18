@@ -323,8 +323,8 @@ async function speak(text, lang) {
         let currentUtterance = new SpeechSynthesisUtterance(text);
             currentUtterance.lang = lang;
             
-            // 👇 Aquí le enchufamos nuestro control de velocidad 👇
-            currentUtterance.rate = 0.9 * window.audioSpeed; 
+            // 👇 EL SALVAVIDAS: Si se pierde, le obligamos a usar 1.0 (velocidad normal) 👇
+            currentUtterance.rate = 0.9 * (window.audioSpeed || 1.0); 
             
             currentUtterance.onend = resolve;
             currentUtterance.onerror = resolve;
