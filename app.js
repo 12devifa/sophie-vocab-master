@@ -493,3 +493,22 @@ if(newNoteBtn) {
 }
 
 updateDashboardStats();
+
+// --- CONTROL DE VELOCIDAD DE AUDIO ---
+window.audioSpeed = 1.0;
+const speedBtn = document.getElementById('speedBtn');
+const speedValue = document.getElementById('speedValue');
+
+if(speedBtn) {
+    speedBtn.onclick = () => {
+        if(window.audioSpeed === 1.0) {
+            window.audioSpeed = 0.75; // Más lento
+            speedValue.innerText = '0.75x';
+            speedBtn.style.color = '#fbbf24'; // Se pone amarillo para avisar que está lento
+        } else {
+            window.audioSpeed = 1.0; // Normal
+            speedValue.innerText = '1x';
+            speedBtn.style.color = 'var(--text-primary)';
+        }
+    };
+}
