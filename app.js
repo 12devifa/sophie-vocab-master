@@ -88,7 +88,7 @@ if (magicOrderBtn) {
         const rawText = textInput ? textInput.value : "";
         if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-        // Sistema Seguro de API Key (V5 - Definitivo)
+      // Sistema Seguro de API Key (V5 - Definitivo)
         let userApiKey = localStorage.getItem('sophie_key_5');
         if (!userApiKey) {
             userApiKey = prompt("🔒 Pega tu clave de Google (SÍ, la que empieza por AQ...):");
@@ -96,18 +96,18 @@ if (magicOrderBtn) {
                 alert("Necesitas una API Key para continuar.");
                 return;
             }
-
-            // --- EFECTO PRO: Suspenso visual ---
-    const btnOriginalText = magicOrderBtn.innerHTML;
-    magicOrderBtn.innerHTML = '<i class="fas fa-sparkles"></i> ✨ Analyzing your input...';
-    magicOrderBtn.style.opacity = '0.7';
-    magicOrderBtn.style.pointerEvents = 'none'; // Evita doble clic
-    
-    // Pausa mágica de medio segundo
-    await new Promise(resolve => setTimeout(resolve, 500));
+            // Guardamos la llave si la acaba de poner
             localStorage.setItem('sophie_key_5', userApiKey.trim());
         }
 
+        // --- EFECTO PRO: Suspenso visual (AHORA ESTÁ LIBRE Y SEGURO) ---
+        const btnOriginalText = magicOrderBtn.innerHTML;
+        magicOrderBtn.innerHTML = '<i class="fas fa-sparkles"></i> ✨ Analyzing your input...';
+        magicOrderBtn.style.opacity = '0.7';
+        magicOrderBtn.style.pointerEvents = 'none'; // Evita doble clic
+        
+        // Pausa mágica de medio segundo
+        await new Promise(resolve => setTimeout(resolve, 500));
         const mode = langSelect ? langSelect.value : 'fr-de';
         const config = getLangConfig(mode, isSwapped);
         let langPrompt = `Idioma 1: ${config.name1} -> Idioma 2: ${config.name2}`;
