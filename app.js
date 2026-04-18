@@ -180,7 +180,7 @@ if (magicOrderBtn) {
                 wowSummary.innerHTML = `
                     <h3 style="color: #4ade80; margin-bottom: 10px;">✨ ${parsedData.wow_message}</h3>
                     <div class="summary-details" style="display: flex; flex-direction: column; gap: 8px; color: #d4d4d8;">
-                        <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> terms detected</div>
+                       <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> ${parsedData.flashcards.length === 1 ? 'term' : 'terms'} detected</div>
                         <div>🌍 Language: <strong>${parsedData.detected_language}</strong></div>
                         <div>🎯 Optimized for: <strong>${window.userCurrentGoal.toUpperCase()}</strong></div>
                     </div>
