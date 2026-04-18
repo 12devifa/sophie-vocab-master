@@ -96,6 +96,15 @@ if (magicOrderBtn) {
                 alert("Necesitas una API Key para continuar.");
                 return;
             }
+
+            // --- EFECTO PRO: Suspenso visual ---
+    const btnOriginalText = magicOrderBtn.innerHTML;
+    magicOrderBtn.innerHTML = '<i class="fas fa-sparkles"></i> ✨ Analyzing your input...';
+    magicOrderBtn.style.opacity = '0.7';
+    magicOrderBtn.style.pointerEvents = 'none'; // Evita doble clic
+    
+    // Pausa mágica de medio segundo
+    await new Promise(resolve => setTimeout(resolve, 500));
             localStorage.setItem('sophie_key_5', userApiKey.trim());
         }
 
@@ -196,11 +205,18 @@ if (magicOrderBtn) {
 
         } catch (error) {
             console.error(error);
-        } finally {
-            magicOrderBtn.innerHTML = originalBtnHTML;
-            magicOrderBtn.disabled = false;
-        }
-    });
+      } catch (error) {
+        console.error(error);
+        alert("Hubo un error al procesar. Intenta de nuevo."); // Añadido para avisar si algo falla
+    } finally {
+        // --- FIN DEL EFECTO PRO (Devolver el botón a la normalidad) ---
+        magicOrderBtn.innerHTML = btnOriginalText;
+        magicOrderBtn.style.opacity = '1';
+        magicOrderBtn.style.pointerEvents = 'auto';
+        magicOrderBtn.disabled = false;
+    }
+});
+      
 }
 
 // --- 3. CREAR TARJETAS VISUALES ---
