@@ -203,12 +203,10 @@ if (magicOrderBtn) {
             if(processBtn) processBtn.click();
             if (navigator.vibrate) navigator.vibrate(50);
 
-        } catch (error) {
+       } catch (error) {
             console.error(error);
-      } catch (error) {
-        console.error(error);
-        alert("Hubo un error al procesar. Intenta de nuevo."); // Añadido para avisar si algo falla
-    } finally {
+            alert("Hubo un error al procesar. Intenta de nuevo."); 
+        } finally {
         // --- FIN DEL EFECTO PRO (Devolver el botón a la normalidad) ---
         magicOrderBtn.innerHTML = btnOriginalText;
         magicOrderBtn.style.opacity = '1';
