@@ -508,21 +508,20 @@ if(newNoteBtn) {
 
 // updateDashboardStats(); // Desactivado hasta que programemos la Fase 3
 
-// --- CONTROL DE VELOCIDAD DE AUDIO ---
+// --- CONTROL DE VELOCIDAD DE AUDIO (BLINDADO) ---
 window.audioSpeed = 1.0;
-const speedBtn = document.getElementById('speedBtn');
-const speedValue = document.getElementById('speedValue');
 
-if(speedBtn) {
-    speedBtn.onclick = () => {
-        if(window.audioSpeed === 1.0) {
-            window.audioSpeed = 0.75; // Más lento
-            speedValue.innerText = '0.75x';
-            speedBtn.style.color = '#fbbf24'; // Se pone amarillo para avisar que está lento
-        } else {
-            window.audioSpeed = 1.0; // Normal
-            speedValue.innerText = '1x';
-            speedBtn.style.color = 'var(--text-primary)';
-        }
-    };
-}
+window.toggleSpeed = function() {
+    const speedBtn = document.getElementById('speedBtn');
+    const speedValue = document.getElementById('speedValue');
+    
+    if (window.audioSpeed === 1.0) {
+        window.audioSpeed = 0.75; // Más lento
+        if(speedValue) speedValue.innerText = '0.75x';
+        if(speedBtn) speedBtn.style.color = '#fbbf24'; // Amarillo
+    } else {
+        window.audioSpeed = 1.0; // Normal
+        if(speedValue) speedValue.innerText = '1x';
+        if(speedBtn) speedBtn.style.color = 'var(--text-primary)'; // Normal
+    }
+};
