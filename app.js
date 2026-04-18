@@ -321,10 +321,14 @@ async function speak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
         let currentUtterance = new SpeechSynthesisUtterance(text);
-        currentUtterance.lang = lang;
-        currentUtterance.onend = resolve;
-        currentUtterance.onerror = resolve;
-        window.speechSynthesis.speak(currentUtterance);
+            currentUtterance.lang = lang;
+            
+            // 👇 Aquí le enchufamos nuestro control de velocidad 👇
+            currentUtterance.rate = 0.9 * window.audioSpeed; 
+            
+            currentUtterance.onend = resolve;
+            currentUtterance.onerror = resolve;
+            window.speechSynthesis.speak(currentUtterance);
     });
 }
 
