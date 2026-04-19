@@ -277,12 +277,18 @@ if (processBtn) {
     });
 }
 
-// --- 4. MOTOR DE AUDIO ---
+// --- 4. MOTOR DE AUDIO (CON DESBLOQUEO PARA MÓVILES) ---
 if(playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
         if (rows.length === 0) return alert("Procesa una lección primero.");
         
+        // 🚨 HACK DE DESBLOQUEO PARA iOS/ANDROID 🚨
+        // Reproducimos un audio de 0 segundos silencioso al hacer clic
+        // para decirle al teléfono: "¡Eh! El usuario quiere usar el altavoz, no me lo bloquees luego."
+        const unlockAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+        unlockAudio.play().catch(e => console.log("Silencio ignorado"));
+
         if (isPlaying) {
             isPlaying = false;
             window.speechSynthesis.cancel();
