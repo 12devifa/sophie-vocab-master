@@ -331,18 +331,75 @@ function getLangConfig(mode, swapped) {
     return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
 }
 
+// --- 4. MOTOR DE AUDIO PREMIUM (ELEVENLABS) 🎙️✨ ---
 async function speak(text, lang) {
+    // 1. Comprobamos si tenemos la llave de ElevenLabs
+    let elevenKey = localStorage.getItem('sophie_eleven_key');
+    
+    // Si no la tenemos, se la pedimos al usuario
+    if (!elevenKey) {
+        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs para la voz Premium:");
+        if (!elevenKey) {
+            console.log("Usando voz estándar de respaldo.");
+            return fallbackSpeak(text, lang); // Si cancela, usa la voz normal
+        }
+        localStorage.setItem('sophie_eleven_key', elevenKey.trim());
+    }
+
+    try {
+        // 2. Llamada mágica a la API de ElevenLabs
+        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel (Femenina, Profesional, Políglota)
+        
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'audio/mpeg',
+                'xi-api-key': elevenKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: "eleven_multilingual_v2", // El cerebro que habla 29 idiomas
+                voice_settings: {
+                    stability: 0.5,
+                    similarity_boost: 0.75
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("ElevenLabs está cansado o la llave falló.");
+        }
+
+        // 3. Reproducir el audio premium
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        audio.playbackRate = window.audioSpeed || 1.0; // Aplica tu botón de velocidad
+
+        return new Promise(resolve => {
+            audio.onended = resolve;
+            audio.onerror = resolve;
+            audio.play();
+        });
+
+    } catch (error) {
+        console.error("Error con voz premium, activando salvavidas:", error);
+        return fallbackSpeak(text, lang);
+    }
+}
+
+// 🛟 EL SALVAVIDAS: La voz antigua por si falla el internet o nos quedamos sin saldo
+async function fallbackSpeak(text, lang) {
     return new Promise(resolve => {
         window.speechSynthesis.cancel();
         let currentUtterance = new SpeechSynthesisUtterance(text);
-            currentUtterance.lang = lang;
-            
-            // 👇 EL SALVAVIDAS: Si se pierde, le obligamos a usar 1.0 (velocidad normal) 👇
-            currentUtterance.rate = 0.9 * (window.audioSpeed || 1.0); 
-            
-            currentUtterance.onend = resolve;
-            currentUtterance.onerror = resolve;
-            window.speechSynthesis.speak(currentUtterance);
+        currentUtterance.lang = lang;
+        currentUtterance.rate = 0.9 * (window.audioSpeed || 1.0); 
+        currentUtterance.onend = resolve;
+        currentUtterance.onerror = resolve;
+        window.speechSynthesis.speak(currentUtterance);
     });
 }
 
