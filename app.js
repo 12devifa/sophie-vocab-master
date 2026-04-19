@@ -331,25 +331,20 @@ function getLangConfig(mode, swapped) {
     return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
 }
 
-// --- 4. MOTOR DE AUDIO PREMIUM (ELEVENLABS) 🎙️✨ ---
+// --- 4. MOTOR DE AUDIO PREMIUM (ELEVENLABS) BLINDADO 🎙️📱 ---
 async function speak(text, lang) {
-    // 1. Comprobamos si tenemos la llave de ElevenLabs
     let elevenKey = localStorage.getItem('sophie_eleven_key');
     
-    // Si no la tenemos, se la pedimos al usuario
     if (!elevenKey) {
-        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs para la voz Premium:");
+        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs en el móvil también:");
         if (!elevenKey) {
-            console.log("Usando voz estándar de respaldo.");
-            return fallbackSpeak(text, lang); // Si cancela, usa la voz normal
+            return fallbackSpeak(text, lang);
         }
         localStorage.setItem('sophie_eleven_key', elevenKey.trim());
     }
 
     try {
-        // 2. Llamada mágica a la API de ElevenLabs
-        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel (Femenina, Profesional, Políglota)
-        
+        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
             method: 'POST',
             headers: {
@@ -359,37 +354,37 @@ async function speak(text, lang) {
             },
             body: JSON.stringify({
                 text: text,
-                model_id: "eleven_multilingual_v2", // El cerebro que habla 29 idiomas
-                voice_settings: {
-                    stability: 0.5,
-                    similarity_boost: 0.75
-                }
+                model_id: "eleven_multilingual_v2",
+                voice_settings: { stability: 0.5, similarity_boost: 0.75 }
             })
         });
 
-        if (!response.ok) {
-            throw new Error("ElevenLabs está cansado o la llave falló.");
-        }
+        if (!response.ok) throw new Error("Fallo en la API o llave incorrecta");
 
-        // 3. Reproducir el audio premium
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
-        
-        audio.playbackRate = window.audioSpeed || 1.0; // Aplica tu botón de velocidad
+        audio.playbackRate = window.audioSpeed || 1.0;
 
         return new Promise(resolve => {
             audio.onended = resolve;
             audio.onerror = resolve;
-            audio.play();
+            
+            // 🛡️ PARCHE PARA MÓVILES: Evita que se quede colgado en "Pausa"
+            let playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error("El móvil bloqueó el audio:", error);
+                    fallbackSpeak(text, lang).then(resolve); 
+                });
+            }
         });
 
     } catch (error) {
-        console.error("Error con voz premium, activando salvavidas:", error);
+        console.error("Error general de voz:", error);
         return fallbackSpeak(text, lang);
     }
 }
-
 // 🛟 EL SALVAVIDAS: La voz antigua por si falla el internet o nos quedamos sin saldo
 async function fallbackSpeak(text, lang) {
     return new Promise(resolve => {
