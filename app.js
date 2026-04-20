@@ -254,7 +254,7 @@ if (processBtn) {
             row.dataset.voice2 = config.voice2;
             row.dataset.example = exampleText;
 
-           row.innerHTML = `
+          row.innerHTML = `
                 <div class="vocab-container" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <div class="vocab-word" style="font-weight:600; display:flex; align-items:center; gap:8px;">
                         <span class="flag">${config.flag1}</span> ${word1}
@@ -340,20 +340,26 @@ function getLangConfig(mode, swapped) {
     return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
 }
 
-// --- 4. MOTOR DE AUDIO PREMIUM (ELEVENLABS) BLINDADO 🎙️📱 ---
-async function speak(text, lang) {
+// ==========================================
+// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (ONE-TOUCH MÓVIL)
+// ==========================================
+
+async function speakEleven(text, buttonElement) {
     let elevenKey = localStorage.getItem('sophie_eleven_key');
     
     if (!elevenKey) {
-        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs en el móvil también:");
-        if (!elevenKey) {
-            return fallbackSpeak(text, lang);
-        }
+        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
+        if (!elevenKey) return; 
         localStorage.setItem('sophie_eleven_key', elevenKey.trim());
     }
 
+    // Efecto visual: Cambiamos el altavoz por un icono de carga
+    const originalIcon = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    buttonElement.disabled = true;
+
     try {
-        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel
+        const voiceId = "cgSgspJ2msm6clMCkdW9"; // Voz de Jessica (Fluida/Natural)
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
             method: 'POST',
             headers: {
@@ -364,34 +370,41 @@ async function speak(text, lang) {
             body: JSON.stringify({
                 text: text,
                 model_id: "eleven_multilingual_v2",
-                voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+                voice_settings: { stability: 0.35, similarity_boost: 0.85 } // Ajuste tipo NotebookLM
             })
         });
 
-        if (!response.ok) throw new Error("Fallo en la API o llave incorrecta");
+        if (!response.ok) {
+            if(response.status === 402) {
+                throw new Error("Sin saldo. Revisa ElevenLabs.");
+            } else {
+                localStorage.removeItem('sophie_eleven_key');
+                throw new Error("Llave incorrecta o error de conexión.");
+            }
+        }
 
+        // Reproducción directa al móvil
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
-        audio.playbackRate = window.audioSpeed || 1.0;
+        
+        audio.play();
 
-        return new Promise(resolve => {
-            audio.onended = resolve;
-            audio.onerror = resolve;
-            
-            // 🛡️ PARCHE PARA MÓVILES: Evita que se quede colgado en "Pausa"
-            let playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error("El móvil bloqueó el audio:", error);
-                    fallbackSpeak(text, lang).then(resolve); 
-                });
-            }
-        });
+        // Devolver el botón a la normalidad al terminar
+        audio.onended = () => {
+            buttonElement.innerHTML = originalIcon;
+            buttonElement.disabled = false;
+        };
+        audio.onerror = () => {
+            buttonElement.innerHTML = originalIcon;
+            buttonElement.disabled = false;
+        };
 
     } catch (error) {
-        console.error("Error general de voz:", error);
-        return fallbackSpeak(text, lang);
+        console.error("Error de voz:", error);
+        alert("🚨 " + error.message);
+        buttonElement.innerHTML = originalIcon;
+        buttonElement.disabled = false;
     }
 }
 // 🛟 EL SALVAVIDAS: La voz antigua por si falla el internet o nos quedamos sin saldo
