@@ -341,71 +341,119 @@ function getLangConfig(mode, swapped) {
 }
 
 // ==========================================
-// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (ONE-TOUCH MÓVIL)
+// ==========================================
+// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (ESCUCHAR TODO - BLINDADO PARA MÓVILES)
 // ==========================================
 
-async function speakEleven(text, buttonElement) {
+let isPlaying = false;
+const masterAudio = new Audio(); // El "Caballo de Troya" que el móvil no bloqueará
+
+async function speakElevenSequential(text) {
     let elevenKey = localStorage.getItem('sophie_eleven_key');
-    
-    if (!elevenKey) {
-        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
-        if (!elevenKey) return; 
-        localStorage.setItem('sophie_eleven_key', elevenKey.trim());
-    }
+    if (!elevenKey) throw new Error("Falta la llave de ElevenLabs");
 
-    // Efecto visual: Cambiamos el altavoz por un icono de carga
-    const originalIcon = buttonElement.innerHTML;
-    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    buttonElement.disabled = true;
+    const voiceId = "cgSgspJ2msm6clMCkdW9"; // Voz de Jessica
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'audio/mpeg',
+            'xi-api-key': elevenKey,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            text: text,
+            model_id: "eleven_multilingual_v2",
+            voice_settings: { stability: 0.35, similarity_boost: 0.85 }
+        })
+    });
 
-    try {
-        const voiceId = "cgSgspJ2msm6clMCkdW9"; // Voz de Jessica (Fluida/Natural)
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'audio/mpeg',
-                'xi-api-key': elevenKey,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: text,
-                model_id: "eleven_multilingual_v2",
-                voice_settings: { stability: 0.35, similarity_boost: 0.85 } // Ajuste tipo NotebookLM
-            })
-        });
+    if (!response.ok) throw new Error("Se acabó el saldo o falló la conexión.");
 
-        if (!response.ok) {
-            if(response.status === 402) {
-                throw new Error("Sin saldo. Revisa ElevenLabs.");
-            } else {
-                localStorage.removeItem('sophie_eleven_key');
-                throw new Error("Llave incorrecta o error de conexión.");
-            }
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    // En lugar de crear un reproductor nuevo, reciclamos el maestro
+    masterAudio.src = audioUrl;
+
+    // Promesa que espera a que el audio termine antes de seguir con el bucle
+    return new Promise((resolve, reject) => {
+        masterAudio.onended = resolve;
+        masterAudio.onerror = reject;
+        masterAudio.play().catch(reject);
+    });
+}
+
+// LÓGICA DEL BOTÓN ESCUCHAR TODO
+const playSessionBtn = document.getElementById('playSession');
+if (playSessionBtn) {
+    playSessionBtn.onclick = async () => {
+        const rows = document.querySelectorAll('.lab-row');
+        if (rows.length === 0) return alert("Procesa una lección primero.");
+
+        // Si ya está sonando, lo pausamos
+        if (isPlaying) {
+            isPlaying = false;
+            masterAudio.pause();
+            playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+            return;
         }
 
-        // Reproducción directa al móvil
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        
-        audio.play();
+        let elevenKey = localStorage.getItem('sophie_eleven_key');
+        if (!elevenKey) {
+            elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
+            if (!elevenKey) return;
+            localStorage.setItem('sophie_eleven_key', elevenKey.trim());
+        }
 
-        // Devolver el botón a la normalidad al terminar
-        audio.onended = () => {
-            buttonElement.innerHTML = originalIcon;
-            buttonElement.disabled = false;
-        };
-        audio.onerror = () => {
-            buttonElement.innerHTML = originalIcon;
-            buttonElement.disabled = false;
-        };
+        // HACK DE DESBLOQUEO: Reproducimos un audio invisible de 0.1s para abrir el canal
+        masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        await masterAudio.play().catch(() => console.log("Canal abierto"));
 
-    } catch (error) {
-        console.error("Error de voz:", error);
-        alert("🚨 " + error.message);
-        buttonElement.innerHTML = originalIcon;
-        buttonElement.disabled = false;
-    }
+        isPlaying = true;
+        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+
+        try {
+            for (let row of rows) {
+                if (!isPlaying) break;
+                
+                // Efecto visual: iluminar la tarjeta que se está leyendo
+                row.style.borderColor = "var(--accent-purple)";
+
+                let t1 = row.dataset.text1;
+                let t2 = row.dataset.text2;
+                let example = row.dataset.example;
+
+                if (t1) {
+                    await speakElevenSequential(t1);
+                    if (!isPlaying) break;
+                    await new Promise(r => setTimeout(r, 1000)); // Pausa de 1 seg
+                }
+
+                if (t2) {
+                    await speakElevenSequential(t2);
+                    if (!isPlaying) break;
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+
+                if (example && example.trim() !== "") {
+                    await speakElevenSequential(example);
+                    if (!isPlaying) break;
+                }
+
+                // Apagar la tarjeta al terminar
+                row.style.borderColor = "var(--border-color)";
+                if (!isPlaying) break;
+                await new Promise(r => setTimeout(r, 1500)); // Pausa antes de la siguiente tarjeta
+            }
+        } catch (error) {
+            console.error(error);
+            alert("🚨 Error de reproducción: " + error.message);
+        }
+
+        // Al terminar toda la lista, restaurar el botón
+        isPlaying = false;
+        playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+    };
 }
 // 🛟 EL SALVAVIDAS: La voz antigua por si falla el internet o nos quedamos sin saldo
 async function fallbackSpeak(text, lang) {
