@@ -354,7 +354,7 @@ async function speakElevenSequential(text) {
     }
 }
 
-// LÓGICA DEL BOTÓN ESCUCHAR TODO 
+// LÓGICA DEL BOTÓN ESCUCHAR TODO (MÉTODO NEURO-APRENDIZAJE SOPHIE)
 if (playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
@@ -367,17 +367,12 @@ if (playSessionBtn) {
             return;
         }
 
-        let elevenKey = localStorage.getItem('sophie_eleven_key');
-        if (!elevenKey) {
-            elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
-            if (!elevenKey) return;
-            localStorage.setItem('sophie_eleven_key', elevenKey.trim());
-        }
-
         isPlaying = true;
         playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
 
+        // 1. Desbloqueo y ajuste de velocidad (0.9x para Rachel)
         masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        masterAudio.playbackRate = 0.9; // ⚡ Velocidad optimizada para retención
         masterAudio.play().catch(() => {});
 
         try {
@@ -385,31 +380,41 @@ if (playSessionBtn) {
                 if (!isPlaying) break;
                 row.style.borderColor = "var(--accent-purple)";
 
-                let t1 = row.dataset.text1;
-                let t2 = row.dataset.text2;
+                let wordTarget = row.dataset.text1; // Ej: "Apple"
+                let wordBase = row.dataset.text2;   // Ej: "Manzana"
                 let example = row.dataset.example;
 
-                if (t1) {
-                    await speakElevenSequential(t1);
-                    if (!isPlaying) break;
-                    await new Promise(r => setTimeout(r, 800)); 
-                }
+                // --- FASE 1: PRIMER CONTACTO (El patrón A-B-A que pediste) ---
+                
+                // A: Palabra en idioma destino
+                await speakElevenSequential(wordTarget);
+                if (!isPlaying) break;
+                await new Promise(r => setTimeout(r, 1000)); // 1s pausa
 
-                if (t2) {
-                    await speakElevenSequential(t2);
-                    if (!isPlaying) break;
-                    await new Promise(r => setTimeout(r, 800));
-                }
+                // B: Traducción en idioma base
+                await speakElevenSequential(wordBase);
+                if (!isPlaying) break;
+                await new Promise(r => setTimeout(r, 1000)); // 1s pausa
 
-               const mode = audioMode ? audioMode.value : 'basic';
-                if (mode === 'full' && example && example.trim() !== "") {
-                    await speakElevenSequential(example);
-                    if (!isPlaying) break;
+                // A: Repetición en idioma destino (Refuerzo)
+                // Aquí usamos el mismo volumen, pero el cerebro ya lo reconoce
+                await speakElevenSequential(wordTarget);
+                if (!isPlaying) break;
+                await new Promise(r => setTimeout(r, 2000)); // 2s pausa larga (CIERRE DE MEMORIA)
+
+                // --- FASE 2: CONTEXTO (Si existe el ejemplo) ---
+                if (example && example.trim() !== "") {
+                    const mode = audioMode ? audioMode.value : 'basic';
+                    if (mode === 'full') {
+                        await speakElevenSequential(example);
+                        if (!isPlaying) break;
+                        await new Promise(r => setTimeout(r, 1500)); // Pausa tras frase
+                    }
                 }
 
                 row.style.borderColor = "var(--border-color)";
                 if (!isPlaying) break;
-                await new Promise(r => setTimeout(r, 1200)); 
+                await new Promise(r => setTimeout(r, 1500)); // Pausa antes de la siguiente tarjeta
             }
         } catch (error) {
             console.error(error);
