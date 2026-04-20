@@ -287,7 +287,7 @@ async function speakEleven(text, buttonElement) {
     buttonElement.disabled = true;
 
     try {
-        const voiceId = "cgSgspJ2msm6clMCkdW9"; 
+        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel (Calmada y perfecta para loops)
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
             method: 'POST',
             headers: {
@@ -323,7 +323,7 @@ async function speakElevenSequential(text) {
     if (!elevenKey) return;
 
     try {
-        const voiceId = "cgSgspJ2msm6clMCkdW9"; 
+        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel (Calmada y perfecta para loops)
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
             method: 'POST',
             headers: {
