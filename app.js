@@ -19,7 +19,7 @@ const playSessionBtn = document.getElementById('playSession');
 
 let isSwapped = false;
 let currentCorrectAnswer = "";
-let isPlaying = false;
+isPlaying = false;
 window.userCurrentGoal = 'auto'; // Variable global para la meta
 
 // --- 1. GESTIÓN DEL TEMA Y CARGA INICIAL ---
