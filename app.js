@@ -298,7 +298,7 @@ async function speakEleven(text, buttonElement) {
             body: JSON.stringify({
                 text: text,
                 model_id: "eleven_multilingual_v2",
-                voice_settings: { stability: 0.35, similarity_boost: 0.85 }
+                voice_settings: { stability: 0.50, similarity_boost: 0.50 }
             })
         });
 
