@@ -19,8 +19,8 @@ const playSessionBtn = document.getElementById('playSession');
 
 let isSwapped = false;
 let currentCorrectAnswer = "";
-let isPlaying = false; // Solo se declara una vez aquí arriba
-window.userCurrentGoal = 'auto'; // Variable global para la meta
+let isPlaying = false; 
+window.userCurrentGoal = 'auto'; 
 
 // --- 1. GESTIÓN DEL TEMA Y CARGA INICIAL ---
 if (themeToggle) {
@@ -50,7 +50,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText && textInput) textInput.value = savedText;
 
-    // --- LÓGICA DE LOS BOTONES DE METAS (GOALS) ---
     const goalChips = document.querySelectorAll('.goal-chip');
     const microcopyText = document.getElementById('goalMicrocopy');
     const goalMessages = {
@@ -83,13 +82,12 @@ if(closeDashboardBtn) {
     };
 }
 
-// --- 2. LÓGICA DE LA IA (EL SÚPER CEREBRO JSON - MODO DETECTIVE) ---
+// --- 2. LÓGICA DE LA IA ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput ? textInput.value : "";
         if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-        // Sistema Seguro de API Key (V5 - Definitivo)
         let userApiKey = localStorage.getItem('sophie_key_5');
         if (!userApiKey) {
             userApiKey = prompt("🔒 Pega tu clave de Google (SÍ, la que empieza por AQ...):");
@@ -97,27 +95,22 @@ if (magicOrderBtn) {
                 alert("Necesitas una API Key para continuar.");
                 return;
             }
-            // Guardamos la llave si la acaba de poner
             localStorage.setItem('sophie_key_5', userApiKey.trim());
         }
 
-        // --- EFECTO PRO: Suspenso visual (AHORA ESTÁ LIBRE Y SEGURO) ---
         const btnOriginalText = magicOrderBtn.innerHTML;
         magicOrderBtn.innerHTML = '<i class="fas fa-sparkles"></i> ✨ Analyzing your input...';
         magicOrderBtn.style.opacity = '0.7';
-        magicOrderBtn.style.pointerEvents = 'none'; // Evita doble clic
+        magicOrderBtn.style.pointerEvents = 'none'; 
         
-        // Pausa mágica de medio segundo
         await new Promise(resolve => setTimeout(resolve, 500));
         const mode = langSelect ? langSelect.value : 'fr-de';
         const config = getLangConfig(mode, isSwapped);
-        let langPrompt = `Idioma 1: ${config.name1} -> Idioma 2: ${config.name2}`;
 
         const originalBtnHTML = magicOrderBtn.innerHTML;
         magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-pulse"></i> Analyzing...';
         magicOrderBtn.disabled = true;
 
-        // URL a prueba de fallos matemáticos (Concatenación segura)
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + userApiKey;
 
         const systemPrompt = `
@@ -125,18 +118,18 @@ if (magicOrderBtn) {
         MISIÓN: El usuario te ha dado un texto. Tu trabajo es TRADUCIRLO TODO a los nuevos idiomas seleccionados, sin importar en qué idioma estaba escrito originalmente.
         
         NUEVOS IDIOMAS SELECCIONADOS:
-        - Idioma Destino (El que quiere aprender): ${config.name1}
-        - Idioma Base (Su idioma de apoyo): ${config.name2}
+        - Idioma Destino: ${config.name1}
+        - Idioma Base: ${config.name2}
 
         REGLAS ESTRICTAS E INQUEBRANTABLES: 
-        1. ¡IGNORA si el texto original ya estaba traducido a otros idiomas! DEBES re-traducir todos los conceptos a ${config.name1} y ${config.name2}.
+        1. DEBES re-traducir todos los conceptos a ${config.name1} y ${config.name2}.
         2. El campo "original" DEBE estar SIEMPRE en ${config.name1}.
         3. El campo "translation" DEBE estar SIEMPRE en ${config.name2}.
         4. El campo "context" (ejemplo) DEBE estar escrito SIEMPRE y ÚNICAMENTE en ${config.name1} (frase real y natural).
 
         OBJETIVO: "${window.userCurrentGoal}".
 
-        TEXTO A ANALIZAR Y TRADUCIR:
+        TEXTO A ANALIZAR:
         "${rawText}"
 
         DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA:
@@ -145,7 +138,7 @@ if (magicOrderBtn) {
           "wow_message": "Mensaje motivador corto en ${config.name1}",
           "flashcards": [
             {
-              "original": "Palabra/Frase en ${config.name1}",
+              "original": "Palabra en ${config.name1}",
               "translation": "Traducción en ${config.name2}",
               "context": "Ejemplo en ${config.name1}"
             }
@@ -189,9 +182,8 @@ if (magicOrderBtn) {
                 wowSummary.innerHTML = `
                     <h3 style="color: #4ade80; margin-bottom: 10px;">✨ ${parsedData.wow_message}</h3>
                     <div class="summary-details" style="display: flex; flex-direction: column; gap: 8px; color: #d4d4d8;">
-                       <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> ${parsedData.flashcards.length === 1 ? 'term' : 'terms'} detected</div>
+                       <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> terms detected</div>
                         <div>🌍 Language: <strong>${parsedData.detected_language}</strong></div>
-                        <div>🎯 Optimized for: <strong>${window.userCurrentGoal.toUpperCase()}</strong></div>
                     </div>
                 `;
                 wowSummary.style.display = 'block';
@@ -201,7 +193,6 @@ if (magicOrderBtn) {
             if(processBtn) processBtn.style.display = 'flex';
 
             if(processBtn) processBtn.click();
-            if (navigator.vibrate) navigator.vibrate(50);
 
        } catch (error) {
             console.error(error);
@@ -213,7 +204,6 @@ if (magicOrderBtn) {
         magicOrderBtn.disabled = false;
     }
 });
-      
 }
 
 // --- 3. CREAR TARJETAS VISUALES ---
@@ -249,8 +239,6 @@ if (processBtn) {
             row.className = 'lab-row';
             row.dataset.text1 = word1;
             row.dataset.text2 = word2;
-            row.dataset.voice1 = config.voice1;
-            row.dataset.voice2 = config.voice2;
             row.dataset.example = exampleText;
 
           row.innerHTML = `
@@ -280,12 +268,12 @@ if (processBtn) {
 }
 
 // ==========================================
-// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (ESCUCHAR TODO - ANTI-CONGELAMIENTO)
+// 🎙️ 4. MOTOR PREMIUM ELEVENLABS 
 // ==========================================
 
 const masterAudio = new Audio(); // Nuestro reproductor reciclable
 
-// Motor individual para los botoncitos redondos
+// Motor individual (Botoncitos redondos)
 async function speakEleven(text, buttonElement) {
     let elevenKey = localStorage.getItem('sophie_eleven_key');
     if (!elevenKey) {
@@ -329,7 +317,7 @@ async function speakEleven(text, buttonElement) {
     }
 }
 
-// Motor secuencial para "Escuchar todo"
+// Motor secuencial ("Escuchar todo")
 async function speakElevenSequential(text) {
     let elevenKey = localStorage.getItem('sophie_eleven_key');
     if (!elevenKey) return;
@@ -350,10 +338,7 @@ async function speakElevenSequential(text) {
             })
         });
 
-        if (!response.ok) {
-            console.error("Fallo de conexión o saldo en ElevenLabs");
-            return; 
-        }
+        if (!response.ok) return; 
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -361,23 +346,15 @@ async function speakElevenSequential(text) {
         return new Promise((resolve) => {
             masterAudio.src = audioUrl;
             masterAudio.onended = resolve; 
-            
-            masterAudio.onerror = () => {
-                console.log("⚠️ Error interno de audio, saltando...");
-                resolve(); 
-            };
-            
-            masterAudio.play().catch((e) => {
-                console.log("⚠️ El navegador frenó este audio, saltando...", e);
-                resolve(); 
-            });
+            masterAudio.onerror = () => resolve(); 
+            masterAudio.play().catch(() => resolve());
         });
     } catch (e) {
-        console.error("Error de red:", e);
+        console.error("Error:", e);
     }
 }
 
-// LÓGICA DEL BOTÓN ESCUCHAR TODO (Limpia y única)
+// LÓGICA DEL BOTÓN ESCUCHAR TODO 
 if (playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
@@ -406,7 +383,6 @@ if (playSessionBtn) {
         try {
             for (let row of rows) {
                 if (!isPlaying) break;
-                
                 row.style.borderColor = "var(--accent-purple)";
 
                 let t1 = row.dataset.text1;
@@ -447,16 +423,16 @@ if (playSessionBtn) {
 // --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
     let configs = {
-        'fr-de': { f1:'🇫🇷', f2:'🇩🇪', v1:'fr-FR', v2:'de-DE', n1:'Français', n2:'Deutsch' },
-        'en-es': { f1:'🇬🇧', f2:'🇪🇸', v1:'en-US', v2:'es-ES', n1:'English', n2:'Español' },
-        'es-de': { f1:'🇪🇸', f2:'🇩🇪', v1:'es-ES', v2:'de-DE', n1:'Español', n2:'Deutsch' },
-        'en-de': { f1:'🇬🇧', f2:'🇩🇪', v1:'en-US', v2:'de-DE', n1:'English', n2:'Deutsch' },
-        'pt-de': { f1:'🇵🇹', f2:'🇩🇪', v1:'pt-PT', v2:'de-DE', n1:'Português', n2:'Deutsch' },
-        'de-es': { f1:'🇩🇪', f2:'🇪🇸', v1:'de-DE', v2:'es-ES', n1:'Deutsch', n2:'Español' },
-        'de-en': { f1:'🇩🇪', f2:'🇬🇧', v1:'de-DE', v2:'en-US', n1:'Deutsch', n2:'English' }
+        'fr-de': { f1:'🇫🇷', f2:'🇩🇪', n1:'Français', n2:'Deutsch' },
+        'en-es': { f1:'🇬🇧', f2:'🇪🇸', n1:'English', n2:'Español' },
+        'es-de': { f1:'🇪🇸', f2:'🇩🇪', n1:'Español', n2:'Deutsch' },
+        'en-de': { f1:'🇬🇧', f2:'🇩🇪', n1:'English', n2:'Deutsch' },
+        'pt-de': { f1:'🇵🇹', f2:'🇩🇪', n1:'Português', n2:'Deutsch' },
+        'de-es': { f1:'🇩🇪', f2:'🇪🇸', n1:'Deutsch', n2:'Español' },
+        'de-en': { f1:'🇩🇪', f2:'🇬🇧', n1:'Deutsch', n2:'English' }
     };
     let c = configs[mode] || configs['en-es'];
-    return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
+    return swapped ? { flag1:c.f2, flag2:c.f1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, name1:c.n1, name2:c.n2 };
 }
 
 function saveLesson(content) {
@@ -493,13 +469,7 @@ function createCardUI(content, date) {
         if(textInput) textInput.value = content; 
         localStorage.setItem('sophie_last_input', content); 
         
-        const processBtn = document.getElementById('processBtn');
-        const wowSummary = document.getElementById('wowSummary');
-        const magicOrderBtn = document.getElementById('magicOrderBtn');
-        
         if(processBtn) processBtn.click(); 
-        if(wowSummary) wowSummary.style.display = 'none';
-        if(magicOrderBtn) magicOrderBtn.style.display = 'flex'; 
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -530,87 +500,3 @@ function loadStreak() {
 
 if(newNoteBtn) newNoteBtn.onclick = () => { if(textInput) textInput.value = ""; if(labList) labList.innerHTML = ""; localStorage.setItem('sophie_last_input', ""); };
 if(swapLangBtn) swapLangBtn.onclick = () => { isSwapped = !isSwapped; swapLangBtn.classList.toggle('active'); };
-
-// --- 6. QUIZ LOGIC ---
-function createQuizOverlayUI() {
-    if (document.getElementById('quizOverlay')) return;
-    const quizOverlay = document.createElement('div');
-    quizOverlay.id = 'quizOverlay';
-    quizOverlay.className = 'quiz-overlay';
-    quizOverlay.style = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:2000; flex-direction:column; align-items:center; justify-content:center; padding:30px;";
-    
-    quizOverlay.innerHTML = `
-        <div class="quiz-card" style="background:var(--bg-color); border-radius:25px; padding:30px; border:1px solid var(--accent-purple); box-shadow:0 0 40px rgba(187,134,252,0.3); width:100%; max-width:400px; text-align:center;">
-            <div style="font-weight:800; color:var(--text-primary); font-size:1.4rem; letter-spacing:1px; margin-bottom:20px;">SOPHIE QUIZ 🧠</div>
-            <div id="quizQuestion" style="font-size:1.2rem; font-weight:600; color:var(--text-primary); margin-bottom:15px; background:var(--card-bg); padding:15px; border-radius:15px;">Lädt...</div>
-            <input type="text" id="quizInput" placeholder="Introduce traducción..." autocomplete="off" style="width:100%; padding:15px; background:var(--card-bg); border:1px solid var(--border-color); border-radius:12px; color:var(--text-primary); margin-bottom:10px;">
-            <div id="quizFeedback" style="min-height:24px; margin:10px 0; font-weight:bold; font-size:1rem;"></div>
-            <button id="checkBtn" style="width:100%; padding:15px; border:none; border-radius:15px; background:var(--accent-purple); color:#111827; font-weight:700; cursor:pointer;">Überprüfen</button>
-            <button id="closeQuiz" style="margin-top:20px; background:none; border:none; color:var(--text-secondary); font-size:0.9rem; text-decoration:underline; cursor:pointer;">Quiz beenden</button>
-        </div>
-    `;
-    document.body.appendChild(quizOverlay);
-
-    if (quizBtn) {
-        quizBtn.onclick = () => {
-            const rows = document.querySelectorAll('.lab-row');
-            if (rows.length === 0) return alert("Por favor, procesa una lección primero.");
-            quizOverlay.style.display = 'flex';
-            nextQuizQuestion();
-        };
-    }
-
-    document.getElementById('checkBtn').onclick = () => checkQuizAnswer();
-    document.getElementById('closeQuiz').onclick = () => quizOverlay.style.display = 'none';
-}
-
-function nextQuizQuestion() {
-    const rows = document.querySelectorAll('.lab-row');
-    const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    const langInput = randomRow.querySelectorAll('.vocab-word');
-    
-    const word1Text = langInput[0].innerText;
-    currentCorrectAnswer = langInput[1].innerText.toLowerCase().trim();
-
-    document.getElementById('quizQuestion').innerText = `Übersetze:\n"${word1Text}"`;
-    const input = document.getElementById('quizInput');
-    input.value = "";
-    input.focus();
-    document.getElementById('quizFeedback').innerText = "";
-}
-
-function checkQuizAnswer() {
-    const userAns = document.getElementById('quizInput').value.toLowerCase().trim();
-    const feedback = document.getElementById('quizFeedback');
-    const checkBtn = document.getElementById('checkBtn');
-    checkBtn.disabled = true;
-
-    if (userAns === currentCorrectAnswer) {
-        feedback.style.color = "#4ade80"; feedback.innerText = "🎉 Ausgezeichnet! 🎉";
-        let streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
-        localStorage.setItem('sophie_streak', 10);;
-        loadStreak();
-        setTimeout(() => { nextQuizQuestion(); checkBtn.disabled = false; feedback.innerText = ""; feedback.style.color = ""; }, 1200); 
-    } else {
-        feedback.style.color = "#fca5a5"; feedback.innerText = `Fast... Richtig ist: ${currentCorrectAnswer.toUpperCase()}`;
-        setTimeout(() => { nextQuizQuestion(); checkBtn.disabled = false; feedback.innerText = ""; feedback.style.color = ""; }, 2500); 
-    }
-}
-
-// --- CONTROL DE VELOCIDAD DE AUDIO (BLINDADO) ---
-window.audioSpeed = 1.0;
-
-window.toggleSpeed = function() {
-    const speedBtn = document.getElementById('speedBtn');
-    const speedValue = document.getElementById('speedValue');
-    
-    if (window.audioSpeed === 1.0) {
-        window.audioSpeed = 0.75; // Más lento
-        if(speedValue) speedValue.innerText = '0.75x';
-        if(speedBtn) speedBtn.style.color = '#fbbf24'; // Amarillo
-    } else {
-        window.audioSpeed = 1.0; // Normal
-        if(speedValue) speedValue.innerText = '1x';
-        if(speedBtn) speedBtn.style.color = 'var(--text-primary)'; // Normal
-    }
-};
