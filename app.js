@@ -268,10 +268,14 @@ if (processBtn) {
 }
 
 // ==========================================
-// 🎙️ 4. MOTOR PREMIUM ELEVENLABS 
+// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (DIRECTOR DE ORQUESTA & CACHÉ) 🧠
 // ==========================================
 
-const masterAudio = new Audio(); // Nuestro reproductor reciclable
+const masterAudio = new Audio();
+let audioCache = {}; // 💰 LA CAJA FUERTE: Aquí guardamos audios para no pagar doble
+
+// Helper para pausas precisas
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Motor individual (Botoncitos redondos)
 async function speakEleven(text, buttonElement) {
@@ -287,26 +291,8 @@ async function speakEleven(text, buttonElement) {
     buttonElement.disabled = true;
 
     try {
-        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel (Calmada y perfecta para loops)
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'audio/mpeg',
-                'xi-api-key': elevenKey,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: text,
-                model_id: "eleven_multilingual_v2",
-                voice_settings: { stability: 0.50, similarity_boost: 0.50 }
-            })
-        });
-
-        if (!response.ok) throw new Error("Fallo en ElevenLabs.");
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
+        const url = await getAudioFromCacheOrAPI(text, elevenKey);
+        const audio = new Audio(url);
         audio.play();
 
         audio.onended = () => { buttonElement.innerHTML = originalIcon; buttonElement.disabled = false; };
@@ -317,44 +303,55 @@ async function speakEleven(text, buttonElement) {
     }
 }
 
-// Motor secuencial ("Escuchar todo")
-async function speakElevenSequential(text) {
-    let elevenKey = localStorage.getItem('sophie_eleven_key');
-    if (!elevenKey) return;
+// 📡 EL DESCARGADOR INTELIGENTE (Busca en la caja fuerte primero)
+async function getAudioFromCacheOrAPI(text, apiKey) {
+    if (audioCache[text]) {
+        console.log("♻️ Audio reciclado (Gratis):", text);
+        return audioCache[text];
+    }
 
+    const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'audio/mpeg',
+            'xi-api-key': apiKey,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            text: text,
+            model_id: "eleven_multilingual_v2",
+            voice_settings: { stability: 0.50, similarity_boost: 0.50 }
+        })
+    });
+
+    if (!response.ok) throw new Error("Fallo de saldo o conexión");
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    
+    audioCache[text] = audioUrl; // Guardamos en la caja fuerte
+    return audioUrl;
+}
+
+// 🎛️ REPRODUCTOR MAESTRO (Controla volumen dinámico)
+async function playAudioNode(text, apiKey, volume = 1.0) {
+    if (!isPlaying) return;
     try {
-        const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel (Calmada y perfecta para loops)
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'audio/mpeg',
-                'xi-api-key': elevenKey,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: text,
-                model_id: "eleven_multilingual_v2",
-                voice_settings: { stability: 0.35, similarity_boost: 0.85 }
-            })
-        });
-
-        if (!response.ok) return; 
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-
+        const url = await getAudioFromCacheOrAPI(text, apiKey);
         return new Promise((resolve) => {
-            masterAudio.src = audioUrl;
+            masterAudio.src = url;
+            masterAudio.volume = volume; // 🔥 El secreto del "suave" está aquí
             masterAudio.onended = resolve; 
             masterAudio.onerror = () => resolve(); 
             masterAudio.play().catch(() => resolve());
         });
     } catch (e) {
-        console.error("Error:", e);
+        console.error("Error reproduciendo:", e);
     }
 }
 
-// LÓGICA DEL BOTÓN ESCUCHAR TODO (MÉTODO NEURO-APRENDIZAJE SOPHIE)
+// 🎼 LÓGICA DEL BOTÓN ESCUCHAR TODO (EL DIRECTOR DE ORQUESTA)
 if (playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
@@ -367,64 +364,116 @@ if (playSessionBtn) {
             return;
         }
 
-        isPlaying = true;
-        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+        let elevenKey = localStorage.getItem('sophie_eleven_key');
+        if (!elevenKey) {
+            elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
+            if (!elevenKey) return;
+            localStorage.setItem('sophie_eleven_key', elevenKey.trim());
+        }
 
-        // 1. Desbloqueo y ajuste de velocidad (0.9x para Rachel)
+        isPlaying = true;
+        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Detener Loop';
+
+        // Desbloqueo silencioso y ajuste de Rachel
         masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-        masterAudio.playbackRate = 0.9; // ⚡ Velocidad optimizada para retención
+        masterAudio.playbackRate = 0.90; // Ritmo meditativo
         masterAudio.play().catch(() => {});
 
         try {
+            // ==========================================
+            // 🥇 FASE 1: Entrada suave (A -> B -> A suave)
+            // ==========================================
+            console.log("Iniciando FASE 1...");
             for (let row of rows) {
                 if (!isPlaying) break;
                 row.style.borderColor = "var(--accent-purple)";
+                let A = row.dataset.text1;
+                let B = row.dataset.text2;
 
-                let wordTarget = row.dataset.text1; // Ej: "Apple"
-                let wordBase = row.dataset.text2;   // Ej: "Manzana"
-                let example = row.dataset.example;
-
-                // --- FASE 1: PRIMER CONTACTO (El patrón A-B-A que pediste) ---
+                await playAudioNode(A, elevenKey, 1.0); await delay(1000);
+                if (!isPlaying) break;
+                await playAudioNode(B, elevenKey, 1.0); await delay(1000);
+                if (!isPlaying) break;
+                await playAudioNode(A, elevenKey, 0.85); await delay(2000); // [suave] y pausa larga
                 
-                // A: Palabra en idioma destino
-                await speakElevenSequential(wordTarget);
-                if (!isPlaying) break;
-                await new Promise(r => setTimeout(r, 1000)); // 1s pausa
+                row.style.borderColor = "var(--border-color)";
+            }
 
-                // B: Traducción en idioma base
-                await speakElevenSequential(wordBase);
-                if (!isPlaying) break;
-                await new Promise(r => setTimeout(r, 1000)); // 1s pausa
+            if (!isPlaying) throw new Error("Detenido");
+            await delay(3000); // Transición de 3 segundos entre fases
 
-                // A: Repetición en idioma destino (Refuerzo)
-                // Aquí usamos el mismo volumen, pero el cerebro ya lo reconoce
-                await speakElevenSequential(wordTarget);
+            // ==========================================
+            // 🧠 FASE 2: Conexión activa (B -> A -> A -> B -> A suave)
+            // ==========================================
+            console.log("Iniciando FASE 2...");
+            masterAudio.playbackRate = 0.92; // Ligeramente más activo
+            
+            for (let row of rows) {
                 if (!isPlaying) break;
-                await new Promise(r => setTimeout(r, 2000)); // 2s pausa larga (CIERRE DE MEMORIA)
+                row.style.borderColor = "#fbbf24"; // Iluminamos amarillo en fase 2
+                let A = row.dataset.text1;
+                let B = row.dataset.text2;
 
-                // --- FASE 2: CONTEXTO (Si existe el ejemplo) ---
-                if (example && example.trim() !== "") {
-                    const mode = audioMode ? audioMode.value : 'basic';
-                    if (mode === 'full') {
-                        await speakElevenSequential(example);
-                        if (!isPlaying) break;
-                        await new Promise(r => setTimeout(r, 1500)); // Pausa tras frase
+                await playAudioNode(B, elevenKey, 1.0); await delay(1200);
+                if (!isPlaying) break;
+                await playAudioNode(A, elevenKey, 1.0); await delay(2000); // Recuperación
+                if (!isPlaying) break;
+                await playAudioNode(A, elevenKey, 1.0); await delay(1000);
+                if (!isPlaying) break;
+                await playAudioNode(B, elevenKey, 1.0); await delay(1000);
+                if (!isPlaying) break;
+                await playAudioNode(A, elevenKey, 0.82); await delay(2000); // Aún más suave
+                
+                row.style.borderColor = "var(--border-color)";
+            }
+
+            if (!isPlaying) throw new Error("Detenido");
+            await delay(3000);
+
+            // ==========================================
+            // 🔥 FASE 3: Refuerzo (A larga -> B larga)
+            // ==========================================
+            console.log("Iniciando FASE 3...");
+            masterAudio.playbackRate = 0.88; // Volvemos a bajar revoluciones
+            
+            for (let row of rows) {
+                if (!isPlaying) break;
+                row.style.borderColor = "#4ade80"; // Iluminamos verde en fase 3
+                let A = row.dataset.text1;
+                let B = row.dataset.text2;
+
+                await playAudioNode(A, elevenKey, 1.0); await delay(2500); // Espacio mental puro
+                if (!isPlaying) break;
+                await playAudioNode(B, elevenKey, 1.0); await delay(2500);
+                
+                row.style.borderColor = "var(--border-color)";
+            }
+
+            // --- LECTURA DEL EJEMPLO (OPCIONAL AL FINAL DE LA SESIÓN) ---
+            const mode = audioMode ? audioMode.value : 'basic';
+            if (mode === 'full' && isPlaying) {
+                await delay(2000);
+                for (let row of rows) {
+                    if (!isPlaying) break;
+                    let example = row.dataset.example;
+                    if (example && example.trim() !== "") {
+                        row.style.borderColor = "var(--accent-purple)";
+                        await playAudioNode(example, elevenKey, 1.0); 
+                        await delay(1500);
+                        row.style.borderColor = "var(--border-color)";
                     }
                 }
-
-                row.style.borderColor = "var(--border-color)";
-                if (!isPlaying) break;
-                await new Promise(r => setTimeout(r, 1500)); // Pausa antes de la siguiente tarjeta
             }
+
         } catch (error) {
-            console.error(error);
+            if (error.message !== "Detenido") console.error(error);
         }
 
+        // LIMPIEZA FINAL
         isPlaying = false;
         playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
     };
 }
-
 
 // --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
