@@ -254,10 +254,13 @@ if (processBtn) {
             row.dataset.voice2 = config.voice2;
             row.dataset.example = exampleText;
 
-            row.innerHTML = `
+           row.innerHTML = `
                 <div class="vocab-container" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <div class="vocab-word" style="font-weight:600; display:flex; align-items:center; gap:8px;">
                         <span class="flag">${config.flag1}</span> ${word1}
+                        <button onclick="speakEleven('${word1.replace(/'/g, "\\'")}', this)" style="background:none; border:none; color:var(--accent-purple); cursor:pointer; font-size:1.1rem; padding:5px;">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
                     </div>
                     <div class="vocab-word" style="font-weight:600; display:flex; align-items:center; gap:8px;">
                         <span class="flag">${config.flag2}</span> ${word2}
@@ -266,7 +269,7 @@ if (processBtn) {
                 ${exampleText ? `
                 <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:8px;">
                     <small style="color:var(--text-secondary); font-style:italic; font-size:0.85rem;">💡 ${exampleText}</small>
-                    <button class="play-example" onclick="speak('${exampleText.replace(/'/g, "\\'")}', '${config.voice1}')" style="background:transparent; border:none; border-radius:50%; width:35px; height:35px; color:var(--accent-purple); cursor:pointer;">
+                    <button class="play-example" onclick="speakEleven('${exampleText.replace(/'/g, "\\'")}', this)" style="background:transparent; border:none; border-radius:50%; width:35px; height:35px; color:var(--accent-purple); cursor:pointer;">
                         <i class="fas fa-volume-up"></i>
                     </button>
                 </div>` : ''}
