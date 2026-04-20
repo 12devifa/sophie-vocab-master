@@ -401,7 +401,8 @@ if (playSessionBtn) {
                     await new Promise(r => setTimeout(r, 800));
                 }
 
-                if (example && example.trim() !== "") {
+               const mode = audioMode ? audioMode.value : 'basic';
+                if (mode === 'full' && example && example.trim() !== "") {
                     await speakElevenSequential(example);
                     if (!isPlaying) break;
                 }
