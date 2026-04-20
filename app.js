@@ -19,7 +19,7 @@ const playSessionBtn = document.getElementById('playSession');
 
 let isSwapped = false;
 let currentCorrectAnswer = "";
-isPlaying = false;
+let isPlaying = false; // Solo se declara una vez aquí arriba
 window.userCurrentGoal = 'auto'; // Variable global para la meta
 
 // --- 1. GESTIÓN DEL TEMA Y CARGA INICIAL ---
@@ -75,12 +75,13 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
 const closeDashboardBtn = document.getElementById('closeDashboardBtn');
-    if(closeDashboardBtn) {
-        closeDashboardBtn.onclick = () => {
-            document.getElementById('cognitiveDashboard').style.display = 'none';
-        };
-    }
+if(closeDashboardBtn) {
+    closeDashboardBtn.onclick = () => {
+        document.getElementById('cognitiveDashboard').style.display = 'none';
+    };
+}
 
 // --- 2. LÓGICA DE LA IA (EL SÚPER CEREBRO JSON - MODO DETECTIVE) ---
 if (magicOrderBtn) {
@@ -88,7 +89,7 @@ if (magicOrderBtn) {
         const rawText = textInput ? textInput.value : "";
         if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-      // Sistema Seguro de API Key (V5 - Definitivo)
+        // Sistema Seguro de API Key (V5 - Definitivo)
         let userApiKey = localStorage.getItem('sophie_key_5');
         if (!userApiKey) {
             userApiKey = prompt("🔒 Pega tu clave de Google (SÍ, la que empieza por AQ...):");
@@ -163,11 +164,10 @@ if (magicOrderBtn) {
             });
 
             if (!response.ok) {
-                // 🚨 EL DETECTIVE DE ERRORES EN ACCIÓN 🚨
                 const errorDetails = await response.json();
                 alert("🚨 GOOGLE NOS HA DICHO ESTO EXACTAMENTE:\n\n" + JSON.stringify(errorDetails, null, 2));
-                localStorage.removeItem('sophie_key_5'); // Borramos la clave para que te deje intentar de nuevo
-                throw new Error("Fallo de comunicación. Lee el cartel de alerta.");
+                localStorage.removeItem('sophie_key_5');
+                throw new Error("Fallo de comunicación.");
             }
 
             const data = await response.json();
@@ -207,7 +207,6 @@ if (magicOrderBtn) {
             console.error(error);
             alert("Hubo un error al procesar. Intenta de nuevo."); 
         } finally {
-        // --- FIN DEL EFECTO PRO (Devolver el botón a la normalidad) ---
         magicOrderBtn.innerHTML = btnOriginalText;
         magicOrderBtn.style.opacity = '1';
         magicOrderBtn.style.pointerEvents = 'auto';
@@ -280,81 +279,63 @@ if (processBtn) {
     });
 }
 
-// --- 4. MOTOR DE AUDIO (CON DESBLOQUEO PARA MÓVILES) ---
-if(playSessionBtn) {
-    playSessionBtn.onclick = async () => {
-        const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("Procesa una lección primero.");
-        
-        // 🚨 HACK DE DESBLOQUEO PARA iOS/ANDROID 🚨
-        // Reproducimos un audio de 0 segundos silencioso al hacer clic
-        // para decirle al teléfono: "¡Eh! El usuario quiere usar el altavoz, no me lo bloquees luego."
-        const unlockAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
-        unlockAudio.play().catch(e => console.log("Silencio ignorado"));
-
-        if (isPlaying) {
-            isPlaying = false;
-            window.speechSynthesis.cancel();
-            playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
-            return;
-        }
-        
-        isPlaying = true;
-        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
-        const mode = audioMode ? audioMode.value : 'basic';
-
-        for (let row of rows) {
-            if (!isPlaying) break;
-            row.style.borderColor = "var(--accent-purple)";
-            
-            await speak(row.dataset.text1, row.dataset.voice1);
-            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
-            
-            if (!isPlaying) break; await speak(row.dataset.text2, row.dataset.voice2);
-            
-            if (mode === 'full' && row.dataset.example && row.dataset.example.trim() !== "") {
-                if (!isPlaying) break; await new Promise(r => setTimeout(r, 1000));
-                if (!isPlaying) break; await speak(row.dataset.example, row.dataset.voice1);
-            }
-            
-            row.style.borderColor = "var(--border-color)";
-            if (!isPlaying) break; await new Promise(r => setTimeout(r, 1500));
-        }
-        isPlaying = false;
-        playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
-    };
-}
-
-// --- 5. FUNCIONES DE APOYO ---
-function getLangConfig(mode, swapped) {
-    let configs = {
-        'fr-de': { f1:'🇫🇷', f2:'🇩🇪', v1:'fr-FR', v2:'de-DE', n1:'Français', n2:'Deutsch' },
-        'en-es': { f1:'🇬🇧', f2:'🇪🇸', v1:'en-US', v2:'es-ES', n1:'English', n2:'Español' },
-        'es-de': { f1:'🇪🇸', f2:'🇩🇪', v1:'es-ES', v2:'de-DE', n1:'Español', n2:'Deutsch' },
-        'en-de': { f1:'🇬🇧', f2:'🇩🇪', v1:'en-US', v2:'de-DE', n1:'English', n2:'Deutsch' },
-        'pt-de': { f1:'🇵🇹', f2:'🇩🇪', v1:'pt-PT', v2:'de-DE', n1:'Português', n2:'Deutsch' },
-        'de-es': { f1:'🇩🇪', f2:'🇪🇸', v1:'de-DE', v2:'es-ES', n1:'Deutsch', n2:'Español' },
-        'de-en': { f1:'🇩🇪', f2:'🇬🇧', v1:'de-DE', v2:'en-US', n1:'Deutsch', n2:'English' }
-    };
-    let c = configs[mode] || configs['en-es'];
-    return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
-}
-
-// ==========================================
-// ==========================================
 // ==========================================
 // 🎙️ 4. MOTOR PREMIUM ELEVENLABS (ESCUCHAR TODO - ANTI-CONGELAMIENTO)
 // ==========================================
 
-let isPlaying = false;
 const masterAudio = new Audio(); // Nuestro reproductor reciclable
 
+// Motor individual para los botoncitos redondos
+async function speakEleven(text, buttonElement) {
+    let elevenKey = localStorage.getItem('sophie_eleven_key');
+    if (!elevenKey) {
+        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
+        if (!elevenKey) return; 
+        localStorage.setItem('sophie_eleven_key', elevenKey.trim());
+    }
+
+    const originalIcon = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    buttonElement.disabled = true;
+
+    try {
+        const voiceId = "cgSgspJ2msm6clMCkdW9"; 
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'audio/mpeg',
+                'xi-api-key': elevenKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: "eleven_multilingual_v2",
+                voice_settings: { stability: 0.35, similarity_boost: 0.85 }
+            })
+        });
+
+        if (!response.ok) throw new Error("Fallo en ElevenLabs.");
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+
+        audio.onended = () => { buttonElement.innerHTML = originalIcon; buttonElement.disabled = false; };
+        audio.onerror = () => { buttonElement.innerHTML = originalIcon; buttonElement.disabled = false; };
+    } catch (error) {
+        console.error(error);
+        buttonElement.innerHTML = originalIcon; buttonElement.disabled = false;
+    }
+}
+
+// Motor secuencial para "Escuchar todo"
 async function speakElevenSequential(text) {
     let elevenKey = localStorage.getItem('sophie_eleven_key');
     if (!elevenKey) return;
 
     try {
-        const voiceId = "cgSgspJ2msm6clMCkdW9"; // Voz de Jessica
+        const voiceId = "cgSgspJ2msm6clMCkdW9"; 
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
             method: 'POST',
             headers: {
@@ -371,13 +352,12 @@ async function speakElevenSequential(text) {
 
         if (!response.ok) {
             console.error("Fallo de conexión o saldo en ElevenLabs");
-            return; // Salimos sin congelar la app
+            return; 
         }
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
 
-        // Promesa blindada: si algo falla, se resuelve igual para no atascarse
         return new Promise((resolve) => {
             masterAudio.src = audioUrl;
             masterAudio.onended = resolve; 
@@ -397,8 +377,7 @@ async function speakElevenSequential(text) {
     }
 }
 
-// LÓGICA DEL BOTÓN ESCUCHAR TODO
-const playSessionBtn = document.getElementById('playSession');
+// LÓGICA DEL BOTÓN ESCUCHAR TODO (Limpia y única)
 if (playSessionBtn) {
     playSessionBtn.onclick = async () => {
         const rows = document.querySelectorAll('.lab-row');
@@ -411,10 +390,16 @@ if (playSessionBtn) {
             return;
         }
 
+        let elevenKey = localStorage.getItem('sophie_eleven_key');
+        if (!elevenKey) {
+            elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
+            if (!elevenKey) return;
+            localStorage.setItem('sophie_eleven_key', elevenKey.trim());
+        }
+
         isPlaying = true;
         playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
 
-        // Disparo de desbloqueo silencioso rápido (sin esperar)
         masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
         masterAudio.play().catch(() => {});
 
@@ -457,17 +442,21 @@ if (playSessionBtn) {
         playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
     };
 }
-// 🛟 EL SALVAVIDAS: La voz antigua por si falla el internet o nos quedamos sin saldo
-async function fallbackSpeak(text, lang) {
-    return new Promise(resolve => {
-        window.speechSynthesis.cancel();
-        let currentUtterance = new SpeechSynthesisUtterance(text);
-        currentUtterance.lang = lang;
-        currentUtterance.rate = 0.9 * (window.audioSpeed || 1.0); 
-        currentUtterance.onend = resolve;
-        currentUtterance.onerror = resolve;
-        window.speechSynthesis.speak(currentUtterance);
-    });
+
+
+// --- 5. FUNCIONES DE APOYO ---
+function getLangConfig(mode, swapped) {
+    let configs = {
+        'fr-de': { f1:'🇫🇷', f2:'🇩🇪', v1:'fr-FR', v2:'de-DE', n1:'Français', n2:'Deutsch' },
+        'en-es': { f1:'🇬🇧', f2:'🇪🇸', v1:'en-US', v2:'es-ES', n1:'English', n2:'Español' },
+        'es-de': { f1:'🇪🇸', f2:'🇩🇪', v1:'es-ES', v2:'de-DE', n1:'Español', n2:'Deutsch' },
+        'en-de': { f1:'🇬🇧', f2:'🇩🇪', v1:'en-US', v2:'de-DE', n1:'English', n2:'Deutsch' },
+        'pt-de': { f1:'🇵🇹', f2:'🇩🇪', v1:'pt-PT', v2:'de-DE', n1:'Português', n2:'Deutsch' },
+        'de-es': { f1:'🇩🇪', f2:'🇪🇸', v1:'de-DE', v2:'es-ES', n1:'Deutsch', n2:'Español' },
+        'de-en': { f1:'🇩🇪', f2:'🇬🇧', v1:'de-DE', v2:'en-US', n1:'Deutsch', n2:'English' }
+    };
+    let c = configs[mode] || configs['en-es'];
+    return swapped ? { flag1:c.f2, flag2:c.f1, voice1:c.v2, voice2:c.v1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, voice1:c.v1, voice2:c.v2, name1:c.n1, name2:c.n2 };
 }
 
 function saveLesson(content) {
@@ -510,8 +499,6 @@ function createCardUI(content, date) {
         
         if(processBtn) processBtn.click(); 
         if(wowSummary) wowSummary.style.display = 'none';
-        
-        // 🔥 AQUÍ ESTÁ EL TRUCO: Le decimos que SIEMPRE se muestre ('flex') 🔥
         if(magicOrderBtn) magicOrderBtn.style.display = 'flex'; 
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -524,25 +511,19 @@ function loadStreak() {
     const streakCounter = document.getElementById('streakCounter');
     
     if (streakCounter) {
-        // Quitamos los brillos antiguos por si acaso
         streakCounter.classList.remove('glow-tier-1', 'glow-tier-2');
-
         let iconHTML = '';
-
-        // Lógica PRO de evolución visual
         if (streak >= 10) {
             iconHTML = `<i class="fas fa-bolt" style="color: #fbbf24;"></i>✨`;
-            streakCounter.classList.add('glow-tier-2'); // Glow dinámico
+            streakCounter.classList.add('glow-tier-2'); 
         } else if (streak >= 5) {
             iconHTML = `<i class="fas fa-bolt" style="color: #fbbf24;"></i>✨`;
-            streakCounter.classList.add('glow-tier-1'); // Glow sutil
+            streakCounter.classList.add('glow-tier-1'); 
         } else if (streak >= 1) {
             iconHTML = `<i class="fas fa-bolt" style="color: #fbbf24;"></i>`;
         } else {
-            iconHTML = `<i class="fas fa-bolt" style="color: #6b7280;"></i>`; // Gris si está en 0
+            iconHTML = `<i class="fas fa-bolt" style="color: #6b7280;"></i>`; 
         }
-
-        // Actualizamos el botón completo
         streakCounter.innerHTML = `${iconHTML} <span id="streakNumber" style="margin-left: 5px; font-weight: bold; color: white;">${streak}</span>`;
     }
 }
@@ -615,22 +596,6 @@ function checkQuizAnswer() {
         setTimeout(() => { nextQuizQuestion(); checkBtn.disabled = false; feedback.innerText = ""; feedback.style.color = ""; }, 2500); 
     }
 }
-
-// --- BOTÓN NUEVA NOTA (+) ---
-if(newNoteBtn) {
-    newNoteBtn.onclick = () => { 
-        if(textInput) textInput.value = ""; 
-        if(labList) labList.innerHTML = ""; 
-        const wowSummary = document.getElementById('wowSummary');
-        const magicOrderBtn = document.getElementById('magicOrderBtn');
-        if(wowSummary) wowSummary.style.display = 'none';
-        if(magicOrderBtn) magicOrderBtn.style.display = 'flex';
-        localStorage.setItem('sophie_last_input', ""); 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-}
-
-// updateDashboardStats(); // Desactivado hasta que programemos la Fase 3
 
 // --- CONTROL DE VELOCIDAD DE AUDIO (BLINDADO) ---
 window.audioSpeed = 1.0;
