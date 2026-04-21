@@ -383,17 +383,20 @@ if (playSessionBtn) {
 
         // Desbloqueo silencioso y ajuste de Rachel
         masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-        masterAudio.playbackRate = 0.90; // Ritmo meditativo
+        masterAudio.playbackRate = 0.90; 
         masterAudio.play().catch(() => {});
 
         try {
             // ==========================================
-            // 🥇 FASE 1: Entrada suave (A -> B -> A suave)
+            // 🥇 FASE 1: Entrada suave (Morado)
             // ==========================================
             console.log("Iniciando FASE 1...");
             for (let row of rows) {
                 if (!isPlaying) break;
+                // ✨ DEVOLVEMOS EL COLOR MORADO Y EL BRILLO ✨
                 row.style.borderColor = "var(--accent-purple)";
+                row.style.boxShadow = "0 0 15px rgba(187,134,252,0.2)"; 
+                
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
@@ -401,59 +404,69 @@ if (playSessionBtn) {
                 if (!isPlaying) break;
                 await playAudioNode(B, elevenKey, 1.0); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 0.85); await delay(2000); // [suave] y pausa larga
+                await playAudioNode(A, elevenKey, 0.85); await delay(2000);
                 
+                // Apagamos el brillo al terminar la tarjeta
                 row.style.borderColor = "var(--border-color)";
+                row.style.boxShadow = "none";
             }
 
             if (!isPlaying) throw new Error("Detenido");
-            await delay(3000); // Transición de 3 segundos entre fases
+            await delay(3000); 
 
             // ==========================================
-            // 🧠 FASE 2: Conexión activa (B -> A -> A -> B -> A suave)
+            // 🧠 FASE 2: Conexión activa (Amarillo Oro)
             // ==========================================
             console.log("Iniciando FASE 2...");
-            masterAudio.playbackRate = 0.92; // Ligeramente más activo
+            masterAudio.playbackRate = 0.92; 
             
             for (let row of rows) {
                 if (!isPlaying) break;
-                row.style.borderColor = "#fbbf24"; // Iluminamos amarillo en fase 2
+                // ✨ COLOR AMARILLO ORO ✨
+                row.style.borderColor = "#fbbf24"; 
+                row.style.boxShadow = "0 0 15px rgba(251,191,36,0.2)";
+                
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
                 await playAudioNode(B, elevenKey, 1.0); await delay(1200);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0); await delay(2000); // Recuperación
+                await playAudioNode(A, elevenKey, 1.0); await delay(2000); 
                 if (!isPlaying) break;
                 await playAudioNode(A, elevenKey, 1.0); await delay(1000);
                 if (!isPlaying) break;
                 await playAudioNode(B, elevenKey, 1.0); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 0.82); await delay(2000); // Aún más suave
+                await playAudioNode(A, elevenKey, 0.82); await delay(2000); 
                 
                 row.style.borderColor = "var(--border-color)";
+                row.style.boxShadow = "none";
             }
 
             if (!isPlaying) throw new Error("Detenido");
             await delay(3000);
 
             // ==========================================
-            // 🔥 FASE 3: Refuerzo (A larga -> B larga)
+            // 🔥 FASE 3: Refuerzo (Verde Éxito)
             // ==========================================
             console.log("Iniciando FASE 3...");
-            masterAudio.playbackRate = 0.88; // Volvemos a bajar revoluciones
+            masterAudio.playbackRate = 0.88; 
             
             for (let row of rows) {
                 if (!isPlaying) break;
-                row.style.borderColor = "#4ade80"; // Iluminamos verde en fase 3
+                // ✨ COLOR VERDE ✨
+                row.style.borderColor = "#4ade80"; 
+                row.style.boxShadow = "0 0 15px rgba(74,222,128,0.2)";
+                
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                await playAudioNode(A, elevenKey, 1.0); await delay(2500); // Espacio mental puro
+                await playAudioNode(A, elevenKey, 1.0); await delay(2500); 
                 if (!isPlaying) break;
                 await playAudioNode(B, elevenKey, 1.0); await delay(2500);
                 
                 row.style.borderColor = "var(--border-color)";
+                row.style.boxShadow = "none";
             }
 
             // --- LECTURA DEL EJEMPLO (OPCIONAL AL FINAL DE LA SESIÓN) ---
@@ -464,10 +477,13 @@ if (playSessionBtn) {
                     if (!isPlaying) break;
                     let example = row.dataset.example;
                     if (example && example.trim() !== "") {
+                        // Le damos un brillo morado cuando lee la frase final
                         row.style.borderColor = "var(--accent-purple)";
+                        row.style.boxShadow = "0 0 15px rgba(187,134,252,0.2)";
                         await playAudioNode(example, elevenKey, 1.0); 
                         await delay(1500);
                         row.style.borderColor = "var(--border-color)";
+                        row.style.boxShadow = "none";
                     }
                 }
             }
