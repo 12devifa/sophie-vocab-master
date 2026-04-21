@@ -177,17 +177,23 @@ if (magicOrderBtn) {
             textInput.value = finalFormattedText.trim();
             localStorage.setItem('sophie_last_input', textInput.value);
 
-            const wowSummary = document.getElementById('wowSummary');
-            if(wowSummary) {
-                wowSummary.innerHTML = `
-                    <h3 style="color: #4ade80; margin-bottom: 10px;">✨ ${parsedData.wow_message}</h3>
-                    <div class="summary-details" style="display: flex; flex-direction: column; gap: 8px; color: #d4d4d8;">
-                       <div class="stat-highlight">📊 <strong>${parsedData.flashcards.length}</strong> terms detected</div>
-                        <div>🌍 Language: <strong>${parsedData.detected_language}</strong></div>
-                    </div>
-                `;
-                wowSummary.style.display = 'block';
-            }
+            // 🪄 EL TRUCO DEL BOTÓN CAMALEÓN
+            magicOrderBtn.innerHTML = `<i class="fas fa-play"></i> Start your loop • ${parsedData.flashcards.length} terms`;
+            
+            // Le damos un "glow" sutil para llamar la atención
+            magicOrderBtn.style.boxShadow = "0 0 15px rgba(187,134,252,0.4)";
+            
+            // Redirigimos el clic: la próxima vez que lo toque, ¡empieza el audio!
+            magicOrderBtn.onclick = (e) => {
+                e.preventDefault();
+                const playBtn = document.getElementById('playSession');
+                if(playBtn) {
+                    playBtn.click(); // Dispara el loop maestro que hicimos ayer
+                    
+                    // Bajamos la pantalla suavemente para que vea las tarjetas iluminarse
+                    document.querySelector('.lab-section').scrollIntoView({ behavior: 'smooth' });
+                }
+            };
             
             magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
