@@ -177,38 +177,39 @@ if (magicOrderBtn) {
             textInput.value = finalFormattedText.trim();
             localStorage.setItem('sophie_last_input', textInput.value);
 
-            // 🪄 EL TRUCO DEL BOTÓN CAMALEÓN
-            magicOrderBtn.innerHTML = `<i class="fas fa-play"></i> Start your loop • ${parsedData.flashcards.length} terms`;
+           // ==========================================
+            // 🪄 EL TRUCO DEL BOTÓN CAMALEÓN PREMIUM
+            // ==========================================
+            const termsCount = parsedData.flashcards.length;
             
-            // Le damos un "glow" sutil para llamar la atención
-            magicOrderBtn.style.boxShadow = "0 0 15px rgba(187,134,252,0.4)";
+            magicOrderBtn.innerHTML = `<span style="display:flex; align-items:center; gap:10px;">
+                <i class="fas fa-play-circle" style="font-size:1.2rem; color:#4ade80;"></i>
+                <span style="font-weight:700;">Start your loop</span>
+                <span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:10px; font-size:0.8rem; border:1px solid rgba(255,255,255,0.2);">${termsCount} terms</span>
+            </span>`;
             
-            // Redirigimos el clic: la próxima vez que lo toque, ¡empieza el audio!
+            // Le damos un diseño "Success" espectacular sin ocupar más espacio
+            magicOrderBtn.style.background = "linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(187, 134, 252, 0.15) 100%)";
+            magicOrderBtn.style.border = "1px solid rgba(74, 222, 128, 0.5)";
+            magicOrderBtn.style.boxShadow = "0 0 20px rgba(74, 222, 128, 0.2)";
+            
             magicOrderBtn.onclick = (e) => {
                 e.preventDefault();
                 const playBtn = document.getElementById('playSession');
                 if(playBtn) {
-                    playBtn.click(); // Dispara el loop maestro que hicimos ayer
-                    
-                    // Bajamos la pantalla suavemente para que vea las tarjetas iluminarse
+                    playBtn.click();
                     document.querySelector('.lab-section').scrollIntoView({ behavior: 'smooth' });
                 }
             };
-            
+
             magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
-
             if(processBtn) processBtn.click();
 
-       } catch (error) {
+        } catch (error) {
             console.error(error);
             alert("Hubo un error al procesar. Intenta de nuevo."); 
-        } finally {
-        magicOrderBtn.innerHTML = btnOriginalText;
-        magicOrderBtn.style.opacity = '1';
-        magicOrderBtn.style.pointerEvents = 'auto';
-        magicOrderBtn.disabled = false;
-    }
+        }
 });
 }
 
