@@ -177,7 +177,7 @@ if (magicOrderBtn) {
             textInput.value = finalFormattedText.trim();
             localStorage.setItem('sophie_last_input', textInput.value);
 
-          // ==========================================
+         // ==========================================
             // 🪄 EL TRUCO DEL BOTÓN CAMALEÓN PREMIUM
             // ==========================================
             const termsCount = parsedData.flashcards.length;
@@ -188,22 +188,20 @@ if (magicOrderBtn) {
                 <span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:10px; font-size:0.8rem; border:1px solid rgba(255,255,255,0.2); color: white;">${termsCount} terms</span>
             </span>`;
             
-            // Le damos un diseño "Success" espectacular sin ocupar más espacio
             magicOrderBtn.style.background = "linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(187, 134, 252, 0.15) 100%)";
             magicOrderBtn.style.border = "1px solid rgba(74, 222, 128, 0.5)";
             magicOrderBtn.style.boxShadow = "0 0 20px rgba(74, 222, 128, 0.2)";
             
-            // 🚨 LOS 3 SALVAVIDAS: Descongelamos el botón para que vuelva a funcionar 🚨
             magicOrderBtn.disabled = false;
             magicOrderBtn.style.pointerEvents = 'auto';
             magicOrderBtn.style.opacity = '1';
             
             magicOrderBtn.onclick = (e) => {
-                e.preventDefault();
+                if(e) e.preventDefault(); // Añadimos seguridad aquí
                 const playBtn = document.getElementById('playSession');
                 if(playBtn) {
-                    playBtn.click();
-                    // Bajamos la pantalla suavemente
+                    // Solo hace clic si el audio NO está sonando ya
+                    if(!isPlaying) playBtn.click(); 
                     document.querySelector('.lab-section').scrollIntoView({ behavior: 'smooth' });
                 }
             };
@@ -211,6 +209,13 @@ if (magicOrderBtn) {
             magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
             if(processBtn) processBtn.click();
+
+            // 🚀 LA MAGIA DEL AUTO-PLAY 🚀
+            // Esperamos 800 milisegundos (para que el ojo humano vea el botón verde)
+            // y luego ¡SOPHIE hace clic por el usuario!
+            setTimeout(() => {
+                magicOrderBtn.click();
+            }, 800);
 
         } catch (error) {
             console.error(error);
