@@ -201,7 +201,7 @@ if (magicOrderBtn) {
                 const playBtn = document.getElementById('playSession');
                 if(playBtn) {
                     // Solo hace clic si el audio NO está sonando ya
-                    if(!isPlaying) playBtn.click(); 
+                    playBtn.click();
                     document.querySelector('.lab-section').scrollIntoView({ behavior: 'smooth' });
                 }
             };
