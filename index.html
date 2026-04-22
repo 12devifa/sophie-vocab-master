@@ -66,6 +66,28 @@
             <button id="magicOrderBtn" class="apple-primary-btn">
                 <i class="fas fa-play"></i> Start learning
             </button>
+
+           <div id="masterPlayerPanel" style="display: none; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(187,134,252,0.3); margin-top: 15px; text-align: center;">
+    <div style="font-size: 0.9rem; color: #4ade80; margin-bottom: 10px; font-weight: bold;">
+        <i class="fas fa-headphones"></i> Loop en progreso...
+    </div>
+    <div style="display: flex; justify-content: center; gap: 15px; align-items: center;">
+        
+        <select id="playerMode" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 8px;">
+            <option value="basic">Sólo Vocabulario</option>
+            <option value="full">Vocabulario + Frases</option>
+        </select>
+
+        <button id="playerSpeedBtn" style="background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 8px 15px;">
+            <i class="fas fa-tachometer-alt"></i> 1x
+        </button>
+
+        <button id="playerToggleBtn" style="background: linear-gradient(135deg, #bb86fc 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; padding: 8px 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(187,134,252,0.3);">
+            <i class="fas fa-pause"></i> Pausar
+        </button>
+
+    </div>
+</div>
             
             <p class="micro-promise" id="microPromise">🎧 Learn while commuting, working or resting</p>
             <p class="ai-signal">✨ Smart learning powered by AI</p>
