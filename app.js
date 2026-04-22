@@ -211,11 +211,7 @@ if (magicOrderBtn) {
             if(processBtn) processBtn.click();
 
             // 🚀 LA MAGIA DEL AUTO-PLAY 🚀
-            // Esperamos 800 milisegundos (para que el ojo humano vea el botón verde)
-            // y luego ¡SOPHIE hace clic por el usuario!
-            setTimeout(() => {
-                magicOrderBtn.click();
-            }, 800);
+            
 
         } catch (error) {
             console.error(error);
