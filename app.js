@@ -197,11 +197,16 @@ if (magicOrderBtn) {
             magicOrderBtn.style.opacity = '1';
             
             magicOrderBtn.onclick = (e) => {
-                if(e) e.preventDefault(); // Añadimos seguridad aquí
+                if(e) e.preventDefault();
                 const playBtn = document.getElementById('playSession');
+                
+                // 🪄 Magia visual: Escondemos el botón verde y mostramos el control remoto
+                magicOrderBtn.style.display = 'none';
+                const masterPanel = document.getElementById('masterPlayerPanel');
+                if(masterPanel) masterPanel.style.display = 'block';
+
                 if(playBtn) {
-                    // Solo hace clic si el audio NO está sonando ya
-                    playBtn.click();
+                    if(!isPlaying) playBtn.click(); 
                     document.querySelector('.lab-section').scrollIntoView({ behavior: 'smooth' });
                 }
             };
