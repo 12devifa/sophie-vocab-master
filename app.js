@@ -1,3 +1,28 @@
+// ==========================================
+// 🧠 MEMORIA DE CONTEXTO DE SOPHIE
+// ==========================================
+let sophieContext = "general"; // Por defecto es general
+
+document.addEventListener('DOMContentLoaded', () => {
+    const ctxBtns = document.querySelectorAll('.ctx-btn');
+    ctxBtns.forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            // Apagamos todos
+            ctxBtns.forEach(b => {
+                b.style.background = 'transparent';
+                b.style.borderColor = 'rgba(255,255,255,0.2)';
+            });
+            // Encendemos el que tocaste (Morado SOPHIE)
+            btn.style.background = 'rgba(187,134,252,0.2)';
+            btn.style.borderColor = '#bb86fc';
+            
+            // ¡SOPHIE MEMORIZA EL CONTEXTO!
+            sophieContext = btn.dataset.ctx; 
+        };
+    });
+});
+
 // ==============================================================
 // SOPHIE.ai - VERSIÓN DEFINITIVA (CEREBRO JSON + AUDIO + GOALS) 💎
 // ==============================================================
