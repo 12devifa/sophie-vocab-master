@@ -176,9 +176,9 @@ if (magicOrderBtn) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: systemPrompt }] }],
-                    generationConfig: { response_mime_type: "application/json", temperature: 0.7 }
-                })
+            contents: [{ parts: [{ text: systemPrompt + "\n\nATENCIÓN AL CONTEXTO: El usuario ha solicitado que los ejemplos de uso de cada palabra estén estrictamente enfocados en un contexto de: " + sophieContext + ". Si es trabajo, usa lenguaje de oficina. Si es viaje, usa lenguaje de turista. Genera ejemplos que tengan sentido real en ese escenario." }] }],
+            generationConfig: { response_mime_type: "application/json", temperature: 0.7 }
+        })
             });
 
             if (!response.ok) {
