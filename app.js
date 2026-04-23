@@ -590,3 +590,52 @@ function loadStreak() {
 
 if(newNoteBtn) newNoteBtn.onclick = () => { if(textInput) textInput.value = ""; if(labList) labList.innerHTML = ""; localStorage.setItem('sophie_last_input', ""); };
 if(swapLangBtn) swapLangBtn.onclick = () => { isSwapped = !isSwapped; swapLangBtn.classList.toggle('active'); };
+
+// ==========================================
+// 🎛️ CEREBRO DEL REPRODUCTOR MAESTRO
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const playerToggleBtn = document.getElementById('playerToggleBtn');
+    const playerSpeedBtn = document.getElementById('playerSpeedBtn');
+
+    // ⏸️ El botón de PAUSA / PLAY
+    if (playerToggleBtn) {
+        playerToggleBtn.onclick = () => {
+            if (isPlaying) {
+                // Si está sonando -> Lo pausamos
+                isPlaying = false;
+                if(masterAudio) masterAudio.pause();
+                playerToggleBtn.innerHTML = '<i class="fas fa-play"></i> Reanudar';
+                playerToggleBtn.style.background = '#fbbf24'; // Se pone amarillo
+                playerToggleBtn.style.color = '#000';
+            } else {
+                // Si está pausado -> Lo reanudamos
+                isPlaying = true;
+                const playBtn = document.getElementById('playSession');
+                if(playBtn) playBtn.click(); // Dispara el loop donde se quedó
+                
+                playerToggleBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+                playerToggleBtn.style.background = 'linear-gradient(135deg, #bb86fc 0%, #7c3aed 100%)';
+                playerToggleBtn.style.color = 'white';
+            }
+        };
+    }
+
+    // ⏱️ El botón de VELOCIDAD (1x -> 0.8x -> 1.2x)
+    let currentSpeed = 1.0;
+    if (playerSpeedBtn) {
+        playerSpeedBtn.onclick = () => {
+            if (currentSpeed === 1.0) {
+                currentSpeed = 0.8;
+                playerSpeedBtn.innerHTML = '<i class="fas fa-snail"></i> 0.8x';
+            } else if (currentSpeed === 0.8) {
+                currentSpeed = 1.2;
+                playerSpeedBtn.innerHTML = '<i class="fas fa-bolt"></i> 1.2x';
+            } else {
+                currentSpeed = 1.0;
+                playerSpeedBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> 1x';
+            }
+            if(masterAudio) masterAudio.playbackRate = currentSpeed;
+        };
+    }
+});
