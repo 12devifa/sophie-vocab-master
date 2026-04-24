@@ -1,10 +1,13 @@
+// ==========================================
 // 🎙️ ELENCO DE VOCES PROFESIONALES DE SOPHIE
+// ==========================================
 const SOPHIE_VOICES = {
-    "EN": "21m00Tcm4T1vDq8ikWAM", // Rachel (Anfitriona)
+    "EN": "21m00Tcm4T1vDq8ikWAM", // Rachel (Anfitriona - Inglés)
     "DE": "D38z5qFv9f9A296T67mP", // Fin (Alemán Nativo)
     "ES": "ErXw7RfSTneByjXv7nRT", // Antoni (Español Nativo)
+    "FR": "GBv7mTt0atIp3Br8iCZE", // Thomas (Francés Nativo) 
     "PT": "AZnzlk1XjtKozAtGSE9S", // Daniel (Portugués Nativo)
-    "IT": "z9fAnlkSfUv1sS4s7s4r", // Giovanni (Italiano Nativo)
+    "IT": "z9fAnlkSfUv1sS4s7s4r"  // Giovanni (Italiano Nativo)
 };
 
 
