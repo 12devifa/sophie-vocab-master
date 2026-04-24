@@ -362,7 +362,7 @@ async function speakEleven(text, buttonElement) {
 }
 
 // 💽 EL DESCARGADOR INTELIGENTE (Ahora con soporte Multilingüe)
-async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4T1vDq8ikWAM") {
+async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4TlvDq8ikWAM") {
     // Usamos el texto Y la voz como llave para no mezclar idiomas en la memoria
     const cacheKey = text + "_" + voiceId; 
     
@@ -396,7 +396,7 @@ async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4T1vDq8ik
 }
 
 // 🎛️ REPRODUCTOR MAESTRO (Controla volumen y voces dinámicas)
-async function playAudioNode(text, apiKey, volume = 1.0, voiceId = "21m00Tcm4T1vDq8ikWAM") {
+async function playAudioNode(text, apiKey, volume = 1.0, voiceId = "21m00Tcm4TlvDq8ikWAM") {
     if (!isPlaying) return;
     try {
         // Le pasamos la voz específica al descargador inteligente
