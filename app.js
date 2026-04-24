@@ -2,12 +2,12 @@
 // 🎙️ ELENCO DE VOCES PROFESIONALES DE SOPHIE
 // ==========================================
 const SOPHIE_VOICES = {
-    "EN": "21m00Tcm4T1vDq8ikWAM", // Rachel (Anfitriona - Inglés)
-    "DE": "D38z5qFv9f9A296T67mP", // Fin (Alemán Nativo)
-    "ES": "ErXw7RfSTneByjXv7nRT", // Antoni (Español Nativo)
-    "FR": "GBv7mTt0atIp3Br8iCZE", // Thomas (Francés Nativo) 
-    "PT": "AZnzlk1XjtKozAtGSE9S", // Daniel (Portugués Nativo)
-    "IT": "z9fAnlkSfUv1sS4s7s4r"  // Giovanni (Italiano Nativo)
+    "EN": "21m00Tcm4TlvDq8ikWAM", // Rachel (Anfitriona - ID Corregido con 'l')
+    "DE": "D38z5RcWu1voky8WS1ja", // Fin (Alemán - ID Real)
+    "ES": "ErXwobaYiN019PkySvjV", // Antoni (Español - ID Real)
+    "FR": "IKne3meq5aSn9XLyUdCD", // Charlie (Para Francés - ID Real)
+    "PT": "onwK4e9ZLuTAKqWW03F9", // Daniel (Portugués - ID Real)
+    "IT": "zcAOhNBS3c14rBihAFp1"  // Giovanni (Italiano - ID Real)
 };
 
 
