@@ -1,3 +1,13 @@
+// 🎙️ ELENCO DE VOCES PROFESIONALES DE SOPHIE
+const SOPHIE_VOICES = {
+    "EN": "21m00Tcm4T1vDq8ikWAM", // Rachel (Anfitriona)
+    "DE": "D38z5qFv9f9A296T67mP", // Fin (Alemán Nativo)
+    "ES": "ErXw7RfSTneByjXv7nRT", // Antoni (Español Nativo)
+    "PT": "AZnzlk1XjtKozAtGSE9S", // Daniel (Portugués Nativo)
+    "IT": "z9fAnlkSfUv1sS4s7s4r", // Giovanni (Italiano Nativo)
+};
+
+
 // ==========================================
 // 🧠 MEMORIA DE CONTEXTO DE SOPHIE
 // ==========================================
