@@ -381,7 +381,7 @@ async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4TlvDq8ik
         },
         body: JSON.stringify({
             text: text + ".", // El hack del punto final para mejorar entonación
-            model_id: "eleven_turbo_v2_5",
+            model_id: "eleven_multilingual_v2",
             voice_settings: { stability: 0.50, similarity_boost: 0.50 }
         })
     });
@@ -456,6 +456,10 @@ if (playSessionBtn) {
             console.log("Iniciando FASE 1...");
             for (let row of rows) {
                 if (!isPlaying) break;
+                
+                // 🎥 MAGIA UI: El Auto-Scroll. La cámara baja sola y centra la tarjeta actual.
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
                 // ✨ DEVOLVEMOS EL COLOR MORADO Y EL BRILLO ✨
                 row.style.borderColor = "var(--accent-purple)";
                 row.style.boxShadow = "0 0 15px rgba(187,134,252,0.2)"; 
@@ -463,17 +467,19 @@ if (playSessionBtn) {
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // 1. RACHEL HABLA INGLÉS (Anfitriona)
+                // 1. RACHEL HABLA INGLÉS
                 await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
                 if (!isPlaying) break;
                 await delay(500); 
 
-                // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Acento Nativo Perfecto)
+                // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Con respiración natural)
                 await playAudioNode(B, elevenKey, 1.0, profInvitado);
                 if (!isPlaying) break;
-                await delay(600); 
+                
+                // 🗣️ MODO SHADOWING: 2.5 segundos de silencio para que el usuario repita en voz alta
+                await delay(2500); 
 
-                // 3. RACHEL REPITE EL INGLÉS SUAVE (Fijación de memoria)
+                // 3. RACHEL REPITE EL INGLÉS SUAVE
                 await playAudioNode(A, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
                 if (!isPlaying) break;
                 await delay(1500);
@@ -482,9 +488,6 @@ if (playSessionBtn) {
                 row.style.borderColor = "var(--border-color)";
                 row.style.boxShadow = "none";
             }
-
-            if (!isPlaying) throw new Error("Detenido");
-            await delay(3000); 
 
             // ==========================================
             // 🧠 FASE 2: Conexión activa (Amarillo Oro)
