@@ -360,14 +360,17 @@ async function speakEleven(text, buttonElement) {
     }
 }
 
-// 📡 EL DESCARGADOR INTELIGENTE (Busca en la caja fuerte primero)
-async function getAudioFromCacheOrAPI(text, apiKey) {
-    if (audioCache[text]) {
+// 💽 EL DESCARGADOR INTELIGENTE (Ahora con soporte Multilingüe)
+async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4T1vDq8ikWAM") {
+    // Usamos el texto Y la voz como llave para no mezclar idiomas en la memoria
+    const cacheKey = text + "_" + voiceId; 
+    
+    if (audioCache[cacheKey]) {
         console.log("♻️ Audio reciclado (Gratis):", text);
-        return audioCache[text];
+        return audioCache[cacheKey];
     }
 
-    const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Voz de Rachel
+    // Usamos la variable 'voiceId' que entra por la puerta
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: {
@@ -376,8 +379,8 @@ async function getAudioFromCacheOrAPI(text, apiKey) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            text: text,
-           model_id: "eleven_turbo_v2_5",
+            text: text + ".", // El hack del punto final para mejorar entonación
+            model_id: "eleven_turbo_v2_5",
             voice_settings: { stability: 0.50, similarity_boost: 0.50 }
         })
     });
@@ -386,21 +389,22 @@ async function getAudioFromCacheOrAPI(text, apiKey) {
 
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
-    
-    audioCache[text] = audioUrl; // Guardamos en la caja fuerte
+
+    audioCache[cacheKey] = audioUrl; // Guardamos en la caja fuerte
     return audioUrl;
 }
 
-// 🎛️ REPRODUCTOR MAESTRO (Controla volumen dinámico)
-async function playAudioNode(text, apiKey, volume = 1.0) {
+// 🎛️ REPRODUCTOR MAESTRO (Controla volumen y voces dinámicas)
+async function playAudioNode(text, apiKey, volume = 1.0, voiceId = "21m00Tcm4T1vDq8ikWAM") {
     if (!isPlaying) return;
     try {
-        const url = await getAudioFromCacheOrAPI(text, apiKey);
+        // Le pasamos la voz específica al descargador inteligente
+        const url = await getAudioFromCacheOrAPI(text, apiKey, voiceId);
         return new Promise((resolve) => {
             masterAudio.src = url;
             masterAudio.volume = volume; // 🔥 El secreto del "suave" está aquí
-            masterAudio.onended = resolve; 
-            masterAudio.onerror = () => resolve(); 
+            masterAudio.onended = resolve;
+            masterAudio.onerror = () => resolve();
             masterAudio.play().catch(() => resolve());
         });
     } catch (e) {
@@ -450,11 +454,28 @@ if (playSessionBtn) {
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                await playAudioNode(A, elevenKey, 1.0); await delay(1000);
-                if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0); await delay(1000);
-                if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 0.85); await delay(2000);
+               // 🌍 Define quién es el profesor invitado para esta sesión
+            // Cambia "DE" por "PT", "IT", "FR" o "ES" según el idioma que estés estudiando
+            const profInvitado = SOPHIE_VOICES["DE"]; 
+
+            // ==========================================
+            // 🎙️ EL NUEVO BUCLE MULTILINGÜE
+            // ==========================================
+
+            // 1. RACHEL HABLA INGLÉS (Anfitriona)
+            await playAudioNode(textoOriginal, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
+            if (!isPlaying) break;
+            await new Promise(resolve => setTimeout(resolve, 500)); 
+
+            // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Acento Nativo Perfecto)
+            await playAudioNode(textoTraducido, elevenKey, 1.0, profInvitado);
+            if (!isPlaying) break;
+            await new Promise(resolve => setTimeout(resolve, 600)); 
+
+            // 3. RACHEL REPITE EL INGLÉS SUAVE (Fijación de memoria)
+            await playAudioNode(textoOriginal, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
+            if (!isPlaying) break;
+            await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 // Apagamos el brillo al terminar la tarjeta
                 row.style.borderColor = "var(--border-color)";
