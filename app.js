@@ -83,7 +83,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedLessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     savedLessons.forEach(l => createCardUI(l.content, l.date));
 
-    createQuizOverlayUI();
+    // 🛡️ BLINDAJE: Solo llama al quiz si existe la función para evitar errores rojos
+    if (typeof createQuizOverlayUI === 'function') {
+        createQuizOverlayUI();
+    }
+    
     loadStreak();
     const savedText = localStorage.getItem('sophie_last_input');
     if (savedText && textInput) textInput.value = savedText;
@@ -252,9 +256,6 @@ if (magicOrderBtn) {
             magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
             if(processBtn) processBtn.click();
-
-            // 🚀 LA MAGIA DEL AUTO-PLAY 🚀
-            
 
         } catch (error) {
             console.error(error);
@@ -440,6 +441,14 @@ if (playSessionBtn) {
         masterAudio.playbackRate = 0.90; 
         masterAudio.play().catch(() => {});
 
+        // 🧠 LÓGICA INTELIGENTE PARA DETECTAR EL IDIOMA DEL PROFESOR
+        let currentMode = langSelect ? langSelect.value : 'en-es';
+        let parts = currentMode.split('-');
+        let targetLang = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
+        if(targetLang === 'EN') targetLang = isSwapped ? parts[1].toUpperCase() : parts[0].toUpperCase();
+        
+        const profInvitado = SOPHIE_VOICES[targetLang] || SOPHIE_VOICES["DE"];
+
         try {
             // ==========================================
             // 🥇 FASE 1: Entrada suave (Morado)
@@ -454,28 +463,20 @@ if (playSessionBtn) {
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-               // 🌍 Define quién es el profesor invitado para esta sesión
-            // Cambia "DE" por "PT", "IT", "FR" o "ES" según el idioma que estés estudiando
-            const profInvitado = SOPHIE_VOICES["DE"]; 
+                // 1. RACHEL HABLA INGLÉS (Anfitriona)
+                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
+                if (!isPlaying) break;
+                await delay(500); 
 
-            // ==========================================
-            // 🎙️ EL NUEVO BUCLE MULTILINGÜE
-            // ==========================================
+                // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Acento Nativo Perfecto)
+                await playAudioNode(B, elevenKey, 1.0, profInvitado);
+                if (!isPlaying) break;
+                await delay(600); 
 
-           // 1. RACHEL HABLA INGLÉS (Anfitriona)
-            await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
-            if (!isPlaying) break;
-            await new Promise(resolve => setTimeout(resolve, 500)); 
-
-            // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Acento Nativo Perfecto)
-            await playAudioNode(B, elevenKey, 1.0, profInvitado);
-            if (!isPlaying) break;
-            await new Promise(resolve => setTimeout(resolve, 600)); 
-
-            // 3. RACHEL REPITE EL INGLÉS SUAVE (Fijación de memoria)
-            await playAudioNode(A, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
-            if (!isPlaying) break;
-            await new Promise(resolve => setTimeout(resolve, 1500));
+                // 3. RACHEL REPITE EL INGLÉS SUAVE (Fijación de memoria)
+                await playAudioNode(A, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
+                if (!isPlaying) break;
+                await delay(1500);
                 
                 // Apagamos el brillo al terminar la tarjeta
                 row.style.borderColor = "var(--border-color)";
@@ -500,15 +501,16 @@ if (playSessionBtn) {
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                await playAudioNode(B, elevenKey, 1.0); await delay(1200);
+                // Ahora la Fase 2 también usa al Profesor Invitado
+                await playAudioNode(B, elevenKey, 1.0, profInvitado); await delay(1200);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0); await delay(2000); 
+                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]); await delay(2000); 
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0); await delay(1000);
+                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0); await delay(1000);
+                await playAudioNode(B, elevenKey, 1.0, profInvitado); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 0.82); await delay(2000); 
+                await playAudioNode(A, elevenKey, 0.82, SOPHIE_VOICES["EN"]); await delay(2000); 
                 
                 row.style.borderColor = "var(--border-color)";
                 row.style.boxShadow = "none";
@@ -532,9 +534,10 @@ if (playSessionBtn) {
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                await playAudioNode(A, elevenKey, 1.0); await delay(2500); 
+                // La Fase 3 también usa al Profesor Invitado
+                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]); await delay(2500); 
                 if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0); await delay(2500);
+                await playAudioNode(B, elevenKey, 1.0, profInvitado); await delay(2500);
                 
                 row.style.borderColor = "var(--border-color)";
                 row.style.boxShadow = "none";
@@ -551,7 +554,7 @@ if (playSessionBtn) {
                         // Le damos un brillo morado cuando lee la frase final
                         row.style.borderColor = "var(--accent-purple)";
                         row.style.boxShadow = "0 0 15px rgba(187,134,252,0.2)";
-                        await playAudioNode(example, elevenKey, 1.0); 
+                        await playAudioNode(example, elevenKey, 1.0, SOPHIE_VOICES["EN"]); 
                         await delay(1500);
                         row.style.borderColor = "var(--border-color)";
                         row.style.boxShadow = "none";
