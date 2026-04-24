@@ -462,18 +462,18 @@ if (playSessionBtn) {
             // 🎙️ EL NUEVO BUCLE MULTILINGÜE
             // ==========================================
 
-            // 1. RACHEL HABLA INGLÉS (Anfitriona)
-            await playAudioNode(textoOriginal, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
+           // 1. RACHEL HABLA INGLÉS (Anfitriona)
+            await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
             if (!isPlaying) break;
             await new Promise(resolve => setTimeout(resolve, 500)); 
 
             // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Acento Nativo Perfecto)
-            await playAudioNode(textoTraducido, elevenKey, 1.0, profInvitado);
+            await playAudioNode(B, elevenKey, 1.0, profInvitado);
             if (!isPlaying) break;
             await new Promise(resolve => setTimeout(resolve, 600)); 
 
             // 3. RACHEL REPITE EL INGLÉS SUAVE (Fijación de memoria)
-            await playAudioNode(textoOriginal, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
+            await playAudioNode(A, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
             if (!isPlaying) break;
             await new Promise(resolve => setTimeout(resolve, 1500));
                 
