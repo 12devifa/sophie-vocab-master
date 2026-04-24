@@ -441,24 +441,29 @@ if (playSessionBtn) {
         masterAudio.playbackRate = 0.90; 
         masterAudio.play().catch(() => {});
 
-        // 🧠 LÓGICA INTELIGENTE PARA DETECTAR EL IDIOMA DEL PROFESOR
+// 🧠 LÓGICA INTELIGENTE (Detecta TANTO el idioma 1 como el 2)
         let currentMode = langSelect ? langSelect.value : 'en-es';
         let parts = currentMode.split('-');
-        let targetLang = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
-        if(targetLang === 'EN') targetLang = isSwapped ? parts[1].toUpperCase() : parts[0].toUpperCase();
         
-        const profInvitado = SOPHIE_VOICES[targetLang] || SOPHIE_VOICES["DE"];
+        let baseLangCode = isSwapped ? parts[1].toUpperCase() : parts[0].toUpperCase();
+        let targetLangCode = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
+        
+        // Asignamos los actores correctos para AMBOS micrófonos
+        const vozBase = SOPHIE_VOICES[baseLangCode] || SOPHIE_VOICES["EN"];
+        const vozMeta = SOPHIE_VOICES[targetLangCode] || SOPHIE_VOICES["DE"];
 
         try {
             // ==========================================
-            // 🥇 FASE 1: Entrada suave (Morado)
+            // 🥇 FASE 1: Entrada suave (Morado) + AutoScroll
             // ==========================================
             console.log("Iniciando FASE 1...");
             for (let row of rows) {
                 if (!isPlaying) break;
                 
-                // 🎥 MAGIA UI: El Auto-Scroll. La cámara baja sola y centra la tarjeta actual.
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 🎥 MAGIA UI: Forzamos el Auto-Scroll con un micro-retraso para que el navegador obedezca
+                setTimeout(() => {
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 50);
 
                 // ✨ DEVOLVEMOS EL COLOR MORADO Y EL BRILLO ✨
                 row.style.borderColor = "var(--accent-purple)";
@@ -467,20 +472,20 @@ if (playSessionBtn) {
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // 1. RACHEL HABLA INGLÉS
-                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]);
+                // 1. EL ACTOR BASE LEE LA PALABRA 1 (¡Adiós acento gringo!)
+                await playAudioNode(A, elevenKey, 1.0, vozBase);
                 if (!isPlaying) break;
                 await delay(500); 
 
-                // 2. EL PROFESOR INVITADO HABLA EL IDIOMA META (Con respiración natural)
-                await playAudioNode(B, elevenKey, 1.0, profInvitado);
+                // 2. EL ACTOR META LEE LA TRADUCCIÓN
+                await playAudioNode(B, elevenKey, 1.0, vozMeta);
                 if (!isPlaying) break;
                 
-                // 🗣️ MODO SHADOWING: 2.5 segundos de silencio para que el usuario repita en voz alta
+                // 🗣️ MODO SHADOWING: 2.5 segundos de silencio perfecto para que el usuario repita
                 await delay(2500); 
 
-                // 3. RACHEL REPITE EL INGLÉS SUAVE
-                await playAudioNode(A, elevenKey, 0.4, SOPHIE_VOICES["EN"]);
+                // 3. EL ACTOR BASE REPITE SUAVE
+                await playAudioNode(A, elevenKey, 0.4, vozBase);
                 if (!isPlaying) break;
                 await delay(1500);
                 
