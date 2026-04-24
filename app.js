@@ -1,13 +1,13 @@
 // ==========================================
-// 🎙️ ELENCO DE VOCES PROFESIONALES DE SOPHIE
+// 🎙️ ELENCO DE VOCES "NOTEBOOK LM" (Relajantes y conversacionales)
 // ==========================================
 const SOPHIE_VOICES = {
-    "EN": "21m00Tcm4TlvDq8ikWAM", // Rachel (Anfitriona - ID Corregido con 'l')
-    "DE": "D38z5RcWu1voky8WS1ja", // Fin (Alemán - ID Real)
-    "ES": "ErXwobaYiN019PkySvjV", // Antoni (Español - ID Real)
-    "FR": "IKne3meq5aSn9XLyUdCD", // Charlie (Para Francés - ID Real)
-    "PT": "onwK4e9ZLuTAKqWW03F9", // Daniel (Portugués - ID Real)
-    "IT": "zcAOhNBS3c14rBihAFp1"  // Giovanni (Italiano - ID Real)
+    "EN": "EXAVITQu4vr4xnSDxMaL", // Sarah (Inglés - Tono suave, maduro y tipo ASMR)
+    "DE": "N2lVS1w4EtoT3dr4eOWO", // Callum (Alemán/Multilingüe - Profundo y relajante)
+    "ES": "XrExE9yKIg1WjnnlVkGX", // Matilda (Español - Muy cálida y conversacional)
+    "FR": "cgSgspJ2msm6clMCkdW9", // Marcus (Francés - Voz masculina profunda y tranquila) 
+    "PT": "Xb7hH8MSALEjdASTLbcO", // Alice (Portugués - Suave y educada)
+    "IT": "ZQe5CZNOzWqw6CGcgHmAS" // Giovanni (Italiano - Tono neutro y calmado)
 };
 
 
