@@ -1,13 +1,18 @@
-export default async function handler(req, res) {
-    // Si no es una petición POST, la bloqueamos por seguridad
+module.exports = async function handler(req, res) {
+    // Reglas de seguridad para que el navegador no lo bloquee
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido' });
     }
 
-    // Sacamos nuestra llave secreta de la bóveda de Vercel
     const apiKey = process.env.GEMINI_API_KEY;
-    
-    // Recibimos los datos que nos manda nuestra web
     const { systemPrompt, rawText, context } = req.body;
 
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -23,10 +28,8 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        
-        // Devolvemos la respuesta a nuestra web
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: "Error conectando con Gemini" });
     }
-}
+};
