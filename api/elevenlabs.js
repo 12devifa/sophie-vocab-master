@@ -1,4 +1,13 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+    // Reglas de seguridad para que el navegador no lo bloquee
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido' });
     }
@@ -29,7 +38,6 @@ export default async function handler(req, res) {
             throw new Error("Fallo de saldo o conexión en ElevenLabs");
         }
 
-        // Convertimos el audio en un formato que el navegador pueda reproducir
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
@@ -40,4 +48,4 @@ export default async function handler(req, res) {
         console.error(error);
         res.status(500).json({ error: "Error conectando con ElevenLabs" });
     }
-}
+};
