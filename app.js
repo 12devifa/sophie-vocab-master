@@ -10,45 +10,37 @@ const SOPHIE_VOICES = {
     "IT": "ZQe5CZNOzWqw6CGcgHmAS" // Giovanni (Italiano - Tono neutro y calmado)
 };
 
-
 // ==========================================
 // 🧠 MEMORIA DE CONTEXTO DE SOPHIE
 // ==========================================
-let sophieContext = "general"; // Por defecto es general
+let sophieContext = "general";
 
 document.addEventListener('DOMContentLoaded', () => {
     const ctxBtns = document.querySelectorAll('.ctx-btn');
     ctxBtns.forEach(btn => {
         btn.onclick = (e) => {
             e.preventDefault();
-            // Apagamos todos
             ctxBtns.forEach(b => {
                 b.style.background = 'transparent';
                 b.style.borderColor = 'rgba(255,255,255,0.2)';
             });
-            // Encendemos el que tocaste (Morado SOPHIE)
             btn.style.background = 'rgba(187,134,252,0.2)';
             btn.style.borderColor = '#bb86fc';
-            
-            // ¡SOPHIE MEMORIZA EL CONTEXTO!
             sophieContext = btn.dataset.ctx; 
         };
     });
 });
 
 // ==============================================================
-// SOPHIE.ai - VERSIÓN DEFINITIVA (CEREBRO JSON + AUDIO + GOALS) 💎
+// SOPHIE.ai - VERSIÓN DEFINITIVA (BÓVEDA SEGURA EN LA NUBE) 💎
 // ==============================================================
 
 const textInput = document.getElementById('textInput');
 const processBtn = document.getElementById('processBtn');
 const labList = document.getElementById('labList');
 const notebookGallery = document.getElementById('notebookGallery');
-const fileUpload = document.getElementById('fileUpload');
-const quizBtn = document.getElementById('quizBtn');
 const newNoteBtn = document.getElementById('newNoteBtn');
 const themeToggle = document.getElementById('themeToggle');
-const exportBtn = document.getElementById('exportBtn');
 const langSelect = document.getElementById('langSelect');
 const swapLangBtn = document.getElementById('swapLangBtn');
 const audioMode = document.getElementById('audioMode');
@@ -56,7 +48,6 @@ const magicOrderBtn = document.getElementById('magicOrderBtn');
 const playSessionBtn = document.getElementById('playSession');
 
 let isSwapped = false;
-let currentCorrectAnswer = "";
 let isPlaying = false; 
 window.userCurrentGoal = 'auto'; 
 
@@ -82,11 +73,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const savedLessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
     savedLessons.forEach(l => createCardUI(l.content, l.date));
-
-    // 🛡️ BLINDAJE: Solo llama al quiz si existe la función para evitar errores rojos
-    if (typeof createQuizOverlayUI === 'function') {
-        createQuizOverlayUI();
-    }
     
     loadStreak();
     const savedText = localStorage.getItem('sophie_last_input');
@@ -124,23 +110,12 @@ if(closeDashboardBtn) {
     };
 }
 
-// --- 2. LÓGICA DE LA IA ---
+// --- 2. LÓGICA DE LA IA (CONEXIÓN SEGURA AL ROBOT GEMINI) ---
 if (magicOrderBtn) {
     magicOrderBtn.addEventListener('click', async () => {
         const rawText = textInput ? textInput.value : "";
         if (!rawText.trim()) return alert("Por favor, pega algo de texto primero.");
 
-        let userApiKey = localStorage.getItem('sophie_key_5');
-        if (!userApiKey) {
-            userApiKey = prompt("🔒 Pega tu clave de Google (SÍ, la que empieza por AQ...):");
-            if (!userApiKey) {
-                alert("Necesitas una API Key para continuar.");
-                return;
-            }
-            localStorage.setItem('sophie_key_5', userApiKey.trim());
-        }
-
-        const btnOriginalText = magicOrderBtn.innerHTML;
         magicOrderBtn.innerHTML = '<i class="fas fa-sparkles"></i> ✨ Analyzing your input...';
         magicOrderBtn.style.opacity = '0.7';
         magicOrderBtn.style.pointerEvents = 'none'; 
@@ -149,11 +124,8 @@ if (magicOrderBtn) {
         const mode = langSelect ? langSelect.value : 'fr-de';
         const config = getLangConfig(mode, isSwapped);
 
-        const originalBtnHTML = magicOrderBtn.innerHTML;
         magicOrderBtn.innerHTML = '<i class="fas fa-brain fa-pulse"></i> Analyzing...';
         magicOrderBtn.disabled = true;
-
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + userApiKey;
 
         const systemPrompt = `
         Eres SOPHIE.ai, una experta en neuroaprendizaje y traductora políglota nativa.
@@ -171,9 +143,6 @@ if (magicOrderBtn) {
 
         OBJETIVO: "${window.userCurrentGoal}".
 
-        TEXTO A ANALIZAR:
-        "${rawText}"
-
         DEVUELVE ÚNICAMENTE UN JSON CON ESTA ESTRUCTURA:
         {
           "detected_language": "Idioma original detectado",
@@ -189,20 +158,19 @@ if (magicOrderBtn) {
         `;
 
         try {
-            const response = await fetch(API_URL, {
+            // 🔒 AQUÍ LLAMAMOS A TU TÚNEL SEGURO EN LUGAR DE A GOOGLE DIRECTAMENTE
+            const response = await fetch('/api/gemini', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-            contents: [{ parts: [{ text: systemPrompt + "\n\nATENCIÓN AL CONTEXTO: El usuario ha solicitado que los ejemplos de uso de cada palabra estén estrictamente enfocados en un contexto de: " + sophieContext + ". Si es trabajo, usa lenguaje de oficina. Si es viaje, usa lenguaje de turista. Genera ejemplos que tengan sentido real en ese escenario." }] }],
-            generationConfig: { response_mime_type: "application/json", temperature: 0.7 }
-        })
+                    systemPrompt: systemPrompt,
+                    context: sophieContext + ". Si es trabajo, usa lenguaje de oficina. Si es viaje, usa lenguaje de turista. Genera ejemplos que tengan sentido real en ese escenario.",
+                    rawText: rawText
+                })
             });
 
             if (!response.ok) {
-                const errorDetails = await response.json();
-                alert("🚨 GOOGLE NOS HA DICHO ESTO EXACTAMENTE:\n\n" + JSON.stringify(errorDetails, null, 2));
-                localStorage.removeItem('sophie_key_5');
-                throw new Error("Fallo de comunicación.");
+                throw new Error("Fallo de comunicación con el servidor seguro.");
             }
 
             const data = await response.json();
@@ -219,9 +187,6 @@ if (magicOrderBtn) {
             textInput.value = finalFormattedText.trim();
             localStorage.setItem('sophie_last_input', textInput.value);
 
-         // ==========================================
-            // 🪄 EL TRUCO DEL BOTÓN CAMALEÓN PREMIUM
-            // ==========================================
             const termsCount = parsedData.flashcards.length;
             
             magicOrderBtn.innerHTML = `<span style="display:flex; align-items:center; gap:10px; color: white;">
@@ -242,7 +207,6 @@ if (magicOrderBtn) {
                 if(e) e.preventDefault();
                 const playBtn = document.getElementById('playSession');
                 
-                // 🪄 Magia visual: Escondemos el botón verde y mostramos el control remoto
                 magicOrderBtn.style.display = 'none';
                 const masterPanel = document.getElementById('masterPlayerPanel');
                 if(masterPanel) masterPanel.style.display = 'block';
@@ -260,6 +224,10 @@ if (magicOrderBtn) {
         } catch (error) {
             console.error(error);
             alert("Hubo un error al procesar. Intenta de nuevo."); 
+            magicOrderBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Audio Lesson';
+            magicOrderBtn.disabled = false;
+            magicOrderBtn.style.pointerEvents = 'auto';
+            magicOrderBtn.style.opacity = '1';
         }
 });
 }
@@ -326,23 +294,19 @@ if (processBtn) {
 }
 
 // ==========================================
-// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (DIRECTOR DE ORQUESTA & CACHÉ) 🧠
+// 🎙️ 4. MOTOR PREMIUM ELEVENLABS (CONEXIÓN SEGURA) 🧠
 // ==========================================
 
 const masterAudio = new Audio();
-let audioCache = {}; // 💰 LA CAJA FUERTE: Aquí guardamos audios para no pagar doble
+let audioCache = {}; 
 
-// Helper para pausas precisas
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper Visual para domar al navegador (Fuerza el pintado y el scroll)
 async function activateRowVisuals(row, borderColor, shadowColor) {
-    // Le damos un milisegundo al navegador para que respire
     await delay(50);
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
     row.style.borderColor = borderColor;
     row.style.boxShadow = `0 0 15px ${shadowColor}`;
-    // Le damos 150ms al navegador para que haga la animación visual ANTES de bloquearse con el audio
     await delay(150); 
 }
 
@@ -351,21 +315,13 @@ function deactivateRowVisuals(row) {
     row.style.boxShadow = "none";
 }
 
-// Motor individual (Botoncitos redondos)
 async function speakEleven(text, buttonElement) {
-    let elevenKey = localStorage.getItem('sophie_eleven_key');
-    if (!elevenKey) {
-        elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
-        if (!elevenKey) return; 
-        localStorage.setItem('sophie_eleven_key', elevenKey.trim());
-    }
-
     const originalIcon = buttonElement.innerHTML;
     buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     buttonElement.disabled = true;
 
     try {
-        const url = await getAudioFromCacheOrAPI(text, elevenKey);
+        const url = await getAudioFromCacheOrAPI(text);
         const audio = new Audio(url);
         audio.play();
 
@@ -377,9 +333,8 @@ async function speakEleven(text, buttonElement) {
     }
 }
 
-// 💽 EL DESCARGADOR INTELIGENTE (Ahora con soporte Multilingüe)
-async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4TlvDq8ikWAM") {
-    // Usamos el texto Y la voz como llave para no mezclar idiomas en la memoria
+// 💽 EL DESCARGADOR INTELIGENTE (AHORA LLAMA A NUESTRO ROBOT)
+async function getAudioFromCacheOrAPI(text, voiceId = "21m00Tcm4TlvDq8ikWAM") {
     const cacheKey = text + "_" + voiceId; 
     
     if (audioCache[cacheKey]) {
@@ -387,39 +342,29 @@ async function getAudioFromCacheOrAPI(text, apiKey, voiceId = "21m00Tcm4TlvDq8ik
         return audioCache[cacheKey];
     }
 
-    // Usamos la variable 'voiceId' que entra por la puerta
-    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    // 🔒 AQUÍ LLAMAMOS A TU TÚNEL SEGURO EN LUGAR DE A ELEVENLABS DIRECTAMENTE
+    const response = await fetch('/api/elevenlabs', {
         method: 'POST',
-        headers: {
-            'Accept': 'audio/mpeg',
-            'xi-api-key': apiKey,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            text: text + ".", // El hack del punto final para mejorar entonación
-            model_id: "eleven_multilingual_v2",
-            voice_settings: { stability: 0.50, similarity_boost: 0.50 }
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text, voiceId: voiceId })
     });
 
-    if (!response.ok) throw new Error("Fallo de saldo o conexión");
+    if (!response.ok) throw new Error("Fallo de conexión con el servidor de audio");
 
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
 
-    audioCache[cacheKey] = audioUrl; // Guardamos en la caja fuerte
+    audioCache[cacheKey] = audioUrl; 
     return audioUrl;
 }
 
-// 🎛️ REPRODUCTOR MAESTRO (Controla volumen y voces dinámicas)
-async function playAudioNode(text, apiKey, volume = 1.0, voiceId = "21m00Tcm4TlvDq8ikWAM") {
+async function playAudioNode(text, volume = 1.0, voiceId = "21m00Tcm4TlvDq8ikWAM") {
     if (!isPlaying) return;
     try {
-        // Le pasamos la voz específica al descargador inteligente
-        const url = await getAudioFromCacheOrAPI(text, apiKey, voiceId);
+        const url = await getAudioFromCacheOrAPI(text, voiceId);
         return new Promise((resolve) => {
             masterAudio.src = url;
-            masterAudio.volume = volume; // 🔥 El secreto del "suave" está aquí
+            masterAudio.volume = volume; 
             masterAudio.onended = resolve;
             masterAudio.onerror = () => resolve();
             masterAudio.play().catch(() => resolve());
@@ -439,34 +384,23 @@ if (playSessionBtn) {
             isPlaying = false;
             masterAudio.pause();
             playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
-            // Limpiamos los brillos que se hayan quedado pegados
             rows.forEach(r => deactivateRowVisuals(r));
             return;
-        }
-
-        let elevenKey = localStorage.getItem('sophie_eleven_key');
-        if (!elevenKey) {
-            elevenKey = prompt("🎙️ Pega tu API Key de ElevenLabs:");
-            if (!elevenKey) return;
-            localStorage.setItem('sophie_eleven_key', elevenKey.trim());
         }
 
         isPlaying = true;
         playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Detener Loop';
 
-        // Desbloqueo silencioso y ajuste de Rachel
         masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
         masterAudio.playbackRate = 0.90; 
         masterAudio.play().catch(() => {});
 
-        // 🧠 LÓGICA INTELIGENTE (Detecta TANTO el idioma 1 como el 2)
         let currentMode = langSelect ? langSelect.value : 'en-es';
         let parts = currentMode.split('-');
         
         let baseLangCode = isSwapped ? parts[1].toUpperCase() : parts[0].toUpperCase();
         let targetLangCode = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
         
-        // Asignamos los actores correctos para AMBOS micrófonos
         const vozBase = SOPHIE_VOICES[baseLangCode] || SOPHIE_VOICES["EN"];
         const vozMeta = SOPHIE_VOICES[targetLangCode] || SOPHIE_VOICES["DE"];
 
@@ -474,34 +408,27 @@ if (playSessionBtn) {
             // ==========================================
             // 🥇 FASE 1: Entrada suave (Morado) + AutoScroll
             // ==========================================
-            console.log("Iniciando FASE 1...");
             for (let row of rows) {
                 if (!isPlaying) break;
                 
-                // 🎥 MAGIA UI: Forzamos el Auto-Scroll con tiempo para el navegador
                 await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
                 
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // 1. EL ACTOR BASE LEE LA PALABRA 1 (¡Adiós acento gringo!)
-                await playAudioNode(A, elevenKey, 1.0, vozBase);
+                await playAudioNode(A, 1.0, vozBase);
                 if (!isPlaying) break;
                 await delay(500); 
 
-                // 2. EL ACTOR META LEE LA TRADUCCIÓN
-                await playAudioNode(B, elevenKey, 1.0, vozMeta);
+                await playAudioNode(B, 1.0, vozMeta);
                 if (!isPlaying) break;
                 
-                // 🗣️ MODO SHADOWING: 2.5 segundos de silencio perfecto para que el usuario repita
                 await delay(2500); 
 
-                // 3. EL ACTOR BASE REPITE SUAVE
-                await playAudioNode(A, elevenKey, 0.4, vozBase);
+                await playAudioNode(A, 0.4, vozBase);
                 if (!isPlaying) break;
                 await delay(1500);
                 
-                // Apagamos el brillo al terminar la tarjeta
                 deactivateRowVisuals(row);
             }
 
@@ -511,28 +438,25 @@ if (playSessionBtn) {
             // ==========================================
             // 🧠 FASE 2: Conexión activa (Amarillo Oro)
             // ==========================================
-            console.log("Iniciando FASE 2...");
             masterAudio.playbackRate = 0.92; 
             
             for (let row of rows) {
                 if (!isPlaying) break;
                 
-                // 🎥 MAGIA UI: Forzamos el Auto-Scroll también en Fase 2
                 await activateRowVisuals(row, "#fbbf24", "rgba(251,191,36,0.2)");
                 
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // Fase 2 también usa actores nativos
-                await playAudioNode(B, elevenKey, 1.0, vozMeta); await delay(1200);
+                await playAudioNode(B, 1.0, vozMeta); await delay(1200);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0, vozBase); await delay(2000); 
+                await playAudioNode(A, 1.0, vozBase); await delay(2000); 
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0, vozBase); await delay(1000);
+                await playAudioNode(A, 1.0, vozBase); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0, vozMeta); await delay(1000);
+                await playAudioNode(B, 1.0, vozMeta); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 0.82, vozBase); await delay(2000); 
+                await playAudioNode(A, 0.82, vozBase); await delay(2000); 
                 
                 deactivateRowVisuals(row);
             }
@@ -543,27 +467,23 @@ if (playSessionBtn) {
             // ==========================================
             // 🔥 FASE 3: Refuerzo (Verde Éxito)
             // ==========================================
-            console.log("Iniciando FASE 3...");
             masterAudio.playbackRate = 0.88; 
             
             for (let row of rows) {
                 if (!isPlaying) break;
                 
-                // 🎥 MAGIA UI: Forzamos el Auto-Scroll también en Fase 3
                 await activateRowVisuals(row, "#4ade80", "rgba(74,222,128,0.2)");
                 
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // Fase 3 usa actores nativos
-                await playAudioNode(A, elevenKey, 1.0, vozBase); await delay(2500); 
+                await playAudioNode(A, 1.0, vozBase); await delay(2500); 
                 if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0, vozMeta); await delay(2500);
+                await playAudioNode(B, 1.0, vozMeta); await delay(2500);
                 
                 deactivateRowVisuals(row);
             }
 
-            // --- LECTURA DEL EJEMPLO (OPCIONAL AL FINAL DE LA SESIÓN) ---
             const mode = audioMode ? audioMode.value : 'basic';
             if (mode === 'full' && isPlaying) {
                 await delay(2000);
@@ -571,9 +491,8 @@ if (playSessionBtn) {
                     if (!isPlaying) break;
                     let example = row.dataset.example;
                     if (example && example.trim() !== "") {
-                        // Animación final para la frase de ejemplo
                         await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
-                        await playAudioNode(example, elevenKey, 1.0, vozBase); 
+                        await playAudioNode(example, 1.0, vozBase); 
                         await delay(1500);
                         deactivateRowVisuals(row);
                     }
@@ -584,7 +503,6 @@ if (playSessionBtn) {
             if (error.message !== "Detenido") console.error(error);
         }
 
-        // LIMPIEZA FINAL
         isPlaying = false;
         rows.forEach(r => deactivateRowVisuals(r));
         playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
@@ -679,21 +597,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerToggleBtn = document.getElementById('playerToggleBtn');
     const playerSpeedBtn = document.getElementById('playerSpeedBtn');
 
-    // ⏸️ El botón de PAUSA / PLAY
     if (playerToggleBtn) {
         playerToggleBtn.onclick = () => {
             if (isPlaying) {
-                // Si está sonando -> Lo pausamos
                 isPlaying = false;
                 if(masterAudio) masterAudio.pause();
                 playerToggleBtn.innerHTML = '<i class="fas fa-play"></i> Reanudar';
-                playerToggleBtn.style.background = '#fbbf24'; // Se pone amarillo
+                playerToggleBtn.style.background = '#fbbf24'; 
                 playerToggleBtn.style.color = '#000';
             } else {
-                // Si está pausado -> Lo reanudamos
                 isPlaying = true;
                 const playBtn = document.getElementById('playSession');
-                if(playBtn) playBtn.click(); // Dispara el loop donde se quedó
+                if(playBtn) playBtn.click(); 
                 
                 playerToggleBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
                 playerToggleBtn.style.background = 'linear-gradient(135deg, #bb86fc 0%, #7c3aed 100%)';
@@ -702,7 +617,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // ⏱️ El botón de VELOCIDAD (1x -> 0.8x -> 1.2x)
     let currentSpeed = 1.0;
     if (playerSpeedBtn) {
         playerSpeedBtn.onclick = () => {
