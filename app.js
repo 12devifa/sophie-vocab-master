@@ -335,6 +335,22 @@ let audioCache = {}; // 💰 LA CAJA FUERTE: Aquí guardamos audios para no paga
 // Helper para pausas precisas
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Helper Visual para domar al navegador (Fuerza el pintado y el scroll)
+async function activateRowVisuals(row, borderColor, shadowColor) {
+    // Le damos un milisegundo al navegador para que respire
+    await delay(50);
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.style.borderColor = borderColor;
+    row.style.boxShadow = `0 0 15px ${shadowColor}`;
+    // Le damos 150ms al navegador para que haga la animación visual ANTES de bloquearse con el audio
+    await delay(150); 
+}
+
+function deactivateRowVisuals(row) {
+    row.style.borderColor = "var(--border-color)";
+    row.style.boxShadow = "none";
+}
+
 // Motor individual (Botoncitos redondos)
 async function speakEleven(text, buttonElement) {
     let elevenKey = localStorage.getItem('sophie_eleven_key');
@@ -423,6 +439,8 @@ if (playSessionBtn) {
             isPlaying = false;
             masterAudio.pause();
             playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+            // Limpiamos los brillos que se hayan quedado pegados
+            rows.forEach(r => deactivateRowVisuals(r));
             return;
         }
 
@@ -441,7 +459,7 @@ if (playSessionBtn) {
         masterAudio.playbackRate = 0.90; 
         masterAudio.play().catch(() => {});
 
-// 🧠 LÓGICA INTELIGENTE (Detecta TANTO el idioma 1 como el 2)
+        // 🧠 LÓGICA INTELIGENTE (Detecta TANTO el idioma 1 como el 2)
         let currentMode = langSelect ? langSelect.value : 'en-es';
         let parts = currentMode.split('-');
         
@@ -460,14 +478,8 @@ if (playSessionBtn) {
             for (let row of rows) {
                 if (!isPlaying) break;
                 
-                // 🎥 MAGIA UI: Forzamos el Auto-Scroll con un micro-retraso para que el navegador obedezca
-                setTimeout(() => {
-                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 50);
-
-                // ✨ DEVOLVEMOS EL COLOR MORADO Y EL BRILLO ✨
-                row.style.borderColor = "var(--accent-purple)";
-                row.style.boxShadow = "0 0 15px rgba(187,134,252,0.2)"; 
+                // 🎥 MAGIA UI: Forzamos el Auto-Scroll con tiempo para el navegador
+                await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
                 
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
@@ -490,9 +502,11 @@ if (playSessionBtn) {
                 await delay(1500);
                 
                 // Apagamos el brillo al terminar la tarjeta
-                row.style.borderColor = "var(--border-color)";
-                row.style.boxShadow = "none";
+                deactivateRowVisuals(row);
             }
+
+            if (!isPlaying) throw new Error("Detenido");
+            await delay(3000);
 
             // ==========================================
             // 🧠 FASE 2: Conexión activa (Amarillo Oro)
@@ -502,26 +516,25 @@ if (playSessionBtn) {
             
             for (let row of rows) {
                 if (!isPlaying) break;
-                // ✨ COLOR AMARILLO ORO ✨
-                row.style.borderColor = "#fbbf24"; 
-                row.style.boxShadow = "0 0 15px rgba(251,191,36,0.2)";
+                
+                // 🎥 MAGIA UI: Forzamos el Auto-Scroll también en Fase 2
+                await activateRowVisuals(row, "#fbbf24", "rgba(251,191,36,0.2)");
                 
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // Ahora la Fase 2 también usa al Profesor Invitado
-                await playAudioNode(B, elevenKey, 1.0, profInvitado); await delay(1200);
+                // Fase 2 también usa actores nativos
+                await playAudioNode(B, elevenKey, 1.0, vozMeta); await delay(1200);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]); await delay(2000); 
+                await playAudioNode(A, elevenKey, 1.0, vozBase); await delay(2000); 
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]); await delay(1000);
+                await playAudioNode(A, elevenKey, 1.0, vozBase); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0, profInvitado); await delay(1000);
+                await playAudioNode(B, elevenKey, 1.0, vozMeta); await delay(1000);
                 if (!isPlaying) break;
-                await playAudioNode(A, elevenKey, 0.82, SOPHIE_VOICES["EN"]); await delay(2000); 
+                await playAudioNode(A, elevenKey, 0.82, vozBase); await delay(2000); 
                 
-                row.style.borderColor = "var(--border-color)";
-                row.style.boxShadow = "none";
+                deactivateRowVisuals(row);
             }
 
             if (!isPlaying) throw new Error("Detenido");
@@ -535,20 +548,19 @@ if (playSessionBtn) {
             
             for (let row of rows) {
                 if (!isPlaying) break;
-                // ✨ COLOR VERDE ✨
-                row.style.borderColor = "#4ade80"; 
-                row.style.boxShadow = "0 0 15px rgba(74,222,128,0.2)";
+                
+                // 🎥 MAGIA UI: Forzamos el Auto-Scroll también en Fase 3
+                await activateRowVisuals(row, "#4ade80", "rgba(74,222,128,0.2)");
                 
                 let A = row.dataset.text1;
                 let B = row.dataset.text2;
 
-                // La Fase 3 también usa al Profesor Invitado
-                await playAudioNode(A, elevenKey, 1.0, SOPHIE_VOICES["EN"]); await delay(2500); 
+                // Fase 3 usa actores nativos
+                await playAudioNode(A, elevenKey, 1.0, vozBase); await delay(2500); 
                 if (!isPlaying) break;
-                await playAudioNode(B, elevenKey, 1.0, profInvitado); await delay(2500);
+                await playAudioNode(B, elevenKey, 1.0, vozMeta); await delay(2500);
                 
-                row.style.borderColor = "var(--border-color)";
-                row.style.boxShadow = "none";
+                deactivateRowVisuals(row);
             }
 
             // --- LECTURA DEL EJEMPLO (OPCIONAL AL FINAL DE LA SESIÓN) ---
@@ -559,13 +571,11 @@ if (playSessionBtn) {
                     if (!isPlaying) break;
                     let example = row.dataset.example;
                     if (example && example.trim() !== "") {
-                        // Le damos un brillo morado cuando lee la frase final
-                        row.style.borderColor = "var(--accent-purple)";
-                        row.style.boxShadow = "0 0 15px rgba(187,134,252,0.2)";
-                        await playAudioNode(example, elevenKey, 1.0, SOPHIE_VOICES["EN"]); 
+                        // Animación final para la frase de ejemplo
+                        await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
+                        await playAudioNode(example, elevenKey, 1.0, vozBase); 
                         await delay(1500);
-                        row.style.borderColor = "var(--border-color)";
-                        row.style.boxShadow = "none";
+                        deactivateRowVisuals(row);
                     }
                 }
             }
@@ -576,6 +586,7 @@ if (playSessionBtn) {
 
         // LIMPIEZA FINAL
         isPlaying = false;
+        rows.forEach(r => deactivateRowVisuals(r));
         playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
     };
 }
