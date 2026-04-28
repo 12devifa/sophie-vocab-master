@@ -292,9 +292,11 @@ if (magicOrderBtn) {
 // --- 3. CREAR TARJETAS VISUALES ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
+        labList.innerHTML = ''; // Esto vacía la pizarra antes de escribir lo nuevo
+window.speechSynthesis.cancel(); // Por si acaso había algo sonando, lo calla
         const rawText = textInput.value;
         if (!rawText.trim()) return;
-        if(labList) labList.innerHTML = '';
+        
         
         const lines = rawText.split('\n');
         const config = getLangConfig(langSelect.value, isSwapped);
