@@ -1,7 +1,6 @@
 const translations = {
     en: {
-        title: "SOPHIE | Vocab Master",
-        generateBtn: "GENERATE LESSON",
+        generateBtn: "START LEARNING",
         generating: "Generating...",
         library: "My Library",
         playAll: "Play All",
@@ -10,8 +9,7 @@ const translations = {
         vocabExamples: "Vocab + Examples"
     },
     de: {
-        title: "SOPHIE | Vokabel-Meister",
-        generateBtn: "LEKTION ERSTELLEN",
+        generateBtn: "LERNEN STARTEN",
         generating: "Erstelle...",
         library: "Meine Bibliothek",
         playAll: "Alle abspielen",
@@ -22,20 +20,39 @@ const translations = {
 };
 
 function changeLanguage(lang) {
-    // 1. Guardar la preferencia
+    // Guardar el idioma en la memoria del teléfono/PC
     localStorage.setItem('sophie_lang', lang);
-    
-    // 2. Actualizar textos en la pantalla
     const t = translations[lang];
     
-    document.querySelector('.library-title-text').innerHTML = `<i class="fas fa-archive"></i> ${t.library}`;
-    document.getElementById('btn-play-all').innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
-    document.querySelector('#btn-generate').innerHTML = `<i class="fas fa-magic"></i> ${t.generateBtn}`;
-    
-    // Actualizar el selector visual
+    // 1. Mover el color morado al botón correcto (¡Aquí estaba el error corregido!)
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(lang === 'en' ? 'btn-en' : 'id-de').classList.add('active');
+    const activeBtn = document.getElementById(lang === 'en' ? 'btn-en' : 'btn-de');
+    if (activeBtn) activeBtn.classList.add('active');
+    
+    // 2. Traducir la Biblioteca
+    const libTitle = document.querySelector('.library-title-text');
+    if (libTitle) libTitle.innerHTML = `<i class="fas fa-archive"></i> ${t.library}`;
+    
+    // 3. Traducir el botón de Escuchar Todo (solo si no está reproduciendo)
+    const playAllBtn = document.getElementById('btn-play-all');
+    if (playAllBtn && !playAllBtn.innerHTML.includes('fa-stop')) {
+        playAllBtn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
+    }
+    
+    // 4. Traducir el desplegable (Dropdown)
+    const optVocab = document.querySelector('option[value="solo_vocabulario"]');
+    if (optVocab) optVocab.textContent = t.vocabOnly;
+    
+    const optEx = document.querySelector('option[value="completo"]');
+    if (optEx) optEx.textContent = t.vocabExamples;
 }
+
+// Magia Extra: Que se ponga en Alemán automáticamente al abrir la app
+document.addEventListener('DOMContentLoaded', () => {
+    // Busca si ya eligió idioma antes, si no, usa 'de' (Alemán) por defecto
+    const savedLang = localStorage.getItem('sophie_lang') || 'de'; 
+    changeLanguage(savedLang);
+});
 
 
 // ==========================================
