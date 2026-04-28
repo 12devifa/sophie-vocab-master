@@ -436,6 +436,7 @@ async function playAudioNode(text, volume = 1.0, voiceId = "21m00Tcm4TlvDq8ikWAM
 // 🎼 LÓGICA DEL BOTÓN ESCUCHAR TODO (EL DIRECTOR DE ORQUESTA)
 if (playSessionBtn) {
     playSessionBtn.onclick = async () => {
+        window.speechSynthesis.cancel(); // 🛑 ¡LA REGLA DE ORO! Borra el historial de audios pendientes
         const rows = document.querySelectorAll('.lab-row');
         if (rows.length === 0) return alert("Procesa una lección primero.");
 
