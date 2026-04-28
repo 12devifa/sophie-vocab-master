@@ -761,3 +761,28 @@ function renderLibrary() {
 
 // Para que la biblioteca se dibuje nada más abrir la app:
 document.addEventListener('DOMContentLoaded', renderLibrary);
+
+// --- REGLA 2: EXPORTAR LECCIÓN (.txt) ---
+const btnExport = document.getElementById('btn-export');
+
+if (btnExport) {
+    btnExport.addEventListener('click', () => {
+        const labList = document.getElementById('labList');
+        if (!labList || labList.innerText.trim() === '') {
+            alert('No hay ninguna lección para exportar todavía.');
+            return;
+        }
+
+        const contenido = "SOPHIE AI - Repaso de Vocabulario\n==========================\n\n" + labList.innerText;
+        const blob = new Blob([contenido], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'SOPHIE_Leccion.txt'; 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+}
