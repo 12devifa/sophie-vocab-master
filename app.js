@@ -694,3 +694,70 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
+
+
+// ==========================================
+// 📚 BÓVEDA NOTEBOOKLM (LOCALSTORAGE)
+// ==========================================
+
+// 1. Función para GUARDAR la lección actual
+function saveToNotebook() {
+    const labList = document.getElementById('labList');
+    const rawText = document.getElementById('textInput').value;
+    
+    // Si la pizarra está vacía, no guardamos nada
+    if (!labList || labList.innerHTML.trim() === '') return;
+
+    // Generamos un título cortito basado en lo que el usuario pegó (primeras 3 palabras)
+    const previewTitle = rawText.split(' ').slice(0, 3).join(' ') + '...';
+    
+    // Obtenemos la biblioteca guardada, o creamos una lista vacía si es nuevo
+    let library = JSON.parse(localStorage.getItem('sophie_notebooks')) || [];
+
+    // Creamos el nuevo "cuaderno"
+    const newNotebook = {
+        id: Date.now(), // Un ID único
+        title: previewTitle,
+        date: new Date().toLocaleDateString('de-CH'), // Formato de fecha suizo
+        htmlContent: labList.innerHTML // Guardamos el vocabulario ya generado!
+    };
+
+    // Lo metemos al principio de la lista y guardamos en el navegador
+    library.unshift(newNotebook);
+    localStorage.setItem('sophie_notebooks', JSON.stringify(library));
+    
+    // Refrescamos la vista de la biblioteca
+    renderLibrary();
+}
+
+// 2. Función para MOSTRAR las tarjetas en tu "Mi Biblioteca"
+function renderLibrary() {
+    // Busca el contenedor que ya tienes en tu diseño (notebookGallery)
+    const gallery = document.getElementById('notebookGallery');
+    if (!gallery) return;
+
+    let library = JSON.parse(localStorage.getItem('sophie_notebooks')) || [];
+    gallery.innerHTML = ''; // Limpiamos antes de dibujar
+
+    library.forEach(notebook => {
+        // Creamos la tarjeta visual
+        const card = document.createElement('div');
+        card.className = 'notebook-card'; // Asegúrate de tener estilo para esto en CSS
+        card.innerHTML = `
+            <h4>${notebook.title}</h4>
+            <span class="notebook-date">${notebook.date}</span>
+        `;
+        
+        // 3. Función para CARGAR la lección al hacer clic en la tarjeta
+        card.addEventListener('click', () => {
+            const labList = document.getElementById('labList');
+            labList.innerHTML = notebook.htmlContent;
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube la pantalla arriba
+        });
+
+        gallery.appendChild(card);
+    });
+}
+
+// Para que la biblioteca se dibuje nada más abrir la app:
+document.addEventListener('DOMContentLoaded', renderLibrary);
