@@ -1,3 +1,43 @@
+const translations = {
+    en: {
+        title: "SOPHIE | Vocab Master",
+        generateBtn: "GENERATE LESSON",
+        generating: "Generating...",
+        library: "My Library",
+        playAll: "Play All",
+        stop: "Stop",
+        vocabOnly: "Vocabulary Only",
+        vocabExamples: "Vocab + Examples"
+    },
+    de: {
+        title: "SOPHIE | Vokabel-Meister",
+        generateBtn: "LEKTION ERSTELLEN",
+        generating: "Erstelle...",
+        library: "Meine Bibliothek",
+        playAll: "Alle abspielen",
+        stop: "Stopp",
+        vocabOnly: "Nur Vokabeln",
+        vocabExamples: "Vokabeln + Beispiele"
+    }
+};
+
+function changeLanguage(lang) {
+    // 1. Guardar la preferencia
+    localStorage.setItem('sophie_lang', lang);
+    
+    // 2. Actualizar textos en la pantalla
+    const t = translations[lang];
+    
+    document.querySelector('.library-title-text').innerHTML = `<i class="fas fa-archive"></i> ${t.library}`;
+    document.getElementById('btn-play-all').innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
+    document.querySelector('#btn-generate').innerHTML = `<i class="fas fa-magic"></i> ${t.generateBtn}`;
+    
+    // Actualizar el selector visual
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(lang === 'en' ? 'btn-en' : 'id-de').classList.add('active');
+}
+
+
 // ==========================================
 // 🎙️ ELENCO DE VOCES "NOTEBOOK LM" (Relajantes y conversacionales)
 // ==========================================
