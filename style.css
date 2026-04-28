@@ -1040,3 +1040,32 @@ body {
     border-color: #c084fc;
     box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
 }
+
+
+
+
+.notebook-card {
+    background: #151515;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.notebook-card:hover {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: #a855f7;
+}
+
+.notebook-card h4 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    color: white;
+}
+
+.notebook-card .notebook-date {
+    font-size: 11px;
+    color: #888;
+}
