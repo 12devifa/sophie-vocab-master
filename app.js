@@ -1,3 +1,38 @@
+// ==========================================
+// 🌍 DICCIONARIO DE LA INTERFAZ (i18n)
+// ==========================================
+const uiTranslations = {
+    en: {
+        mainTitle: "Learn exactly what you need",
+        subTitle: "Turn your words into mastery",
+        btnAuto: "Auto",
+        btnWork: "Work",
+        btnTravel: "Travel",
+        btnExam: "Exam",
+        fiveMins: "Even 5 minutes makes a difference",
+        startLoop: "START YOUR LOOP",
+        learnCommuting: "Learn while commuting, working or resting",
+        smartLearning: "Smart learning powered by AI",
+        trainBrain: "Train your brain",
+        myLibrary: "Mi Biblioteca" 
+    },
+    de: {
+        mainTitle: "Lerne genau das, was du brauchst",
+        subTitle: "Verwandle deine Worte in Meisterschaft",
+        btnAuto: "Auto",
+        btnWork: "Arbeit",
+        btnTravel: "Reisen",
+        btnExam: "Prüfung",
+        fiveMins: "Schon 5 Minuten machen einen Unterschied",
+        startLoop: "LERNEN STARTEN",
+        learnCommuting: "Lerne beim Pendeln, Arbeiten oder Ausruhen",
+        smartLearning: "Intelligentes Lernen mit KI",
+        trainBrain: "Trainiere dein Gehirn",
+        myLibrary: "Meine Bibliothek"
+    }
+};
+
+
 const translations = {
     en: {
         generateBtn: "START LEARNING",
