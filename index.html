@@ -146,7 +146,7 @@
             <button class="tool-btn" title="My Library" onclick="document.getElementById('cognitiveDashboard').style.display = 'block'; updateDashboardStats();"><i class="fas fa-folder-open"></i></button>
         </section>
             <section class="lab-section">
-                <h2><i class="fas fa-brain"></i> Train your brain</h2>
+                <h2 data-translate="trainBrain"><i class="fas fa-brain"></i> Train your brain</h2>
 <div class="controls-row">
     <select id="audioMode">
         <option value="basic">Sólo Vocabulario</option>
@@ -157,9 +157,9 @@
         <i class="fas fa-gauge"></i> <span id="speedValue">1x</span>
     </button>
 
-    <button id="playSession" class="icon-btn" style="width: auto; padding: 0 15px; gap: 8px;">
-        <i class="fas fa-play"></i> Escuchar todo
-    </button>
+    <button id="btn-play-all" class="icon-btn" data-translate="playAll">
+    <i class="fas fa-play"></i> Escuchar todo
+</button>
     <button id="btn-export" class="icon-btn" style="width: auto; padding: 0 15px; gap: 8px; margin-left: 10px;">
     <i class="fas fa-download"></i> Exportar
 </button>
@@ -170,7 +170,7 @@
             </section>
 
             <section class="gallery-section">
-                <h2><i class="fas fa-box-archive"></i> Mi Biblioteca</h2>
+               <h2 class="library-title-text" data-translate="library"><i class="fas fa-archive"></i> Mi Biblioteca</h2>
                 <div id="notebookGallery">
                     </div>
             </section>
