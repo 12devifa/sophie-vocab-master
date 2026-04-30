@@ -63,12 +63,13 @@ function changeLanguage(lang) {
         playAllBtn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
     }
     
-    // 4. Traducir el desplegable (Dropdown)
-    const optVocab = document.querySelector('option[value="basic"]');
-    if (optVocab) optVocab.textContent = t.vocabOnly;
-
-    const optEx = document.querySelector('option[value="full"]');
-    if (optEx) optEx.textContent = t.vocabExamples;
+// 4. Traducir los desplegables (Dropdowns) - ¡Todos ellos!
+    document.querySelectorAll('option[value="basic"]').forEach(opt => {
+        opt.textContent = t.vocabOnly;
+    });
+    document.querySelectorAll('option[value="full"]').forEach(opt => {
+        opt.textContent = t.vocabExamples;
+    });
 
     // // 5. Traducir los textos visuales del HTML (NUEVO)
     const elementsToTranslate = document.querySelectorAll('[data-translate]');
