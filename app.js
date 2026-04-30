@@ -45,16 +45,15 @@ const translations = {
         stop: "Stopp",
         vocabOnly: "Nur Vokabeln",
         vocabExamples: "Vokabeln + Beispiele",
-        exportBtn: "<i class=\"fas fa-download\"></i> Exportieren",
+       exportBtn: "<i class=\"fas fa-download\"></i> Exportieren",
         placeholderText: "Füge alles ein, was du lernen musst...\nNotizen, Phrasen, Last-Minute-Vorbereitung...",
-        <select id="langSelect">
-    <option value="en-es" data-translate="langEnEs">EN English → ES Español</option>
-    <option value="fr-de" data-translate="langFrDe">FR Français → DE Deutsch</option>
-    <option value="de-es" data-translate="langDeEs">DE Deutsch → ES Español</option>
-    <option value="de-en" data-translate="langDeEn">DE Deutsch → EN English</option>
-    <option value="pt-de" data-translate="langPtDe">PT Português → DE Deutsch</option>
-    <option value="es-de" data-translate="langEsDe">ES Español → DE Deutsch</option>
-</select>
+        // Opciones de idiomas del selector
+        langEnEs: "EN Englisch → ES Spanisch",
+        langFrDe: "FR Französisch → DE Deutsch",
+        langDeEs: "DE Deutsch → ES Spanisch",
+        langDeEn: "DE Deutsch → EN Englisch",
+        langPtDe: "PT Portugiesisch → DE Deutsch",
+        langEsDe: "ES Spanisch → DE Deutsch"
     }
 };
 
