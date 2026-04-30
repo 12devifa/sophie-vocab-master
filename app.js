@@ -1,9 +1,5 @@
-
-
-
 const translations = {
     en: {
-        // Textos de la interfaz (Nuevos)
         mainTitle: "Learn exactly what you need",
         subTitle: "Turn your words into mastery",
         btnAuto: "✨ Auto",
@@ -14,18 +10,17 @@ const translations = {
         learnCommuting: "🎧 Learn while commuting, working or resting",
         smartLearning: "✨ Smart learning powered by AI",
         trainBrain: "🧠 Train your brain",
-        
-        // Textos de tus botones de abajo (Los que ya tenías)
         generateBtn: "▶ START LEARNING",
         generating: "Generating...",
         library: "🗃️ My Library",
         playAll: "Play All",
         stop: "Stop",
         vocabOnly: "Vocabulary Only",
-        vocabExamples: "Vocab + Examples"
+        vocabExamples: "Vocab + Examples",
+        exportBtn: "<i class=\"fas fa-download\"></i> Export",
+        placeholderText: "Paste anything you need to learn...\nNotes, phrases, last-minute prep..."
     },
     de: {
-        // Textos de la interfaz (Nuevos)
         mainTitle: "Lerne genau das, was du brauchst",
         subTitle: "Verwandle deine Worte in Meisterschaft",
         btnAuto: "✨ Auto",
@@ -36,15 +31,15 @@ const translations = {
         learnCommuting: "🎧 Lerne beim Pendeln, Arbeiten oder Ausruhen",
         smartLearning: "✨ Intelligentes Lernen mit KI",
         trainBrain: "🧠 Trainiere dein Gehirn",
-        
-        // Textos de tus botones de abajo (Los que ya tenías)
         generateBtn: "▶ LERNEN STARTEN",
         generating: "Erstelle...",
         library: "🗃️ Meine Bibliothek",
         playAll: "Alle abspielen",
         stop: "Stopp",
         vocabOnly: "Nur Vokabeln",
-        vocabExamples: "Vokabeln + Beispiele"
+        vocabExamples: "Vokabeln + Beispiele",
+        exportBtn: "<i class=\"fas fa-download\"></i> Exportieren",
+        placeholderText: "Füge alles ein, was du lernen musst...\nNotizen, Phrasen, Last-Minute-Vorbereitung..."
     }
 };
 
@@ -69,10 +64,10 @@ function changeLanguage(lang) {
     }
     
     // 4. Traducir el desplegable (Dropdown)
-    const optVocab = document.querySelector('option[value="solo_vocabulario"]');
+    const optVocab = document.querySelector('option[value="basic"]');
     if (optVocab) optVocab.textContent = t.vocabOnly;
-    
-    const optEx = document.querySelector('option[value="completo"]');
+
+    const optEx = document.querySelector('option[value="full"]');
     if (optEx) optEx.textContent = t.vocabExamples;
 
     // // 5. Traducir los textos visuales del HTML (NUEVO)
