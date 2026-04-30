@@ -20,12 +20,12 @@ const translations = {
         exportBtn: "<i class=\"fas fa-download\"></i> Export",
         placeholderText: "Paste anything you need to learn...\nNotes, phrases, last-minute prep...",
         // Opciones de idiomas del selector
-        langEnEs: "EN Englisch → ES Spanisch",
-        langFrDe: "FR Französisch → DE Deutsch",
-        langDeEs: "DE Deutsch → ES Spanisch",
-        langDeEn: "DE Deutsch → EN Englisch",
-        langPtDe: "PT Portugiesisch → DE Deutsch",
-        langEsDe: "ES Spanisch → DE Deutsch"
+        langEnEs: "EN English → ES Spanish",
+        langFrDe: "FR French → DE German",
+        langDeEs: "DE German → ES Spanish",
+        langDeEn: "DE German → EN English",
+        langPtDe: "PT Portuguese → DE German",
+        langEsDe: "ES Spanish → DE German"
     },
     de: {
         mainTitle: "Lerne genau das, was du brauchst",
