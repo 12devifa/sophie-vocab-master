@@ -317,17 +317,21 @@ if (magicOrderBtn) {
             magicOrderBtn.style.pointerEvents = 'auto';
             magicOrderBtn.style.opacity = '1';
             
-// 🚀 NUEVO BLOQUE: EXPERIENCIA PREMIUM (AUTO-PLAY + SCROLL)
+// 🚀 NUEVO BLOQUE: EXPERIENCIA PREMIUM (SISTEMA ANTI-CHOQUE)
 magicOrderBtn.onclick = (e) => {
     if(e) e.preventDefault();
     
-    // 1. Limpiamos la pantalla ocultando el botón verde (Cero distracciones)
+    // 1. Limpiamos la pantalla (Cero distracciones)
     magicOrderBtn.style.display = 'none';
     
-    // 2. ¡AUTO-PLAY DIRECTO! Invocamos al cerebro del loop sin depender de botones físicos
-    if (!isPlaying && typeof startLoopProcess === 'function') {
-        startLoopProcess();
-    }
+    // 2. Le damos 100 milisegundos al navegador para que la pantalla se acomode tras ocultar el botón
+    setTimeout(() => {
+        // 3. ¡AUTO-PLAY DIRECTO! Arranca la voz y el elevador baja suavemente a la primera tarjeta
+        if (!isPlaying && typeof startLoopProcess === 'function') {
+            startLoopProcess();
+        }
+    }, 100);
+};
     
     // 3. AUTO-SCROLL MÁGICO: Bajamos directo a la primera tarjeta
     setTimeout(() => {
