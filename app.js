@@ -317,19 +317,31 @@ if (magicOrderBtn) {
             magicOrderBtn.style.pointerEvents = 'auto';
             magicOrderBtn.style.opacity = '1';
             
-            magicOrderBtn.onclick = (e) => {
-                if(e) e.preventDefault();
-                const playBtn = document.getElementById('playSession');
-                
-                magicOrderBtn.style.display = 'none';
-                const masterPanel = document.getElementById('masterPlayerPanel');
-                if(masterPanel) masterPanel.style.display = 'block';
-
-                if(playBtn) {
-                    if(!isPlaying) playBtn.click(); 
-                    document.querySelector('.lab-section').scrollIntoView({ behavior: 'smooth' });
-                }
-            };
+// 🚀 NUEVO BLOQUE: EXPERIENCIA PREMIUM (AUTO-PLAY + SCROLL)
+magicOrderBtn.onclick = (e) => {
+    if(e) e.preventDefault();
+    
+    // 1. Limpiamos la pantalla ocultando el botón verde (Cero distracciones)
+    magicOrderBtn.style.display = 'none';
+    
+    // 2. ¡AUTO-PLAY DIRECTO! Invocamos al cerebro del loop sin depender de botones físicos
+    if (!isPlaying && typeof startLoopProcess === 'function') {
+        startLoopProcess();
+    }
+    
+    // 3. AUTO-SCROLL MÁGICO: Bajamos directo a la primera tarjeta
+    setTimeout(() => {
+        const firstCard = document.querySelector('.lab-row');
+        if (firstCard) {
+            // Si hay tarjetas, bajamos suavemente hasta la primera para verla iluminarse
+            firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            // Si por alguna razón no hay, bajamos al panel general
+            const labList = document.getElementById('labList');
+            if (labList) labList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 400); // Le damos 400 milisegundos a la interfaz para que respire antes de moverse
+};
 
             magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
