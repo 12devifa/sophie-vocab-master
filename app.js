@@ -27,7 +27,25 @@ const translations = {
         langDeEs: "DE German → ES Spanish",
         langDeEn: "DE German → EN English",
         langPtDe: "PT Portuguese → DE German",
-        langEsDe: "ES Spanish → DE German"
+        langEsDe: "ES Spanish → DE German",
+        
+        // ✨ NUEVOS TEXTOS DEL PANEL EN VIVO ✨
+        panelTitle: "Learning in progress",
+        panelSubtitle: "Adapts in real time",
+        statListening: "Listening",
+        statTerms: "Active terms",
+        statStatus: "Loop status",
+        passiveTitle: "Passive learning",
+        statusPaused: "Paused",
+        statusRunning: "Running",
+        statusFinished: "Finished",
+        feedbackPaused: "Loop paused. Ready when you are.",
+        feedbackRunning: "Your brain is adapting through repetition...",
+        feedbackFinished: "Great session! Ready for more?",
+        btnResume: "Resume your loop",
+        btnPause: "Pause loop",
+        btnStartOver: "Start over",
+        btnStartLoop: "Start your loop"
     },
     de: {
         mainTitle: "Lerne genau das, was du brauchst",
@@ -54,7 +72,25 @@ const translations = {
         langDeEs: "DE Deutsch → ES Spanisch",
         langDeEn: "DE Deutsch → EN Englisch",
         langPtDe: "PT Portugiesisch → DE Deutsch",
-        langEsDe: "ES Spanisch → DE Deutsch"
+        langEsDe: "ES Spanisch → DE Deutsch",
+
+        // ✨ NUEVOS TEXTOS DEL PANEL EN VIVO ✨
+        panelTitle: "Lernen im Gange",
+        panelSubtitle: "Passt sich in Echtzeit an",
+        statListening: "Zuhören",
+        statTerms: "Aktive Begriffe",
+        statStatus: "Loop-Status",
+        passiveTitle: "Passives Lernen",
+        statusPaused: "Pausiert",
+        statusRunning: "Läuft",
+        statusFinished: "Beendet",
+        feedbackPaused: "Loop pausiert. Bereit, wenn du es bist.",
+        feedbackRunning: "Dein Gehirn passt sich durch Wiederholung an...",
+        feedbackFinished: "Tolle Sitzung! Bereit für mehr?",
+        btnResume: "Loop fortsetzen",
+        btnPause: "Loop pausieren",
+        btnStartOver: "Neu starten",
+        btnStartLoop: "Starte deinen Loop"
     }
 };
 
