@@ -494,29 +494,29 @@ async function playAudioNode(text, volume = 1.0, voiceId = "21m00Tcm4TlvDq8ikWAM
 // 🎼 LÓGICA DEL BOTÓN ESCUCHAR TODO Y PANEL EN VIVO
 // ==========================================
 
-// Conectamos todos los botones de "Play" (El de arriba y el nuevo del panel iOS)
 const playBtns = [
     document.getElementById('playSession'), 
     document.getElementById('btn-play-all'), 
     document.getElementById('btn-resume-loop')
 ].filter(Boolean);
 
-// Variables para el reloj del panel en vivo
 let listeningTimer = null;
 let secondsListened = 0;
 
 const startLoopProcess = async () => {
-    window.speechSynthesis.cancel(); // 🛑 ¡LA REGLA DE ORO! Borra memoria residual
+    window.speechSynthesis.cancel(); // 🛑 REGLA DE ORO: Sin memoria residual
     const rows = document.querySelectorAll('.lab-row');
     if (rows.length === 0) return alert("Procesa una lección primero.");
 
-    // Conexiones al nuevo Panel en Vivo
+    // Leemos el idioma actual para no forzar el español
+    const currentLang = localStorage.getItem('sophie_lang') || 'en';
+    const t = translations[currentLang] || translations['en'];
+
     const statLoop = document.getElementById('stat-loop');
     const statTerms = document.getElementById('stat-terms');
     const statListening = document.getElementById('stat-listening');
     const dynamicFeedback = document.getElementById('dynamic-feedback');
     
-    // 1. Actualizamos los términos activos al instante
     if(statTerms) statTerms.innerText = rows.length;
 
     // 2. Si ya estaba sonando, lo Pausamos
@@ -525,7 +525,7 @@ const startLoopProcess = async () => {
         masterAudio.pause();
         playBtns.forEach(btn => {
             if(btn.id === 'btn-resume-loop') btn.innerText = "Resume your loop";
-            else btn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+            else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`; // ¡Traducción dinámica!
         });
         if(statLoop) { statLoop.innerText = "Paused"; statLoop.className = "status-value paused"; }
         if(dynamicFeedback) dynamicFeedback.innerText = "Loop paused. Ready when you are.";
@@ -538,13 +538,18 @@ const startLoopProcess = async () => {
     isPlaying = true;
     playBtns.forEach(btn => {
         if(btn.id === 'btn-resume-loop') btn.innerText = "Pause loop";
-        else btn.innerHTML = '<i class="fas fa-pause"></i> Detener Loop';
+        else btn.innerHTML = `<i class="fas fa-pause"></i> ${t.stop}`; // ¡Traducción dinámica!
     });
     
     if(statLoop) { statLoop.innerText = "Running"; statLoop.className = "status-value running"; }
     if(dynamicFeedback) dynamicFeedback.innerText = "Your brain is adapting through repetition...";
     
-    // Arrancamos el cronómetro en vivo
+    // 🚀 MAGIA RECUPERADA: Auto-scroll al inicio de la lección
+    const firstRow = rows[0];
+    if (firstRow) {
+        firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     clearInterval(listeningTimer);
     listeningTimer = setInterval(() => {
         secondsListened++;
@@ -552,7 +557,6 @@ const startLoopProcess = async () => {
         const secs = secondsListened % 60;
         if(statListening) statListening.innerText = `${mins}:${secs.toString().padStart(2, '0')} min`;
         
-        // Gamificación pasiva (XP) súper ligera (Sin base de datos)
         const passiveXp = document.getElementById('passive-xp');
         if(passiveXp && secondsListened % 10 === 0) passiveXp.innerText = parseInt(passiveXp.innerText) + 5;
         const passiveMins = document.getElementById('passive-mins');
@@ -573,7 +577,6 @@ const startLoopProcess = async () => {
     const vozMeta = SOPHIE_VOICES[targetLangCode] || SOPHIE_VOICES["DE"];
 
     try {
-        // FASE 1 (Morado)
         for (let row of rows) {
             if (!isPlaying) break;
             await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
@@ -586,7 +589,6 @@ const startLoopProcess = async () => {
         if (!isPlaying) throw new Error("Detenido");
         await delay(3000);
 
-        // FASE 2 (Amarillo)
         masterAudio.playbackRate = 0.92; 
         for (let row of rows) {
             if (!isPlaying) break;
@@ -602,7 +604,6 @@ const startLoopProcess = async () => {
         if (!isPlaying) throw new Error("Detenido");
         await delay(3000);
 
-        // FASE 3 (Verde)
         masterAudio.playbackRate = 0.88; 
         for (let row of rows) {
             if (!isPlaying) break;
@@ -640,11 +641,10 @@ const startLoopProcess = async () => {
     if(dynamicFeedback) dynamicFeedback.innerText = "Great session! Ready for more?";
     playBtns.forEach(btn => {
         if(btn.id === 'btn-resume-loop') btn.innerText = "Start over";
-        else btn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+        else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`; // ¡Traducción dinámica!
     });
 };
 
-// Asignamos el cerebro a todos los botones
 playBtns.forEach(btn => {
     btn.onclick = startLoopProcess;
 });
