@@ -490,142 +490,164 @@ async function playAudioNode(text, volume = 1.0, voiceId = "21m00Tcm4TlvDq8ikWAM
     }
 }
 
-// 🎼 LÓGICA DEL BOTÓN ESCUCHAR TODO (EL DIRECTOR DE ORQUESTA)
-if (playSessionBtn) {
-    playSessionBtn.onclick = async () => {
-        window.speechSynthesis.cancel(); // 🛑 ¡LA REGLA DE ORO! Borra el historial de audios pendientes
-        const rows = document.querySelectorAll('.lab-row');
-        if (rows.length === 0) return alert("Procesa una lección primero.");
+// ==========================================
+// 🎼 LÓGICA DEL BOTÓN ESCUCHAR TODO Y PANEL EN VIVO
+// ==========================================
 
-        if (isPlaying) {
-            isPlaying = false;
-            masterAudio.pause();
-            playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
-            rows.forEach(r => deactivateRowVisuals(r));
-            return;
+// Conectamos todos los botones de "Play" (El de arriba y el nuevo del panel iOS)
+const playBtns = [
+    document.getElementById('playSession'), 
+    document.getElementById('btn-play-all'), 
+    document.getElementById('btn-resume-loop')
+].filter(Boolean);
+
+// Variables para el reloj del panel en vivo
+let listeningTimer = null;
+let secondsListened = 0;
+
+const startLoopProcess = async () => {
+    window.speechSynthesis.cancel(); // 🛑 ¡LA REGLA DE ORO! Borra memoria residual
+    const rows = document.querySelectorAll('.lab-row');
+    if (rows.length === 0) return alert("Procesa una lección primero.");
+
+    // Conexiones al nuevo Panel en Vivo
+    const statLoop = document.getElementById('stat-loop');
+    const statTerms = document.getElementById('stat-terms');
+    const statListening = document.getElementById('stat-listening');
+    const dynamicFeedback = document.getElementById('dynamic-feedback');
+    
+    // 1. Actualizamos los términos activos al instante
+    if(statTerms) statTerms.innerText = rows.length;
+
+    // 2. Si ya estaba sonando, lo Pausamos
+    if (isPlaying) {
+        isPlaying = false;
+        masterAudio.pause();
+        playBtns.forEach(btn => {
+            if(btn.id === 'btn-resume-loop') btn.innerText = "Resume your loop";
+            else btn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+        });
+        if(statLoop) { statLoop.innerText = "Paused"; statLoop.className = "status-value paused"; }
+        if(dynamicFeedback) dynamicFeedback.innerText = "Loop paused. Ready when you are.";
+        clearInterval(listeningTimer);
+        rows.forEach(r => deactivateRowVisuals(r));
+        return;
+    }
+
+    // 3. Si estaba pausado, le damos Play
+    isPlaying = true;
+    playBtns.forEach(btn => {
+        if(btn.id === 'btn-resume-loop') btn.innerText = "Pause loop";
+        else btn.innerHTML = '<i class="fas fa-pause"></i> Detener Loop';
+    });
+    
+    if(statLoop) { statLoop.innerText = "Running"; statLoop.className = "status-value running"; }
+    if(dynamicFeedback) dynamicFeedback.innerText = "Your brain is adapting through repetition...";
+    
+    // Arrancamos el cronómetro en vivo
+    clearInterval(listeningTimer);
+    listeningTimer = setInterval(() => {
+        secondsListened++;
+        const mins = Math.floor(secondsListened / 60);
+        const secs = secondsListened % 60;
+        if(statListening) statListening.innerText = `${mins}:${secs.toString().padStart(2, '0')} min`;
+        
+        // Gamificación pasiva (XP) súper ligera (Sin base de datos)
+        const passiveXp = document.getElementById('passive-xp');
+        if(passiveXp && secondsListened % 10 === 0) passiveXp.innerText = parseInt(passiveXp.innerText) + 5;
+        const passiveMins = document.getElementById('passive-mins');
+        if(passiveMins) passiveMins.innerText = mins;
+    }, 1000);
+
+    // --- INICIA EL AUDIO MAESTRO ---
+    masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+    masterAudio.playbackRate = 0.90; 
+    masterAudio.play().catch(() => {});
+
+    let currentMode = langSelect ? langSelect.value : 'en-es';
+    let parts = currentMode.split('-');
+    let baseLangCode = isSwapped ? parts[1].toUpperCase() : parts[0].toUpperCase();
+    let targetLangCode = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
+    
+    const vozBase = SOPHIE_VOICES[baseLangCode] || SOPHIE_VOICES["EN"];
+    const vozMeta = SOPHIE_VOICES[targetLangCode] || SOPHIE_VOICES["DE"];
+
+    try {
+        // FASE 1 (Morado)
+        for (let row of rows) {
+            if (!isPlaying) break;
+            await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
+            let A = row.dataset.text1; let B = row.dataset.text2;
+            await playAudioNode(A, 1.0, vozBase); if (!isPlaying) break; await delay(500); 
+            await playAudioNode(B, 1.0, vozMeta); if (!isPlaying) break; await delay(2500); 
+            await playAudioNode(A, 0.4, vozBase); if (!isPlaying) break; await delay(1500);
+            deactivateRowVisuals(row);
+        }
+        if (!isPlaying) throw new Error("Detenido");
+        await delay(3000);
+
+        // FASE 2 (Amarillo)
+        masterAudio.playbackRate = 0.92; 
+        for (let row of rows) {
+            if (!isPlaying) break;
+            await activateRowVisuals(row, "#fbbf24", "rgba(251,191,36,0.2)");
+            let A = row.dataset.text1; let B = row.dataset.text2;
+            await playAudioNode(B, 1.0, vozMeta); await delay(1200); if (!isPlaying) break;
+            await playAudioNode(A, 1.0, vozBase); await delay(2000); if (!isPlaying) break;
+            await playAudioNode(A, 1.0, vozBase); await delay(1000); if (!isPlaying) break;
+            await playAudioNode(B, 1.0, vozMeta); await delay(1000); if (!isPlaying) break;
+            await playAudioNode(A, 0.82, vozBase); await delay(2000); 
+            deactivateRowVisuals(row);
+        }
+        if (!isPlaying) throw new Error("Detenido");
+        await delay(3000);
+
+        // FASE 3 (Verde)
+        masterAudio.playbackRate = 0.88; 
+        for (let row of rows) {
+            if (!isPlaying) break;
+            await activateRowVisuals(row, "#4ade80", "rgba(74,222,128,0.2)");
+            let A = row.dataset.text1; let B = row.dataset.text2;
+            await playAudioNode(A, 1.0, vozBase); await delay(2500); if (!isPlaying) break;
+            await playAudioNode(B, 1.0, vozMeta); await delay(2500);
+            deactivateRowVisuals(row);
         }
 
-        isPlaying = true;
-        playSessionBtn.innerHTML = '<i class="fas fa-pause"></i> Detener Loop';
-
-        masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-        masterAudio.playbackRate = 0.90; 
-        masterAudio.play().catch(() => {});
-
-        let currentMode = langSelect ? langSelect.value : 'en-es';
-        let parts = currentMode.split('-');
-        
-        let baseLangCode = isSwapped ? parts[1].toUpperCase() : parts[0].toUpperCase();
-        let targetLangCode = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
-        
-        const vozBase = SOPHIE_VOICES[baseLangCode] || SOPHIE_VOICES["EN"];
-        const vozMeta = SOPHIE_VOICES[targetLangCode] || SOPHIE_VOICES["DE"];
-
-        try {
-            // ==========================================
-            // 🥇 FASE 1: Entrada suave (Morado) + AutoScroll
-            // ==========================================
+        const mode = audioMode ? audioMode.value : 'basic';
+        if (mode === 'full' && isPlaying) {
+            await delay(2000);
             for (let row of rows) {
                 if (!isPlaying) break;
-                
-                await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
-                
-                let A = row.dataset.text1;
-                let B = row.dataset.text2;
-
-                await playAudioNode(A, 1.0, vozBase);
-                if (!isPlaying) break;
-                await delay(500); 
-
-                await playAudioNode(B, 1.0, vozMeta);
-                if (!isPlaying) break;
-                
-                await delay(2500); 
-
-                await playAudioNode(A, 0.4, vozBase);
-                if (!isPlaying) break;
-                await delay(1500);
-                
-                deactivateRowVisuals(row);
-            }
-
-            if (!isPlaying) throw new Error("Detenido");
-            await delay(3000);
-
-            // ==========================================
-            // 🧠 FASE 2: Conexión activa (Amarillo Oro)
-            // ==========================================
-            masterAudio.playbackRate = 0.92; 
-            
-            for (let row of rows) {
-                if (!isPlaying) break;
-                
-                await activateRowVisuals(row, "#fbbf24", "rgba(251,191,36,0.2)");
-                
-                let A = row.dataset.text1;
-                let B = row.dataset.text2;
-
-                await playAudioNode(B, 1.0, vozMeta); await delay(1200);
-                if (!isPlaying) break;
-                await playAudioNode(A, 1.0, vozBase); await delay(2000); 
-                if (!isPlaying) break;
-                await playAudioNode(A, 1.0, vozBase); await delay(1000);
-                if (!isPlaying) break;
-                await playAudioNode(B, 1.0, vozMeta); await delay(1000);
-                if (!isPlaying) break;
-                await playAudioNode(A, 0.82, vozBase); await delay(2000); 
-                
-                deactivateRowVisuals(row);
-            }
-
-            if (!isPlaying) throw new Error("Detenido");
-            await delay(3000);
-
-            // ==========================================
-            // 🔥 FASE 3: Refuerzo (Verde Éxito)
-            // ==========================================
-            masterAudio.playbackRate = 0.88; 
-            
-            for (let row of rows) {
-                if (!isPlaying) break;
-                
-                await activateRowVisuals(row, "#4ade80", "rgba(74,222,128,0.2)");
-                
-                let A = row.dataset.text1;
-                let B = row.dataset.text2;
-
-                await playAudioNode(A, 1.0, vozBase); await delay(2500); 
-                if (!isPlaying) break;
-                await playAudioNode(B, 1.0, vozMeta); await delay(2500);
-                
-                deactivateRowVisuals(row);
-            }
-
-            const mode = audioMode ? audioMode.value : 'basic';
-            if (mode === 'full' && isPlaying) {
-                await delay(2000);
-                for (let row of rows) {
-                    if (!isPlaying) break;
-                    let example = row.dataset.example;
-                    if (example && example.trim() !== "") {
-                        await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
-                        await playAudioNode(example, 1.0, vozBase); 
-                        await delay(1500);
-                        deactivateRowVisuals(row);
-                    }
+                let example = row.dataset.example;
+                if (example && example.trim() !== "") {
+                    await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
+                    await playAudioNode(example, 1.0, vozBase); 
+                    await delay(1500);
+                    deactivateRowVisuals(row);
                 }
             }
-
-        } catch (error) {
-            if (error.message !== "Detenido") console.error(error);
         }
 
-        isPlaying = false;
-        rows.forEach(r => deactivateRowVisuals(r));
-        playSessionBtn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
-    };
-}
+    } catch (error) {
+        if (error.message !== "Detenido") console.error(error);
+    }
 
+    // CUANDO TERMINA EL LOOP NATURALMENTE
+    isPlaying = false;
+    clearInterval(listeningTimer);
+    rows.forEach(r => deactivateRowVisuals(r));
+    if(statLoop) { statLoop.innerText = "Finished"; statLoop.className = "status-value"; }
+    if(dynamicFeedback) dynamicFeedback.innerText = "Great session! Ready for more?";
+    playBtns.forEach(btn => {
+        if(btn.id === 'btn-resume-loop') btn.innerText = "Start over";
+        else btn.innerHTML = '<i class="fas fa-play"></i> Escuchar todo';
+    });
+};
+
+// Asignamos el cerebro a todos los botones
+playBtns.forEach(btn => {
+    btn.onclick = startLoopProcess;
+});
 // --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
     let configs = {
