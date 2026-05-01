@@ -106,41 +106,56 @@
             <button id="processBtn" style="display: none;"></button>
         </section>
 
-        <section id="cognitiveDashboard" class="cognitive-dashboard" style="display: none;">
-            <div class="dashboard-header">
-               <h2>Learning adaptation in progress</h2>
-                <div class="current-level">
-                    <span class="level-badge">Operator</span>
-                </div>
-            </div>
-            <div class="brain-progress-container">
-                <div class="progress-info">
-                    <span>Adaptation in progress</span>
-                    <span class="progress-percentage">60%</span>
-                </div>
-                <div class="brain-bar-bg">
-                    <div class="brain-bar-fill" style="width: 60%;"></div>
-                </div>
-                <p class="neuro-insight">"Your brain adapts with repetition"</p>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-check-double"></i><div class="stat-value">42</div><div class="stat-label">Mastered</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-brain"></i><div class="stat-value">78%</div><div class="stat-label">Retention</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-bolt"></i><div class="stat-value">+15%</div><div class="stat-label">Speed</div>
-                </div>
-            </div>
-            <div class="smart-insight-box">
-                <div class="insight-header"><i class="fas fa-headphones"></i> Passive Learning Active</div>
-                <p>You trained 12 minutes while commuting today. <strong>+45 Passive XP</strong>.</p>
-            </div>
-         <button id="closeDashboardBtn" class="secondary-btn-minimal" onclick="document.getElementById('cognitiveDashboard').style.display = 'none';">💥 Continue learning</button>
-        </section>
+        <!-- NUEVO PANEL EN VIVO -->
+<div id="live-learning-panel" class="learning-panel">
+    
+    <!-- 1. HEADER -->
+    <div class="panel-header">
+        <div class="header-titles">
+            <h3>🧠 Learning in progress</h3>
+            <span class="subtitle">Adapts in real time</span>
+        </div>
+        <span class="operator-badge">OPERATOR</span>
+    </div>
 
+    <hr class="elegant-divider">
+
+    <!-- 2. ESTADO EN VIVO (Filas limpias) -->
+    <div class="live-status">
+        <div class="status-row">
+            <span class="status-label"><i class="fas fa-clock"></i> Listening</span>
+            <span id="stat-listening" class="status-value">0 min</span>
+        </div>
+        <div class="status-row">
+            <span class="status-label"><i class="fas fa-layer-group"></i> Active terms</span>
+            <span id="stat-terms" class="status-value">0</span>
+        </div>
+        <div class="status-row">
+            <span class="status-label"><i class="fas fa-sync-alt"></i> Loop status</span>
+            <span id="stat-loop" class="status-value paused">Paused</span>
+        </div>
+    </div>
+
+    <hr class="elegant-divider">
+
+    <!-- 3. FEEDBACK SUAVE -->
+    <p id="dynamic-feedback" class="soft-feedback">
+        "Your brain adapts through repetition."
+    </p>
+
+    <!-- 4. BLOQUE PASSIVE (Con aire) -->
+    <div class="passive-block">
+        <h4><i class="fas fa-headphones"></i> Passive learning</h4>
+        <p>You trained <span id="passive-mins">0</span> minutes while commuting.<br>
+        <span class="highlight-xp">+<span id="passive-xp">0</span> Passive XP</span></p>
+    </div>
+
+    <!-- 5. CTA FINAL (Minimalista) -->
+    <button id="btn-resume-loop" class="minimal-cta">
+        Resume your loop
+    </button>
+
+</div>
        <section class="secondary-tools-menu">
            <button class="tool-btn" title="Add New" onclick="localStorage.removeItem('sophie_last_input'); location.reload();"><i class="fas fa-plus"></i></button>
             <button class="tool-btn" title="My Library" onclick="document.getElementById('cognitiveDashboard').style.display = 'block'; updateDashboardStats();"><i class="fas fa-folder-open"></i></button>
