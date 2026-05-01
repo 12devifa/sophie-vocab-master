@@ -89,8 +89,14 @@ function changeLanguage(lang) {
     const elementsToTranslate = document.querySelectorAll('[data-translate]');
     elementsToTranslate.forEach(element => {
         const translationKey = element.getAttribute('data-translate');
-        if (t[translationKey]) { 
-            element.innerHTML = t[translationKey]; 
+        if (t[translationKey]) {
+            // Regla de Limpieza: Si es el textarea, usa el placeholder fantasma
+            if (element.tagName === 'TEXTAREA') {
+                element.placeholder = t[translationKey];
+            } else {
+                // Si son botones u otras cosas, mételo adentro normal
+                element.innerHTML = t[translationKey];
+            }
         }
     });
 
