@@ -120,7 +120,7 @@ const SOPHIE_VOICES = {
     "DE": "N2lVS1w4EtoT3dr4eOWO", // Callum (Alemán/Multilingüe - Profundo y relajante)
     "ES": "XrExE9yKIg1WjnnlVkGX", // Matilda (Español - Muy cálida y conversacional)
     "FR": "cgSgspJ2msm6clMCkdW9", // Marcus (Francés - Voz masculina profunda y tranquila) 
-    "PT": "Xb7hH8MSALEjdASTLbcO", // Alice (Portugués - Suave y educada)
+    "PT": "qPfM2laM0pRL4rrZtBGl", // Alice (Portugués - Suave y educada)
     "IT": "ZQe5CZNOzWqw6CGcgHmAS" // Giovanni (Italiano - Tono neutro y calmado)
 };
 
