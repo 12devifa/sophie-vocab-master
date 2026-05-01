@@ -1,3 +1,6 @@
+// ==========================================
+// TRADUCCIONES Y CONFIGURACIÓN INICIAL
+// ==========================================
 const translations = {
     en: {
         mainTitle: "Learn exactly what you need",
@@ -19,7 +22,6 @@ const translations = {
         vocabExamples: "Vocab + Examples",
         exportBtn: "<i class=\"fas fa-download\"></i> Export",
         placeholderText: "Paste anything you need to learn...\nNotes, phrases, last-minute prep...",
-        // Opciones de idiomas del selector
         langEnEs: "EN English → ES Spanish",
         langFrDe: "FR French → DE German",
         langDeEs: "DE German → ES Spanish",
@@ -45,9 +47,8 @@ const translations = {
         stop: "Stopp",
         vocabOnly: "Nur Vokabeln",
         vocabExamples: "Vokabeln + Beispiele",
-       exportBtn: "<i class=\"fas fa-download\"></i> Exportieren",
+        exportBtn: "<i class=\"fas fa-download\"></i> Exportieren",
         placeholderText: "Füge alles ein, was du lernen musst...\nNotizen, Phrasen, Last-Minute-Vorbereitung...",
-        // Opciones de idiomas del selector
         langEnEs: "EN Englisch → ES Spanisch",
         langFrDe: "FR Französisch → DE Deutsch",
         langDeEs: "DE Deutsch → ES Spanisch",
@@ -58,70 +59,52 @@ const translations = {
 };
 
 function changeLanguage(lang) {
-    // Guardar el idioma en la memoria del teléfono/PC
     localStorage.setItem('sophie_lang', lang);
     const t = translations[lang];
     
-    // 1. Mover el color morado al botón correcto (¡Aquí estaba el error corregido!)
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(lang === 'en' ? 'btn-en' : 'btn-de');
     if (activeBtn) activeBtn.classList.add('active');
     
-    // 2. Traducir la Biblioteca
     const libTitle = document.querySelector('.library-title-text');
     if (libTitle) libTitle.innerHTML = `<i class="fas fa-archive"></i> ${t.library}`;
     
-    // 3. Traducir el botón de Escuchar Todo (solo si no está reproduciendo)
     const playAllBtn = document.getElementById('btn-play-all');
     if (playAllBtn && !playAllBtn.innerHTML.includes('fa-stop')) {
         playAllBtn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
     }
     
-// 4. Traducir los desplegables (Dropdowns) - ¡Todos ellos!
-    document.querySelectorAll('option[value="basic"]').forEach(opt => {
-        opt.textContent = t.vocabOnly;
-    });
-    document.querySelectorAll('option[value="full"]').forEach(opt => {
-        opt.textContent = t.vocabExamples;
-    });
+    document.querySelectorAll('option[value="basic"]').forEach(opt => { opt.textContent = t.vocabOnly; });
+    document.querySelectorAll('option[value="full"]').forEach(opt => { opt.textContent = t.vocabExamples; });
 
-    // // 5. Traducir los textos visuales del HTML (NUEVO)
     const elementsToTranslate = document.querySelectorAll('[data-translate]');
     elementsToTranslate.forEach(element => {
         const translationKey = element.getAttribute('data-translate');
         if (t[translationKey]) {
-            // Regla de Limpieza: Si es el textarea, usa el placeholder fantasma
             if (element.tagName === 'TEXTAREA') {
                 element.placeholder = t[translationKey];
             } else {
-                // Si son botones u otras cosas, mételo adentro normal
                 element.innerHTML = t[translationKey];
             }
         }
     });
-
-
-    
 }
 
-// Magia Extra: Que se ponga en Alemán automáticamente al abrir la app
 document.addEventListener('DOMContentLoaded', () => {
-    // Busca si ya eligió idioma antes, si no, usa 'de' (Alemán) por defecto
     const savedLang = localStorage.getItem('sophie_lang') || 'de'; 
     changeLanguage(savedLang);
 });
 
-
 // ==========================================
-// 🎙️ ELENCO DE VOCES "NOTEBOOK LM" (Relajantes y conversacionales)
+// 🎙️ ELENCO DE VOCES (NOTEBOOK LM)
 // ==========================================
 const SOPHIE_VOICES = {
-    "EN": "EXAVITQu4vr4xnSDxMaL", // Sarah (Inglés - Tono suave, maduro y tipo ASMR)
-    "DE": "N2lVS1w4EtoT3dr4eOWO", // Callum (Alemán/Multilingüe - Profundo y relajante)
-    "ES": "XrExE9yKIg1WjnnlVkGX", // Matilda (Español - Muy cálida y conversacional)
-    "FR": "cgSgspJ2msm6clMCkdW9", // Marcus (Francés - Voz masculina profunda y tranquila) 
-    "PT": "qPfM2laM0pRL4rrZtBGl", // Alice (Portugués - Suave y educada)
-    "IT": "ZQe5CZNOzWqw6CGcgHmAS" // Giovanni (Italiano - Tono neutro y calmado)
+    "EN": "EXAVITQu4vr4xnSDxMaL",
+    "DE": "N2lVS1w4EtoT3dr4eOWO",
+    "ES": "XrExE9yKIg1WjnnlVkGX",
+    "FR": "cgSgspJ2msm6clMCkdW9", 
+    "PT": "qPfM2laM0pRL4rrZtBGl", // Nueva voz configurada!
+    "IT": "ZQe5CZNOzWqw6CGcgHmAS"
 };
 
 // ==========================================
@@ -272,7 +255,6 @@ if (magicOrderBtn) {
         `;
 
         try {
-            // 🔒 AQUÍ LLAMAMOS A TU TÚNEL SEGURO EN LUGAR DE A GOOGLE DIRECTAMENTE
             const response = await fetch('/api/gemini', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -317,35 +299,21 @@ if (magicOrderBtn) {
             magicOrderBtn.style.pointerEvents = 'auto';
             magicOrderBtn.style.opacity = '1';
             
-// 🚀 NUEVO BLOQUE: EXPERIENCIA PREMIUM (SISTEMA ANTI-CHOQUE)
-magicOrderBtn.onclick = (e) => {
-    if(e) e.preventDefault();
-    
-    // 1. Limpiamos la pantalla (Cero distracciones)
-    magicOrderBtn.style.display = 'none';
-    
-    // 2. Le damos 100 milisegundos al navegador para que la pantalla se acomode tras ocultar el botón
-    setTimeout(() => {
-        // 3. ¡AUTO-PLAY DIRECTO! Arranca la voz y el elevador baja suavemente a la primera tarjeta
-        if (!isPlaying && typeof startLoopProcess === 'function') {
-            startLoopProcess();
-        }
-    }, 100);
-};
-    
-    // 3. AUTO-SCROLL MÁGICO: Bajamos directo a la primera tarjeta
-    setTimeout(() => {
-        const firstCard = document.querySelector('.lab-row');
-        if (firstCard) {
-            // Si hay tarjetas, bajamos suavemente hasta la primera para verla iluminarse
-            firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            // Si por alguna razón no hay, bajamos al panel general
-            const labList = document.getElementById('labList');
-            if (labList) labList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, 400); // Le damos 400 milisegundos a la interfaz para que respire antes de moverse
-};
+            // 🚀 NUEVO BLOQUE: EXPERIENCIA PREMIUM (SISTEMA ANTI-CHOQUE REPARADO)
+            magicOrderBtn.onclick = (e) => {
+                if(e) e.preventDefault();
+                
+                // 1. Limpiamos la pantalla (Cero distracciones)
+                magicOrderBtn.style.display = 'none';
+                
+                // 2. Le damos 100 milisegundos al navegador para que la pantalla se acomode tras ocultar el botón
+                setTimeout(() => {
+                    // 3. ¡AUTO-PLAY DIRECTO! Arranca la voz y el elevador baja suavemente a la primera tarjeta
+                    if (!isPlaying && typeof startLoopProcess === 'function') {
+                        startLoopProcess();
+                    }
+                }, 100);
+            };
 
             magicOrderBtn.style.display = 'flex';
             if(processBtn) processBtn.style.display = 'flex';
@@ -359,17 +327,16 @@ magicOrderBtn.onclick = (e) => {
             magicOrderBtn.style.pointerEvents = 'auto';
             magicOrderBtn.style.opacity = '1';
         }
-});
+    });
 }
 
 // --- 3. CREAR TARJETAS VISUALES ---
 if (processBtn) {
     processBtn.addEventListener('click', () => {
-        labList.innerHTML = ''; // Esto vacía la pizarra antes de escribir lo nuevo
-window.speechSynthesis.cancel(); // Por si acaso había algo sonando, lo calla
+        labList.innerHTML = ''; 
+        window.speechSynthesis.cancel(); 
         const rawText = textInput.value;
         if (!rawText.trim()) return;
-        
         
         const lines = rawText.split('\n');
         const config = getLangConfig(langSelect.value, isSwapped);
@@ -465,7 +432,7 @@ async function speakEleven(text, buttonElement) {
     }
 }
 
-// 💽 EL DESCARGADOR INTELIGENTE (AHORA LLAMA A NUESTRO ROBOT)
+// 💽 EL DESCARGADOR INTELIGENTE
 async function getAudioFromCacheOrAPI(text, voiceId = "21m00Tcm4TlvDq8ikWAM") {
     const cacheKey = text + "_" + voiceId; 
     
@@ -474,7 +441,6 @@ async function getAudioFromCacheOrAPI(text, voiceId = "21m00Tcm4TlvDq8ikWAM") {
         return audioCache[cacheKey];
     }
 
-    // 🔒 AQUÍ LLAMAMOS A TU TÚNEL SEGURO EN LUGAR DE A ELEVENLABS DIRECTAMENTE
     const response = await fetch('/api/elevenlabs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -520,11 +486,10 @@ let listeningTimer = null;
 let secondsListened = 0;
 
 const startLoopProcess = async () => {
-    window.speechSynthesis.cancel(); // 🛑 REGLA DE ORO: Sin memoria residual
+    window.speechSynthesis.cancel(); 
     const rows = document.querySelectorAll('.lab-row');
     if (rows.length === 0) return alert("Procesa una lección primero.");
 
-    // Leemos el idioma actual para no forzar el español
     const currentLang = localStorage.getItem('sophie_lang') || 'en';
     const t = translations[currentLang] || translations['en'];
 
@@ -535,13 +500,12 @@ const startLoopProcess = async () => {
     
     if(statTerms) statTerms.innerText = rows.length;
 
-    // 2. Si ya estaba sonando, lo Pausamos
     if (isPlaying) {
         isPlaying = false;
         masterAudio.pause();
         playBtns.forEach(btn => {
             if(btn.id === 'btn-resume-loop') btn.innerText = "Resume your loop";
-            else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`; // ¡Traducción dinámica!
+            else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
         });
         if(statLoop) { statLoop.innerText = "Paused"; statLoop.className = "status-value paused"; }
         if(dynamicFeedback) dynamicFeedback.innerText = "Loop paused. Ready when you are.";
@@ -550,17 +514,15 @@ const startLoopProcess = async () => {
         return;
     }
 
-    // 3. Si estaba pausado, le damos Play
     isPlaying = true;
     playBtns.forEach(btn => {
         if(btn.id === 'btn-resume-loop') btn.innerText = "Pause loop";
-        else btn.innerHTML = `<i class="fas fa-pause"></i> ${t.stop}`; // ¡Traducción dinámica!
+        else btn.innerHTML = `<i class="fas fa-pause"></i> ${t.stop}`; 
     });
     
     if(statLoop) { statLoop.innerText = "Running"; statLoop.className = "status-value running"; }
     if(dynamicFeedback) dynamicFeedback.innerText = "Your brain is adapting through repetition...";
     
-    // 🚀 MAGIA RECUPERADA: Auto-scroll al inicio de la lección
     const firstRow = rows[0];
     if (firstRow) {
         firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -579,7 +541,6 @@ const startLoopProcess = async () => {
         if(passiveMins) passiveMins.innerText = mins;
     }, 1000);
 
-    // --- INICIA EL AUDIO MAESTRO ---
     masterAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
     masterAudio.playbackRate = 0.90; 
     masterAudio.play().catch(() => {});
@@ -649,7 +610,6 @@ const startLoopProcess = async () => {
         if (error.message !== "Detenido") console.error(error);
     }
 
-    // CUANDO TERMINA EL LOOP NATURALMENTE
     isPlaying = false;
     clearInterval(listeningTimer);
     rows.forEach(r => deactivateRowVisuals(r));
@@ -657,13 +617,14 @@ const startLoopProcess = async () => {
     if(dynamicFeedback) dynamicFeedback.innerText = "Great session! Ready for more?";
     playBtns.forEach(btn => {
         if(btn.id === 'btn-resume-loop') btn.innerText = "Start over";
-        else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`; // ¡Traducción dinámica!
+        else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`; 
     });
 };
 
 playBtns.forEach(btn => {
     btn.onclick = startLoopProcess;
 });
+
 // --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
     let configs = {
@@ -790,7 +751,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 // ==========================================
 // 📚 BÓVEDA NOTEBOOKLM (LOCALSTORAGE)
 // ==========================================
@@ -800,61 +760,51 @@ function saveToNotebook() {
     const labList = document.getElementById('labList');
     const rawText = document.getElementById('textInput').value;
     
-    // Si la pizarra está vacía, no guardamos nada
     if (!labList || labList.innerHTML.trim() === '') return;
 
-    // Generamos un título cortito basado en lo que el usuario pegó (primeras 3 palabras)
     const previewTitle = rawText.split(' ').slice(0, 3).join(' ') + '...';
     
-    // Obtenemos la biblioteca guardada, o creamos una lista vacía si es nuevo
     let library = JSON.parse(localStorage.getItem('sophie_notebooks')) || [];
 
-    // Creamos el nuevo "cuaderno"
     const newNotebook = {
-        id: Date.now(), // Un ID único
+        id: Date.now(), 
         title: previewTitle,
-        date: new Date().toLocaleDateString('de-CH'), // Formato de fecha suizo
-        htmlContent: labList.innerHTML // Guardamos el vocabulario ya generado!
+        date: new Date().toLocaleDateString('de-CH'), 
+        htmlContent: labList.innerHTML 
     };
 
-    // Lo metemos al principio de la lista y guardamos en el navegador
     library.unshift(newNotebook);
     localStorage.setItem('sophie_notebooks', JSON.stringify(library));
     
-    // Refrescamos la vista de la biblioteca
     renderLibrary();
 }
 
 // 2. Función para MOSTRAR las tarjetas en tu "Mi Biblioteca"
 function renderLibrary() {
-    // Busca el contenedor que ya tienes en tu diseño (notebookGallery)
     const gallery = document.getElementById('notebookGallery');
     if (!gallery) return;
 
     let library = JSON.parse(localStorage.getItem('sophie_notebooks')) || [];
-    gallery.innerHTML = ''; // Limpiamos antes de dibujar
+    gallery.innerHTML = ''; 
 
     library.forEach(notebook => {
-        // Creamos la tarjeta visual
         const card = document.createElement('div');
-        card.className = 'notebook-card'; // Asegúrate de tener estilo para esto en CSS
+        card.className = 'notebook-card'; 
         card.innerHTML = `
             <h4>${notebook.title}</h4>
             <span class="notebook-date">${notebook.date}</span>
         `;
         
-        // 3. Función para CARGAR la lección al hacer clic en la tarjeta
         card.addEventListener('click', () => {
             const labList = document.getElementById('labList');
             labList.innerHTML = notebook.htmlContent;
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube la pantalla arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         });
 
         gallery.appendChild(card);
     });
 }
 
-// Para que la biblioteca se dibuje nada más abrir la app:
 document.addEventListener('DOMContentLoaded', renderLibrary);
 
 // --- REGLA 2: EXPORTAR LECCIÓN (.txt) ---
