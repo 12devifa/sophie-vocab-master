@@ -139,7 +139,7 @@ const SOPHIE_VOICES = {
     "DE": "N2lVS1w4EtoT3dr4eOWO",
     "ES": "XrExE9yKIg1WjnnlVkGX",
     "FR": "cgSgspJ2msm6clMCkdW9", 
-    "PT": "qPfM2laM0pRL4rrZtBGl", // Nueva voz configurada!
+    "PT": "qPfM2laM0pRL4rrZtBGl", 
     "IT": "ZQe5CZNOzWqw6CGcgHmAS"
 };
 
@@ -335,16 +335,12 @@ if (magicOrderBtn) {
             magicOrderBtn.style.pointerEvents = 'auto';
             magicOrderBtn.style.opacity = '1';
             
-            // 🚀 NUEVO BLOQUE: EXPERIENCIA PREMIUM (SISTEMA ANTI-CHOQUE REPARADO)
             magicOrderBtn.onclick = (e) => {
                 if(e) e.preventDefault();
                 
-                // 1. Limpiamos la pantalla (Cero distracciones)
                 magicOrderBtn.style.display = 'none';
                 
-                // 2. Le damos 100 milisegundos al navegador para que la pantalla se acomode tras ocultar el botón
                 setTimeout(() => {
-                    // 3. ¡AUTO-PLAY DIRECTO! Arranca la voz y el elevador baja suavemente a la primera tarjeta
                     if (!isPlaying && typeof startLoopProcess === 'function') {
                         startLoopProcess();
                     }
@@ -540,11 +536,11 @@ const startLoopProcess = async () => {
         isPlaying = false;
         masterAudio.pause();
         playBtns.forEach(btn => {
-            if(btn.id === 'btn-resume-loop') btn.innerText = "Resume your loop";
+            if(btn.id === 'btn-resume-loop') btn.innerText = t.btnResume;
             else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`;
         });
-        if(statLoop) { statLoop.innerText = "Paused"; statLoop.className = "status-value paused"; }
-        if(dynamicFeedback) dynamicFeedback.innerText = "Loop paused. Ready when you are.";
+        if(statLoop) { statLoop.innerText = t.statusPaused; statLoop.className = "status-value paused"; }
+        if(dynamicFeedback) dynamicFeedback.innerText = t.feedbackPaused;
         clearInterval(listeningTimer);
         rows.forEach(r => deactivateRowVisuals(r));
         return;
@@ -552,12 +548,12 @@ const startLoopProcess = async () => {
 
     isPlaying = true;
     playBtns.forEach(btn => {
-        if(btn.id === 'btn-resume-loop') btn.innerText = "Pause loop";
+        if(btn.id === 'btn-resume-loop') btn.innerText = t.btnPause;
         else btn.innerHTML = `<i class="fas fa-pause"></i> ${t.stop}`; 
     });
     
-    if(statLoop) { statLoop.innerText = "Running"; statLoop.className = "status-value running"; }
-    if(dynamicFeedback) dynamicFeedback.innerText = "Your brain is adapting through repetition...";
+    if(statLoop) { statLoop.innerText = t.statusRunning; statLoop.className = "status-value running"; }
+    if(dynamicFeedback) dynamicFeedback.innerText = t.feedbackRunning;
     
     const firstRow = rows[0];
     if (firstRow) {
@@ -649,10 +645,10 @@ const startLoopProcess = async () => {
     isPlaying = false;
     clearInterval(listeningTimer);
     rows.forEach(r => deactivateRowVisuals(r));
-    if(statLoop) { statLoop.innerText = "Finished"; statLoop.className = "status-value"; }
-    if(dynamicFeedback) dynamicFeedback.innerText = "Great session! Ready for more?";
+    if(statLoop) { statLoop.innerText = t.statusFinished; statLoop.className = "status-value"; }
+    if(dynamicFeedback) dynamicFeedback.innerText = t.feedbackFinished;
     playBtns.forEach(btn => {
-        if(btn.id === 'btn-resume-loop') btn.innerText = "Start over";
+        if(btn.id === 'btn-resume-loop') btn.innerText = t.btnStartOver;
         else btn.innerHTML = `<i class="fas fa-play"></i> ${t.playAll}`; 
     });
 };
