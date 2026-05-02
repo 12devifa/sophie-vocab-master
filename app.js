@@ -442,16 +442,21 @@ let audioCache = {};
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// ✅ REEMPLAZA TUS FUNCIONES VISUALES CON ESTAS
 async function activateRowVisuals(row, borderColor, shadowColor) {
     await delay(50);
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    row.style.borderColor = borderColor;
+    // Forzamos el diseño premium y la transición suave
+    row.style.transition = "all 0.3s ease";
+    row.style.border = `2px solid ${borderColor}`;
     row.style.boxShadow = `0 0 15px ${shadowColor}`;
+    // El motor se encarga del scroll de forma segura
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
     await delay(150); 
 }
 
 function deactivateRowVisuals(row) {
-    row.style.borderColor = "var(--border-color)";
+    // Restauramos al color por defecto para que la tarjeta se "apague"
+    row.style.border = "1px solid var(--border-color)";
     row.style.boxShadow = "none";
 }
 
@@ -564,10 +569,7 @@ const startLoopProcess = async () => {
     if(statLoop) { statLoop.innerText = t.statusRunning; statLoop.className = "status-value running"; }
     if(dynamicFeedback) dynamicFeedback.innerText = t.feedbackRunning;
     
-    const firstRow = rows[0];
-    if (firstRow) {
-        firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+
 
     clearInterval(listeningTimer);
     listeningTimer = setInterval(() => {
