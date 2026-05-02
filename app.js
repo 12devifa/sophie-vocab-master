@@ -29,6 +29,7 @@ const translations = {
         langPtDe: "PT Portuguese → DE German",
         langEsDe: "ES Spanish → DE German",
         
+        
         // ✨ NUEVOS TEXTOS DEL PANEL EN VIVO ✨
         panelTitle: "Learning in progress",
         panelSubtitle: "Adapts in real time",
@@ -46,6 +47,10 @@ const translations = {
         btnPause: "Pause loop",
         btnStartOver: "Start over",
         btnStartLoop: "Start your loop"
+        passiveText1: "You trained ",
+        passiveText2: " minutes while commuting.",
+        passiveXpText: " Passive XP",
+        quoteInit: '"Your brain adapts through repetition."'
     },
     de: {
         mainTitle: "Lerne genau das, was du brauchst",
@@ -91,6 +96,10 @@ const translations = {
         btnPause: "Loop pausieren",
         btnStartOver: "Neu starten",
         btnStartLoop: "Starte deinen Loop"
+        passiveText1: "Du hast ",
+        passiveText2: " Minuten beim Pendeln trainiert.",
+        passiveXpText: " Passive XP",
+        quoteInit: '"Dein Gehirn passt sich durch Wiederholung an."'
     }
 };
 
