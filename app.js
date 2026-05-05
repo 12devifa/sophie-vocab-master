@@ -45,8 +45,8 @@ const translations = {
         feedbackFinished: "Great session! Ready for more?",
         btnResume: "Resume your loop",
         btnPause: "Pause loop",
-        btnStartOver: "Start over",
-        btnStartLoop: "Start your loop"
+       btnStartOver: "Start over",
+        btnStartLoop: "Start your loop",
         passiveText1: "You trained ",
         passiveText2: " minutes while commuting.",
         passiveXpText: " Passive XP",
@@ -95,7 +95,7 @@ const translations = {
         btnResume: "Loop fortsetzen",
         btnPause: "Loop pausieren",
         btnStartOver: "Neu starten",
-        btnStartLoop: "Starte deinen Loop"
+        btnStartLoop: "Starte deinen Loop",
         passiveText1: "Du hast ",
         passiveText2: " Minuten beim Pendeln trainiert.",
         passiveXpText: " Passive XP",
