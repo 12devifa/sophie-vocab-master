@@ -672,6 +672,7 @@ playBtns.forEach(btn => {
 function getLangConfig(mode, swapped) {
     let configs = {
         'fr-fr': { f1:'🇫🇷', f2:'🇫🇷', n1:'Français', n2:'Français' }, // ✨ NUESTRO MODO MEMORIZACIÓN
+        'de-de': { f1:'🇩🇪', f2:'🇩🇪', n1:'Deutsch', n2:'Deutsch' }, // ✨ NUESTRO NUEVO MODO ALEMÁN
         'fr-de': { f1:'🇫🇷', f2:'🇩🇪', n1:'Français', n2:'Deutsch' },
         'en-es': { f1:'🇬🇧', f2:'🇪🇸', n1:'English', n2:'Español' },
         'es-de': { f1:'🇪🇸', f2:'🇩🇪', n1:'Español', n2:'Deutsch' },
