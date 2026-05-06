@@ -72,9 +72,17 @@
                 <input type="file" id="fileUpload" style="display: none;" accept=".txt,.pdf,image/*">
             </div>
 
-            <button id="magicOrderBtn" class="apple-primary-btn" data-translate="generateBtn">
-    <i class="fas fa-play"></i> Start learning
-</button>
+<div class="action-buttons-wrapper" style="display: flex; gap: 10px; margin-bottom: 15px;">
+    <!-- BOTÓN PRINCIPAL (Aplica la Regla 1: Limpieza por Defecto) -->
+    <button id="magicOrderBtn" class="apple-primary-btn" data-translate="generateBtn" style="flex: 2;">
+        <i class="fas fa-play"></i> Start learning
+    </button>
+    
+    <!-- BOTÓN SECUNDARIO (Opción de inyectar nueva info sin borrar) -->
+    <button id="appendOrderBtn" class="apple-secondary-btn" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #a1a1aa; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;">
+        <i class="fas fa-plus"></i> Add more
+    </button>
+</div>
 
            <div id="masterPlayerPanel" style="display: none; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(187,134,252,0.3); margin-top: 15px; text-align: center;">
     <div style="font-size: 0.9rem; color: #4ade80; margin-bottom: 10px; font-weight: bold;">
