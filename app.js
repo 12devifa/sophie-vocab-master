@@ -704,26 +704,100 @@ function createCardUI(content, date) {
     const title = content.split('\n')[0].substring(0, 25);
     const card = document.createElement('div');
     card.className = 'gallery-card';
+    card.style.position = 'relative'; // Crucial para que el menú flote bien
+
+    // 1. El diseño visual con los 3 puntitos al estilo NotebookLM
     card.innerHTML = `
-        <div style="display:flex; align-items:center; gap:15px; border-bottom:1px solid var(--border-color); padding:10px 0;">
-            <i class="fas fa-book-bookmark" style="color:var(--accent-purple); font-size:1.4rem;"></i>
-            <div>
-                <div style="font-weight:700; font-size:0.95rem;">${title}...</div>
-                <div style="font-size:0.75rem; color:var(--text-secondary)">${date}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding:10px 0;">
+            
+            <!-- Zona clickeable para cargar la lección -->
+            <div class="card-content" style="display:flex; align-items:center; gap:15px; cursor:pointer; flex-grow: 1;">
+                <i class="fas fa-book-bookmark" style="color:var(--accent-purple); font-size:1.4rem;"></i>
+                <div>
+                    <div class="card-title" style="font-weight:700; font-size:0.95rem;">${title}...</div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary)">${date}</div>
+                </div>
+            </div>
+            
+            <!-- Zona del botón de opciones -->
+            <div class="menu-container" style="position:relative;">
+                <button class="menu-btn" style="background:none; border:none; color:#a1a1aa; padding:5px 10px; cursor:pointer; font-size: 1.2rem; transition: color 0.2s;">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                
+                <!-- El menú desplegable (oculto por defecto) -->
+                <div class="dropdown-menu" style="display:none; position:absolute; right:0; top:30px; background:#1e1e1e; border:1px solid #333; border-radius:8px; padding:5px; z-index:100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); min-width: 140px;">
+                    <button class="edit-btn" style="display:block; width:100%; text-align:left; background:none; border:none; color:white; padding:10px; cursor:pointer; border-radius:4px;"><i class="fas fa-pen" style="margin-right:8px;"></i> Editar título</button>
+                    <button class="delete-btn" style="display:block; width:100%; text-align:left; background:none; border:none; color:#ff4d4d; padding:10px; cursor:pointer; border-radius:4px;"><i class="fas fa-trash" style="margin-right:8px;"></i> Eliminar</button>
+                </div>
             </div>
         </div>
     `;
-    card.onclick = () => { 
+
+    // 2. Lógica para cargar la lección (solo al hacer clic en el texto/icono)
+    const cardContent = card.querySelector('.card-content');
+    cardContent.onclick = () => { 
         if(textInput) textInput.value = content; 
         localStorage.setItem('sophie_last_input', content); 
-        
         if(processBtn) processBtn.click(); 
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    // 3. Conectar el menú de 3 puntitos
+    const menuBtn = card.querySelector('.menu-btn');
+    const dropdownMenu = card.querySelector('.dropdown-menu');
+    const editBtn = card.querySelector('.edit-btn');
+    const deleteBtn = card.querySelector('.delete-btn');
+
+    // Abrir/cerrar menú
+    menuBtn.onclick = (e) => {
+        e.stopPropagation(); // Evita que se cargue la lección por accidente
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+            if (m !== dropdownMenu) m.style.display = 'none'; // Cierra otros menús
+        });
+        dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+    };
+
+    // Cerrar si haces clic fuera
+    document.addEventListener('click', () => {
+        dropdownMenu.style.display = 'none';
+    });
+
+    // 4. Lógica de ELIMINAR (con alerta de seguridad)
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm("¿Estás segura de que quieres eliminar esta lección para siempre?")) {
+            let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
+            lessons = lessons.filter(l => l.content !== content); // Filtramos la que borramos
+            localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
+            card.remove(); // Desaparece visualmente
+        }
+    };
+
+    // 5. Lógica de EDITAR TÍTULO
+    editBtn.onclick = (e) => {
+        e.stopPropagation();
+        const newTitle = prompt("Escribe el nuevo título para esta lección:", title);
+        if (newTitle && newTitle.trim() !== "") {
+            const titleElement = card.querySelector('.card-title');
+            titleElement.innerText = newTitle + "...";
+            
+            // Guardarlo en la memoria del navegador
+            let lessons = JSON.parse(localStorage.getItem('sophie_lessons')) || [];
+            const lessonIndex = lessons.findIndex(l => l.content === content);
+            if (lessonIndex !== -1) {
+                const lines = lessons[lessonIndex].content.split('\n');
+                lines[0] = newTitle; // Reemplazamos la primera línea (que usamos como título)
+                lessons[lessonIndex].content = lines.join('\n');
+                localStorage.setItem('sophie_lessons', JSON.stringify(lessons));
+                content = lessons[lessonIndex].content; 
+            }
+        }
+        dropdownMenu.style.display = 'none';
+    };
+
     if(notebookGallery) notebookGallery.prepend(card);
 }
-
 function loadStreak() {
     const streak = parseInt(localStorage.getItem('sophie_streak')) || 0;
     const streakCounter = document.getElementById('streakCounter');
