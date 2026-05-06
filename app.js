@@ -950,3 +950,71 @@ if (btnExport) {
         URL.revokeObjectURL(url);
     });
 }
+
+
+// ==========================================
+// 🎙️ MODO SHADOWING: LEER TEXTO COMPLETO (SIN IA)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const readTextBtn = document.getElementById('readTextBtn');
+
+    if (readTextBtn) {
+        readTextBtn.addEventListener('click', () => {
+            const rawText = textInput ? textInput.value : "";
+            if (!rawText.trim()) return alert("Por favor, pega el texto que quieres memorizar.");
+
+            // Regla 1: Limpieza por defecto
+            const labList = document.getElementById('labList');
+            if (labList) labList.innerHTML = ''; 
+            window.speechSynthesis.cancel(); 
+
+            const mode = langSelect ? langSelect.value : 'fr-fr';
+            const config = getLangConfig(mode, isSwapped);
+
+            // Magia: Cortamos el texto cada vez que hay un punto, interrogación o exclamación
+            const sentences = rawText.match(/[^.?!]+[.?!]+/g) || [rawText];
+            let finalFormattedText = "";
+
+            sentences.forEach(sentence => {
+                let cleanSentence = sentence.trim();
+                if (!cleanSentence) return;
+
+                finalFormattedText += `${cleanSentence} → ${cleanSentence}\n`;
+
+                const row = document.createElement('div');
+                row.className = 'lab-row';
+                row.dataset.text1 = cleanSentence; // La frase a memorizar
+                row.dataset.text2 = cleanSentence; // Repetimos la frase (Shadowing)
+                row.dataset.example = ""; // Sin ejemplo
+
+                // Creamos la tarjeta visual para la frase completa
+                const container = document.createElement('div');
+                container.className = 'vocab-container';
+                container.style.cssText = 'display:flex; justify-content:space-between; align-items:center; width:100%;';
+                
+                const wordBox = document.createElement('div');
+                wordBox.className = 'vocab-word';
+                wordBox.style.cssText = 'font-weight:600; display:flex; align-items:center; gap:8px; line-height: 1.5; text-align: left;';
+                wordBox.innerHTML = `<span class="flag">${config.flag1}</span> <span>${cleanSentence}</span>`;
+                
+                const audioBtn = document.createElement('button');
+                audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                audioBtn.style.cssText = 'background:none; border:none; color:var(--accent-purple); cursor:pointer; font-size:1.2rem; padding:5px; margin-left: auto;';
+                audioBtn.onclick = function() { speakEleven(cleanSentence, this); };
+
+                container.appendChild(wordBox);
+                container.appendChild(audioBtn);
+                row.appendChild(container);
+                
+                if (labList) labList.appendChild(row);
+            });
+
+            // Guardamos y preparamos todo
+            if(textInput) textInput.value = finalFormattedText.trim();
+            if(typeof saveLesson === 'function') saveLesson(finalFormattedText.trim());
+
+            const masterPanel = document.getElementById('masterPlayerPanel');
+            if (masterPanel) masterPanel.style.display = 'block';
+        });
+    }
+});
