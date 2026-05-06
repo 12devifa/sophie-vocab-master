@@ -671,6 +671,7 @@ playBtns.forEach(btn => {
 // --- 5. FUNCIONES DE APOYO ---
 function getLangConfig(mode, swapped) {
     let configs = {
+        'fr-fr': { f1:'🇫🇷', f2:'🇫🇷', n1:'Français', n2:'Français' }, // ✨ NUESTRO MODO MEMORIZACIÓN
         'fr-de': { f1:'🇫🇷', f2:'🇩🇪', n1:'Français', n2:'Deutsch' },
         'en-es': { f1:'🇬🇧', f2:'🇪🇸', n1:'English', n2:'Español' },
         'es-de': { f1:'🇪🇸', f2:'🇩🇪', n1:'Español', n2:'Deutsch' },
@@ -679,6 +680,7 @@ function getLangConfig(mode, swapped) {
         'de-es': { f1:'🇩🇪', f2:'🇪🇸', n1:'Deutsch', n2:'Español' },
         'de-en': { f1:'🇩🇪', f2:'🇬🇧', n1:'Deutsch', n2:'English' }
     };
+// ... el resto de la función sigue igual
     let c = configs[mode] || configs['en-es'];
     return swapped ? { flag1:c.f2, flag2:c.f1, name1:c.n2, name2:c.n1 } : { flag1:c.f1, flag2:c.f2, name1:c.n1, name2:c.n2 };
 }
