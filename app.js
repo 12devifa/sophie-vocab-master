@@ -1086,7 +1086,48 @@ if (fileUploadInput) {
     });
 }
 
-// Función temporal para atrapar PDFs e Imágenes
-function extractTextFromFile(file) {
-    alert("Socia, el archivo fue recibido. Falta conectar el motor de extracción de texto.");
+// Función definitiva para extraer texto de PDFs e Imágenes
+async function extractTextFromFile(file) {
+    const txtInput = document.getElementById('textInput');
+
+    try {
+        // 📸 SI ES IMAGEN (Usa Inteligencia Artificial de OCR)
+        if (file.type.startsWith('image/')) {
+            txtInput.value = "🔍 Analizando imagen con IA (esto puede tardar unos segundos)...";
+            const result = await Tesseract.recognize(file, 'eng+spa+deu+fra', {
+                logger: m => {
+                    if(m.status === 'recognizing text') {
+                        txtInput.value = `🔍 Extrayendo texto: ${Math.round(m.progress * 100)}%...`;
+                    }
+                }
+            });
+            txtInput.value = result.data.text;
+        } 
+        // 📄 SI ES PDF (Usa motor de documentos)
+        else if (file.type === 'application/pdf') {
+            txtInput.value = "📄 Abriendo PDF...";
+            const arrayBuffer = await file.arrayBuffer();
+            
+            // Configurar el trabajador del PDF
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+            
+            for (let i = 1; i <= pdf.numPages; i++) {
+                txtInput.value = `📄 Extrayendo página ${i} de ${pdf.numPages}...`;
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += pageText + '\n\n';
+            }
+            
+            txtInput.value = fullText.trim();
+        } else {
+            txtInput.value = "❌ Formato no soportado. Sube una imagen o un PDF.";
+        }
+    } catch (error) {
+        console.error("Error en la extracción:", error);
+        txtInput.value = "❌ Hubo un error al extraer el texto. Revisa la consola o intenta escribirlo manualmente.";
+    }
 }
