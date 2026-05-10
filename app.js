@@ -594,64 +594,81 @@ const startLoopProcess = async () => {
     let targetLangCode = isSwapped ? parts[0].toUpperCase() : parts[1].toUpperCase();
     
     const vozBase = SOPHIE_VOICES[baseLangCode] || SOPHIE_VOICES["EN"];
-    const vozMeta = SOPHIE_VOICES[targetLangCode] || SOPHIE_VOICES["DE"];
+   // 🚀 INICIO DEL NUEVO MOTOR
+    const dropMode = document.getElementById('playerMode') || document.getElementById('audioMode');
+    const selectedMode = dropMode ? dropMode.value : 'basic';
 
     try {
-        for (let row of rows) {
-            if (!isPlaying) break;
-            await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
-            let A = row.dataset.text1; let B = row.dataset.text2;
-            await playAudioNode(A, 1.0, vozBase); if (!isPlaying) break; await delay(500); 
-            await playAudioNode(B, 1.0, vozMeta); if (!isPlaying) break; await delay(2500); 
-            await playAudioNode(A, 0.4, vozBase); if (!isPlaying) break; await delay(1500);
-            deactivateRowVisuals(row);
-        }
-        if (!isPlaying) throw new Error("Detenido");
-        await delay(3000);
-
-        masterAudio.playbackRate = 0.92; 
-        for (let row of rows) {
-            if (!isPlaying) break;
-            await activateRowVisuals(row, "#fbbf24", "rgba(251,191,36,0.2)");
-            let A = row.dataset.text1; let B = row.dataset.text2;
-            await playAudioNode(B, 1.0, vozMeta); await delay(1200); if (!isPlaying) break;
-            await playAudioNode(A, 1.0, vozBase); await delay(2000); if (!isPlaying) break;
-            await playAudioNode(A, 1.0, vozBase); await delay(1000); if (!isPlaying) break;
-            await playAudioNode(B, 1.0, vozMeta); await delay(1000); if (!isPlaying) break;
-            await playAudioNode(A, 0.82, vozBase); await delay(2000); 
-            deactivateRowVisuals(row);
-        }
-        if (!isPlaying) throw new Error("Detenido");
-        await delay(3000);
-
-        masterAudio.playbackRate = 0.88; 
-        for (let row of rows) {
-            if (!isPlaying) break;
-            await activateRowVisuals(row, "#4ade80", "rgba(74,222,128,0.2)");
-            let A = row.dataset.text1; let B = row.dataset.text2;
-            await playAudioNode(A, 1.0, vozBase); await delay(2500); if (!isPlaying) break;
-            await playAudioNode(B, 1.0, vozMeta); await delay(2500);
-            deactivateRowVisuals(row);
-        }
-
-        const mode = audioMode ? audioMode.value : 'basic';
-        if (mode === 'full' && isPlaying) {
-            await delay(2000);
+        if (selectedMode === 'linear') {
+            // 🚄 MODO LECTURA CONTINUA PARA SOPHIE (Rápido, 1 sola vez, sin pausas largas)
+            masterAudio.playbackRate = 1.0;
             for (let row of rows) {
                 if (!isPlaying) break;
-                let example = row.dataset.example;
-                if (example && example.trim() !== "") {
-                    await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
-                    await playAudioNode(example, 1.0, vozBase); 
-                    await delay(1500);
-                    deactivateRowVisuals(row);
+                await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
+                let A = row.dataset.text1; let B = row.dataset.text2;
+
+                await playAudioNode(A, 1.0, vozBase); if (!isPlaying) break; await delay(300);
+                await playAudioNode(B, 1.0, vozMeta); if (!isPlaying) break; await delay(1000);
+
+                deactivateRowVisuals(row);
+            }
+        } else {
+            // 🧠 MODO NEURO-REPETICIÓN ORIGINAL (3 Fases para memorización profunda)
+            for (let row of rows) {
+                if (!isPlaying) break;
+                await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
+                let A = row.dataset.text1; let B = row.dataset.text2;
+                await playAudioNode(A, 1.0, vozBase); if (!isPlaying) break; await delay(500);
+                await playAudioNode(B, 1.0, vozMeta); if (!isPlaying) break; await delay(2500);
+                await playAudioNode(A, 0.4, vozBase); if (!isPlaying) break; await delay(1500);
+                deactivateRowVisuals(row);
+            }
+            if (!isPlaying) throw new Error("Detenido");
+            await delay(3000);
+
+            masterAudio.playbackRate = 0.92; 
+            for (let row of rows) {
+                if (!isPlaying) break;
+                await activateRowVisuals(row, "#fbbf24", "rgba(251,191,36,0.2)");
+                let A = row.dataset.text1; let B = row.dataset.text2;
+                await playAudioNode(B, 1.0, vozMeta); await delay(1200); if (!isPlaying) break;
+                await playAudioNode(A, 1.0, vozBase); await delay(2000); if (!isPlaying) break;
+                await playAudioNode(A, 1.0, vozBase); await delay(1000); if (!isPlaying) break;
+                await playAudioNode(B, 1.0, vozMeta); await delay(1000); if (!isPlaying) break;
+                await playAudioNode(A, 0.82, vozBase); await delay(2000); 
+                deactivateRowVisuals(row);
+            }
+            if (!isPlaying) throw new Error("Detenido");
+            await delay(3000);
+
+            masterAudio.playbackRate = 0.88; 
+            for (let row of rows) {
+                if (!isPlaying) break;
+                await activateRowVisuals(row, "#4ade80", "rgba(74,222,128,0.2)");
+                let A = row.dataset.text1; let B = row.dataset.text2;
+                await playAudioNode(A, 1.0, vozBase); await delay(2500); if (!isPlaying) break;
+                await playAudioNode(B, 1.0, vozMeta); await delay(2500);
+                deactivateRowVisuals(row);
+            }
+
+            if (selectedMode === 'full' && isPlaying) {
+                await delay(2000);
+                for (let row of rows) {
+                    if (!isPlaying) break;
+                    let example = row.dataset.example;
+                    if (example && example.trim() !== "") {
+                        await activateRowVisuals(row, "var(--accent-purple)", "rgba(187,134,252,0.2)");
+                        await playAudioNode(example, 1.0, vozBase); 
+                        await delay(1500);
+                        deactivateRowVisuals(row);
+                    }
                 }
             }
         }
-
     } catch (error) {
         if (error.message !== "Detenido") console.error(error);
     }
+    // 🚀 FIN DEL NUEVO MOTOR
 
     isPlaying = false;
     clearInterval(listeningTimer);
