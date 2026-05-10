@@ -1043,3 +1043,50 @@ function startShadowingMode() {
     const masterPanel = document.getElementById('masterPlayerPanel');
     if (masterPanel) masterPanel.style.display = 'block';
 }
+
+
+// ==========================================
+// 📎 GESTIÓN DE CARGA DE ARCHIVOS (TXT, PDF, IMÁGENES)
+// ==========================================
+const fileUploadInput = document.getElementById('fileUpload');
+
+if (fileUploadInput) {
+    fileUploadInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const txtInput = document.getElementById('textInput');
+        txtInput.value = "⏳ Leyendo archivo, por favor espera...";
+
+        try {
+            // 1. Si es un archivo de texto simple (.txt)
+            if (file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    txtInput.value = e.target.result;
+                };
+                reader.readAsText(file);
+            } 
+            // 2. Si es PDF o Imagen (Requiere procesamiento complejo)
+            else {
+                // Aquí va la conexión con tu API de extracción
+                console.log("Archivo detectado:", file.name, "Tipo:", file.type);
+                txtInput.value = `⏳ Archivo "${file.name}" detectado. Preparando extracción...`;
+                
+                // TODO: Restaurar la lógica de OCR/PDF
+                extractTextFromFile(file); 
+            }
+        } catch (error) {
+            console.error("Error al procesar el archivo:", error);
+            txtInput.value = "❌ Ocurrió un error al intentar leer el archivo.";
+        }
+
+        // Resetear el botón por si quieres subir el mismo archivo después
+        event.target.value = '';
+    });
+}
+
+// Función temporal para atrapar PDFs e Imágenes
+function extractTextFromFile(file) {
+    alert("Socia, el archivo fue recibido. Falta conectar el motor de extracción de texto.");
+}
