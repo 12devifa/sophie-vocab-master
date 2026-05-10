@@ -1056,66 +1056,57 @@ if (fileUploadInput) {
         if (!file) return;
 
         const txtInput = document.getElementById('textInput');
-        txtInput.value = "⏳ Leyendo archivo, por favor espera...";
+        txtInput.value = "⏳ Loading file... / Datei wird geladen...";
 
         try {
-            // 1. Si es un archivo de texto simple (.txt)
             if (file.type === 'text/plain') {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     txtInput.value = e.target.result;
                 };
                 reader.readAsText(file);
-            } 
-            // 2. Si es PDF o Imagen (Requiere procesamiento complejo)
-            else {
-                // Aquí va la conexión con tu API de extracción
-                console.log("Archivo detectado:", file.name, "Tipo:", file.type);
-                txtInput.value = `⏳ Archivo "${file.name}" detectado. Preparando extracción...`;
-                
-                // TODO: Restaurar la lógica de OCR/PDF
-                extractTextFromFile(file); 
+            } else {
+                await extractTextFromFile(file);
             }
         } catch (error) {
-            console.error("Error al procesar el archivo:", error);
-            txtInput.value = "❌ Ocurrió un error al intentar leer el archivo.";
+            console.error("[System Error] File processing failed:", error);
+            txtInput.value = "❌ Error: Could not read the file. / Fehler beim Lesen der Datei.";
         }
 
-        // Resetear el botón por si quieres subir el mismo archivo después
+        // Resetear el input para permitir subir el mismo archivo nuevamente si es necesario
         event.target.value = '';
     });
 }
 
-// Función definitiva para extraer texto de PDFs e Imágenes
+// Motor de extracción de texto (OCR y PDF)
 async function extractTextFromFile(file) {
     const txtInput = document.getElementById('textInput');
 
     try {
-        // 📸 SI ES IMAGEN (Usa Inteligencia Artificial de OCR)
+        // 📸 PROCESAMIENTO DE IMÁGENES (OCR)
         if (file.type.startsWith('image/')) {
-            txtInput.value = "🔍 Analizando imagen con IA (esto puede tardar unos segundos)...";
+            txtInput.value = "🔍 Analyzing image... / Bild wird analysiert (Dies kann einige Sekunden dauern)...";
             const result = await Tesseract.recognize(file, 'eng+spa+deu+fra', {
                 logger: m => {
                     if(m.status === 'recognizing text') {
-                        txtInput.value = `🔍 Extrayendo texto: ${Math.round(m.progress * 100)}%...`;
+                        txtInput.value = `🔍 Extracting text / Text wird extrahiert: ${Math.round(m.progress * 100)}%`;
                     }
                 }
             });
             txtInput.value = result.data.text;
         } 
-        // 📄 SI ES PDF (Usa motor de documentos)
+        // 📄 PROCESAMIENTO DE DOCUMENTOS PDF
         else if (file.type === 'application/pdf') {
-            txtInput.value = "📄 Abriendo PDF...";
+            txtInput.value = "📄 Opening document... / Dokument wird geöffnet...";
             const arrayBuffer = await file.arrayBuffer();
             
-            // Configurar el trabajador del PDF
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
             
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             let fullText = '';
             
             for (let i = 1; i <= pdf.numPages; i++) {
-                txtInput.value = `📄 Extrayendo página ${i} de ${pdf.numPages}...`;
+                txtInput.value = `📄 Extracting page / Extrahiere Seite ${i} of ${pdf.numPages}...`;
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
                 const pageText = textContent.items.map(item => item.str).join(' ');
@@ -1124,10 +1115,10 @@ async function extractTextFromFile(file) {
             
             txtInput.value = fullText.trim();
         } else {
-            txtInput.value = "❌ Formato no soportado. Sube una imagen o un PDF.";
+            txtInput.value = "❌ Unsupported format. Please upload an image or PDF. / Nicht unterstütztes Format.";
         }
     } catch (error) {
-        console.error("Error en la extracción:", error);
-        txtInput.value = "❌ Hubo un error al extraer el texto. Revisa la consola o intenta escribirlo manualmente.";
+        console.error("[System Error] Text extraction failed:", error);
+        txtInput.value = "❌ Extraction error. Please try again. / Extraktionsfehler. Bitte versuchen Sie es erneut.";
     }
 }
